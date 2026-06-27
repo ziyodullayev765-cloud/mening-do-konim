@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Do'kon</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --cream: #FAF4E8;
+    --ink: #241B12;
+    --indigo: #1F4E5F;
+    --indigo-dark: #153945;
+    --terracotta: #C1502E;
+    --gold: #D4A24C;
+    --line: #E6D9BD;
+    --muted: #8a7a60;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    padding-bottom: 96px;
+  }
+  .header {
+    padding: 26px 20px 20px;
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-dark) 100%);
+    color: var(--cream);
+    border-radius: 0 0 26px 26px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header h1 {
+    margin: 0 0 4px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.78;
+  }
+  .ornament {
+    height: 5px;
+    margin: 16px 20px 18px;
+    background: repeating-linear-gradient(45deg, var(--gold) 0 6px, var(--terracotta) 6px 12px);
+    border-radius: 3px;
+    opacity: 0.85;
+  }
+  .grid {
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: transform 0.15s ease;
+  }
+  .card .emoji { font-size: 34px; line-height: 1; }
+  .card .name { font-weight: 700; font-size: 14.5px; line-height: 1.25; }
+  .card .desc { font-size: 12px; color: var(--muted); line-height: 1.3; min-height: 30px; }
+  .card .price { font-weight: 700; color: var(--terracotta); font-size: 14px; margin-top: 2px; }
+  .qty-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .qty-btn {
+    width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--cream); font-size: 16px; font-weight: 700; color: var(--indigo);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qty-val { font-weight: 700; font-size: 15px; min-width: 22px; text-align: center; }
+  .add-btn {
+    margin-top: 4px; border: none; background: var(--indigo); color: var(--cream);
+    border-radius: 9px; padding: 9px 0; font-size: 13px; font-weight: 600;
+  }
+  .footer-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+    border-top: 1px solid var(--line); padding: 13px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 -6px 18px rgba(0,0,0,0.08);
+  }
+  .footer-bar .total-label { font-size: 11px; color: var(--muted); }
+  .footer-bar .total-val { font-size: 18px; font-weight: 700; color: var(--indigo); }
+  .checkout-btn {
+    background: var(--terracotta); color: #fff; border: none; border-radius: 13px;
+    padding: 12px 22px; font-size: 15px; font-weight: 700;
+  }
+  .checkout-btn:disabled { background: #d8c9b3; color: #fff; }
+  .empty-note, .loading-note { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🛍 Bizning Do'kon</h1>
+  <p>Mahsulotni tanlang, savatga qo'shing va buyurtma bering</p>
+</div>
+<div class="ornament"></div>
+
+<div class="loading-note" id="loadingNote">Yuklanmoqda...</div>
+<div class="grid" id="grid"></div>
+<div class="empty-note" id="emptyNote" style="display:none;">Hozircha mahsulot yo'q</div>
+
+<div class="footer-bar">
+  <div>
+    <div class="total-label">Jami</div>
+    <div class="total-val" id="totalVal">0 so'm</div>
+  </div>
+  <button class="checkout-btn" id="checkoutBtn" disabled>✅ Buyurtma berish</button>
+</div>
+
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  let PRODUCTS = [];
+  const cart = {};
+
+  function fmt(n) {
+    return n.toLocaleString("ru-RU").replace(/,/g, " ") + " so'm";
+  }
+
+  async function loadProducts() {
+    try {
+      const res = await fetch("/api/products");
+      PRODUCTS = await res.json();
+    } catch (e) {
+      PRODUCTS = [];
+    }
+    document.getElementById("loadingNote").style.display = "none";
+    render();
+  }
+
+  function render() {
+    const grid = document.getElementById("grid");
+    const emptyNote = document.getElementById("emptyNote");
+    if (PRODUCTS.length === 0) {
+      grid.style.display = "none";
+      emptyNote.style.display = "block";
+      return;
+    }
+    grid.style.display = "grid";
+    emptyNote.style.display = "none";
+    grid.innerHTML = "";
+    PRODUCTS.forEach(p => {
+      const qty = cart[p.id] || 0;
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="emoji">${p.emoji}</div>
+        <div class="name">${p.name}</div>
+        <div class="desc">${p.desc}</div>
+        <div class="price">${fmt(p.price)}</div>
+        ${qty === 0
+          ? `<button class="add-btn" data-add="${p.id}">➕ Savatga qo'shish</button>`
+          : `<div class="qty-row">
+               <button class="qty-btn" data-dec="${p.id}">−</button>
+               <div class="qty-val">${qty}</div>
+               <button class="qty-btn" data-inc="${p.id}">+</button>
+             </div>`
+        }
+      `;
+      grid.appendChild(card);
+    });
+    updateTotal();
+  }
+
+  function updateTotal() {
+    let total = 0, count = 0;
+    for (const id in cart) {
+      const p = PRODUCTS.find(x => x.id === id);
+      if (!p) continue;
+      total += p.price * cart[id];
+      count += cart[id];
+    }
+    document.getElementById("totalVal").textContent = fmt(total);
+    const btn = document.getElementById("checkoutBtn");
+    btn.disabled = count === 0;
+    btn.textContent = count === 0 ? "✅ Buyurtma berish" : `✅ Buyurtma berish (${count})`;
+  }
+
+  document.getElementById("grid").addEventListener("click", (e) => {
+    const add = e.target.getAttribute("data-add");
+    const inc = e.target.getAttribute("data-inc");
+    const dec = e.target.getAttribute("data-dec");
+    if (add) cart[add] = 1;
+    if (inc) cart[inc] = (cart[inc] || 0) + 1;
+    if (dec) {
+      cart[dec] = (cart[dec] || 0) - 1;
+      if (cart[dec] <= 0) delete cart[dec];
+    }
+    render();
+    tg?.HapticFeedback?.impactOccurred("light");
+  });
+
+  document.getElementById("checkoutBtn").addEventListener("click", () => {
+    const items = Object.keys(cart).map(id => {
+      const p = PRODUCTS.find(x => x.id === id);
+      return { id, name: p.name, price: p.price, qty: cart[id] };
+    });
+    const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const payload = JSON.stringify({ items, total });
+
+    if (tg) {
+      tg.sendData(payload);
+      tg.close();
+    } else {
+      alert("Bu sahifa faqat Telegram ichida to'liq ishlaydi.\n\n" + payload);
+    }
+  });
+
+  loadProducts();
+</script>
+
+</body>
+</html>
