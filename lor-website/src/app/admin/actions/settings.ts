@@ -1,0 +1,89 @@
+"use server";
+
+import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
+import { db } from "@/lib/db";
+import { t } from "@/lib/i18n";
+import { requireAdmin } from "@/lib/auth";
+import { failure, success, type ActionState } from "@/lib/action";
+import { TIME_RE } from "@/lib/slots-shared";
+import { toMinutes } from "@/lib/slots";
+import { blockedDateSchema, fieldErrors, id, passwordSchema, settingsSchema } from "@/lib/validation";
+
+/* ---------- Weekly schedule ---------- */
+
+export async function saveSchedule(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const days = [];
+  const errors: Record<string, string[]> = {};
+  for (let dow = 0; dow < 7; dow++) {
+    const isOpen = formData.get(`open_${dow}`) === "on";
+    const openTime = String(formData.get(`from_${dow}`) ?? "");
+    const closeTime = String(formData.get(`to_${dow}`) ?? "");
+    if (!TIME_RE.test(openTime) || !TIME_RE.test(closeTime)) {
+      errors[`to_${dow}`] = [t.booking.errors.time];
+      continue;
+    }
+    if (isOpen && toMinutes(closeTime) <= toMinutes(openTime)) {
+      errors[`to_${dow}`] = [t.admin.schedule.invalidRange];
+      continue;
+    }
+    days.push({ dayOfWeek: dow, isOpen, openTime, closeTime });
+  }
+  if (Object.keys(errors).length) return failure(t.common.invalidForm, errors);
+  await db.$transaction(
+    days.map((d) => db.workingDay.upsert({ where: { dayOfWeek: d.dayOfWeek }, create: d, update: d })),
+  );
+  revalidatePath("/", "layout");
+  return success(t.admin.schedule.saved);
+}
+
+export async function addBlockedDate(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const parsed = blockedDateSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
+  try {
+    await db.blockedDate.create({ data: parsed.data });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      return failure(t.admin.schedule.blockedExists, { date: [t.admin.schedule.blockedExists] });
+    }
+    throw e;
+  }
+  revalidatePath("/", "layout");
+  return success(t.admin.schedule.blockedAdded);
+}
+
+export async function removeBlockedDate(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const parsed = id.safeParse(formData.get("id"));
+  if (!parsed.success) return failure(t.common.invalidForm);
+  await db.blockedDate.delete({ where: { id: parsed.data } });
+  revalidatePath("/", "layout");
+  return success(t.admin.schedule.blockedRemoved);
+}
+
+/* ---------- Site settings ---------- */
+
+export async function saveSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const parsed = settingsSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
+  await db.setting.upsert({ where: { id: 1 }, create: { id: 1, ...parsed.data }, update: parsed.data });
+  revalidatePath("/", "layout");
+  return success(t.admin.settings.saved);
+}
+
+export async function changePassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const admin = await requireAdmin();
+  const parsed = passwordSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
+  const record = await db.admin.findUniqueOrThrow({ where: { id: admin.id } });
+  if (!(await bcrypt.compare(parsed.data.currentPassword, record.passwordHash))) {
+    return failure(t.admin.settings.wrongPassword, { currentPassword: [t.admin.settings.wrongPassword] });
+  }
+  const passwordHash = await bcrypt.hash(parsed.data.newPassword, 12);
+  await db.admin.update({ where: { id: admin.id }, data: { passwordHash } });
+  return success(t.admin.settings.passwordChanged);
+}
