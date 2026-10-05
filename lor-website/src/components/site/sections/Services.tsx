@@ -18,21 +18,21 @@ export async function Services({ services }: { services: Service[] }) {
       {groups.length === 0 ? (
         <p className="text-muted">{t.services.empty}</p>
       ) : (
-        <div className="mx-auto max-w-4xl space-y-6">
+        <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6">
           {groups.map((g, gi) => (
             <Reveal key={g.title} delay={gi * 80} className="card overflow-hidden">
-              <h3 className="border-b border-line bg-paper px-6 py-4 text-sm font-bold text-ink">{g.title}</h3>
+              <h3 className="border-b border-line bg-paper px-4 py-3 text-sm sm:px-6 sm:py-4 font-bold text-ink">{g.title}</h3>
               <ul className="divide-y divide-line">
                 {g.items.map((s) => {
                   const duration = formatDuration(s.durationMinutes, t);
                   return (
-                    <li key={s.id} className="flex items-start justify-between gap-6 px-6 py-4 transition-colors hover:bg-paper">
+                    <li key={s.id} className="flex items-start justify-between gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4 transition-colors hover:bg-paper">
                       <div className="min-w-0">
-                        <p className="font-semibold text-ink">{s.name}</p>
-                        {s.description && !isPlaceholder(s.description) && <p className="mt-0.5 text-sm leading-relaxed text-muted">{s.description}</p>}
+                        <p className="text-[15px] font-semibold text-ink sm:text-base">{s.name}</p>
+                        {s.description && !isPlaceholder(s.description) && <p className="mt-0.5 text-[13px] leading-relaxed text-muted sm:text-sm">{s.description}</p>}
                         {duration && <p className="mt-1 flex items-center gap-1 text-xs text-muted"><Clock className="size-3.5" aria-hidden />{duration}</p>}
                       </div>
-                      <span className={`shrink-0 whitespace-nowrap tabular-nums ${s.price == null ? "text-sm text-muted" : "font-bold text-ink"}`}>
+                      <span className={`shrink-0 whitespace-nowrap tabular-nums ${s.price == null ? "text-[13px] text-muted sm:text-sm" : "text-[15px] font-bold text-ink sm:text-base"}`}>
                         {formatPrice(s.price, s.priceFrom, t)}
                       </span>
                     </li>

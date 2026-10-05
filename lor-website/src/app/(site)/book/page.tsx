@@ -21,15 +21,15 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
   const initialServiceId = services.some((s) => s.id === service) ? service! : null;
 
   return (
-    <section className="pt-8 pb-28 lg:pt-14 lg:pb-32">
+    <section className="pt-6 pb-28 sm:pt-8 lg:pt-14 lg:pb-32">
       <div className="container-x">
         <div className="max-w-2xl">
           <p className="eyebrow">{doctor.fullName}</p>
-          <h1 className="h-display mt-4 text-[clamp(2.4rem,1.8rem+2.4vw,3.75rem)]">{t.booking.title}</h1>
-          <p className="mt-4 text-lg text-muted">{t.booking.lead}</p>
+          <h1 className="h-display mt-3 text-[1.85rem] sm:mt-4 sm:text-[clamp(2.4rem,1.8rem+2.4vw,3.75rem)]">{t.booking.title}</h1>
+          <p className="mt-2 text-[15px] text-muted sm:mt-4 sm:text-lg">{t.booking.lead}</p>
         </div>
 
-        <div className="mt-10 lg:mt-14">
+        <div className="mt-6 sm:mt-10 lg:mt-14">
           {!settings.bookingEnabled ? (
             <Unavailable phone={doctor.phone} message={t.booking.unavailable} />
           ) : services.length === 0 ? (

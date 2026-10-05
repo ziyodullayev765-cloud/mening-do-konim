@@ -27,26 +27,26 @@ export async function Contact({ doctor, schedule }: { doctor: Doctor; schedule: 
 
   return (
     <Block id="contact" label={t.contact.eyebrow} title={t.contact.title}>
-      <div className="grid gap-6 lg:grid-cols-12">
-        <Reveal className="card p-6 sm:p-8 lg:col-span-5">
-          <ul className="space-y-5">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
+        <Reveal className="card p-4 sm:p-8 lg:col-span-5">
+          <ul className="space-y-3.5 sm:space-y-5">
             {rows.map((r) => (
-              <li key={r.label} className="flex gap-4">
-                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><r.icon className="size-5" aria-hidden /></span>
+              <li key={r.label} className="flex gap-3 sm:gap-4">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg sm:size-11 sm:rounded-xl bg-accent-soft text-accent"><r.icon className="size-4 sm:size-5" aria-hidden /></span>
                 <div className="min-w-0">
                   <p className="text-xs text-muted">{r.label}</p>
                   {r.href ? (
-                    <a href={r.href} {...(r.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="font-semibold break-words text-ink hover:text-accent">{r.value}</a>
+                    <a href={r.href} {...(r.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="text-[15px] font-semibold break-words text-ink hover:text-accent sm:text-base">{r.value}</a>
                   ) : (
-                    <p className="font-semibold text-ink">{r.value}</p>
+                    <p className="text-[15px] font-semibold text-ink sm:text-base">{r.value}</p>
                   )}
                 </div>
               </li>
             ))}
           </ul>
-          <div className="mt-8 border-t border-line pt-6">
+          <div className="mt-5 border-t border-line pt-4 sm:mt-8 sm:pt-6">
             <p className="flex items-center gap-2 font-bold text-ink"><Clock className="size-5 text-accent" aria-hidden />{t.contact.hours}</p>
-            <dl className="mt-3 space-y-1.5 text-[15px]">
+            <dl className="mt-2.5 space-y-1 text-sm sm:mt-3 sm:space-y-1.5 sm:text-[15px]">
               {schedule.map((d) => (
                 <div key={d.dayOfWeek} className="flex justify-between gap-4">
                   <dt className="text-muted">{t.weekdays[d.dayOfWeek]}</dt>
@@ -55,7 +55,7 @@ export async function Contact({ doctor, schedule }: { doctor: Doctor; schedule: 
               ))}
             </dl>
           </div>
-          <Link href="/book" className="btn btn-primary mt-8 w-full">
+          <Link href="/book" className="btn btn-primary mt-5 w-full sm:mt-8">
             {t.common.bookAppointment} <ArrowRight className="size-4" aria-hidden />
           </Link>
         </Reveal>
