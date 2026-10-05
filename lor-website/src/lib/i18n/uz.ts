@@ -272,11 +272,11 @@ export const uz = {
     login: {
       title: "Boshqaruv paneliga kirish",
       lead: "Davom etish uchun hisobingizga kiring.",
-      email: "Email",
+      email: "Login",
       password: "Parol",
       remember: "Meni eslab qol",
       submit: "Kirish",
-      invalid: "Email yoki parol noto'g'ri.",
+      invalid: "Login yoki parol noto'g'ri.",
       showPassword: "Parolni ko'rsatish",
       hidePassword: "Parolni yashirish",
     },

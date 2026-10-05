@@ -25,7 +25,7 @@ export function LoginForm() {
       )}
       <div>
         <label htmlFor="email" className="label">{t.admin.login.email}</label>
-        <input id="email" name="email" type="email" autoComplete="username" required className="input" autoFocus />
+        <input id="email" name="email" type="text" autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} required className="input" autoFocus />
       </div>
       <div>
         <label htmlFor="password" className="label">{t.admin.login.password}</label>

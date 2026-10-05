@@ -9,7 +9,7 @@ import { createSession, destroySession } from "@/lib/auth";
 import { clientIp, rateLimit, resetRateLimit } from "@/lib/rate-limit";
 import { loginSchema } from "@/lib/validation";
 
-// Compared against when the email is unknown so response time doesn't reveal valid emails.
+// Compared against when the login is unknown so response time doesn't reveal valid logins.
 const DUMMY_HASH = bcrypt.hashSync("timing-equaliser-not-a-real-password", 12);
 
 export async function login(_prev: ActionState, formData: FormData): Promise<ActionState> {

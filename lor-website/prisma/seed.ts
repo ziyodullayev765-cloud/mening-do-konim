@@ -18,8 +18,18 @@ async function main() {
   if (password.length < 10) throw new Error("ADMIN_PASSWORD must be at least 10 characters.");
 
   if (!(await db.admin.findUnique({ where: { email } }))) {
-    await db.admin.create({ data: { email, name: "Administrator", passwordHash: await bcrypt.hash(password, 12) } });
-    console.log(`Admin created: ${email}`);
+    const admins = await db.admin.findMany({ select: { id: true } });
+    if (admins.length === 1) {
+      // ADMIN_EMAIL (login) was changed in the environment: move the single
+      // admin account to the new login and password, and sign out old sessions.
+      // A password changed later in the admin panel is kept as long as the login stays the same.
+      await db.admin.update({ where: { id: admins[0].id }, data: { email, passwordHash: await bcrypt.hash(password, 12) } });
+      await db.session.deleteMany({ where: { adminId: admins[0].id } });
+      console.log(`Admin login updated: ${email}`);
+    } else {
+      await db.admin.create({ data: { email, name: "Administrator", passwordHash: await bcrypt.hash(password, 12) } });
+      console.log(`Admin created: ${email}`);
+    }
   }
 
   if (!(await db.doctor.findUnique({ where: { id: 1 } }))) {

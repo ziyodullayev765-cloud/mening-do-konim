@@ -26,7 +26,7 @@ export async function Highlights({ doctor }: { doctor: Doctor }) {
           <dl className={`grid grid-cols-2 gap-5 border-b border-white/10 pb-8 sm:gap-8 sm:pb-14 ${stats.length >= 4 ? "lg:grid-cols-4" : stats.length === 3 ? "lg:grid-cols-3" : ""}`}>
             {stats.map((s, i) => (
               <Reveal key={s.label} delay={i * 80}>
-                <dd className="text-[clamp(1.9rem,1.5rem+2vw,3.4rem)] font-extrabold tracking-tight text-white tabular-nums">{formatNumber(s.value)}+</dd>
+                <dd className="text-[clamp(1.615rem,1.275rem+1.7vw,2.89rem)] font-extrabold tracking-tight text-white tabular-nums">{formatNumber(s.value)}+</dd>
                 <dt className="mt-1 text-[13px] text-white/60 sm:text-[15px]">{s.label}</dt>
               </Reveal>
             ))}

@@ -50,7 +50,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PageHeader title={t.admin.nav.dashboard} description={formatDate(today, true, t)} />
+      <PageHeader title={t.admin.nav.dashboard} description={formatDate(today, true, t)} back={false} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (

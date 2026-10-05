@@ -3,6 +3,7 @@
 import { useDeferredValue, useEffect, useMemo, useOptimistic, useState, useTransition } from "react";
 import { CalendarClock, Clock, Pencil, Plus, Search, SearchX, Stethoscope, Trash2, X } from "lucide-react";
 import { useI18n } from "@/components/site/I18nProvider";
+import { BackButton } from "@/components/BackButton";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceIcon } from "@/lib/icons";
 import { SERVICE_CATEGORIES } from "@/lib/schemas/service";
@@ -130,6 +131,7 @@ export function ServicesManager({ services, initialFilters }: { services: Servic
       {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
+          <BackButton fallback="/admin" className="mb-2 -ml-0.5" />
           <h1 className="font-serif text-3xl text-ink lg:text-4xl">{ui.title}</h1>
           <p className="mt-1.5 max-w-xl text-[15px] text-muted">{ui.lead}</p>
         </div>

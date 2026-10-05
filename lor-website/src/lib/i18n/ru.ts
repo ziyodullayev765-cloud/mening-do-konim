@@ -244,11 +244,11 @@ export const ru: Dictionary = {
     login: {
       title: "Вход в панель управления",
       lead: "Войдите в аккаунт, чтобы продолжить.",
-      email: "Email",
+      email: "Логин",
       password: "Пароль",
       remember: "Запомнить меня",
       submit: "Войти",
-      invalid: "Неверный email или пароль.",
+      invalid: "Неверный логин или пароль.",
       showPassword: "Показать пароль",
       hidePassword: "Скрыть пароль",
     },

@@ -4,6 +4,7 @@ import { Phone, X } from "lucide-react";
 import { getPublicContent } from "@/lib/data";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { telHref } from "@/lib/format";
+import { BackButton } from "@/components/BackButton";
 import { BookingWizard } from "@/components/site/booking/BookingWizard";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,8 +27,9 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
       <div className="container-x">
         <div className="flex items-start justify-between gap-4">
         <div className="max-w-2xl">
+          <BackButton fallback="/" className="mb-3 -ml-0.5" />
           <p className="eyebrow">{doctor.fullName}</p>
-          <h1 className="h-display mt-3 text-[1.85rem] sm:mt-4 sm:text-[clamp(2.4rem,1.8rem+2.4vw,3.75rem)]">{t.booking.title}</h1>
+          <h1 className="h-display mt-3 text-[1.573rem] sm:mt-4 sm:text-[clamp(2.04rem,1.53rem+2.04vw,3.188rem)]">{t.booking.title}</h1>
           <p className="mt-2 text-[15px] text-muted sm:mt-4 sm:text-lg">{t.booking.lead}</p>
         </div>
           <Link href="/" className="btn btn-secondary shrink-0 !px-3 sm:!px-4" aria-label={t.booking.exit}>

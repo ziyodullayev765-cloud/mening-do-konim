@@ -5,6 +5,7 @@ import { getT } from "@/lib/i18n/server";
 import { formatNumber, isPlaceholder, lines } from "@/lib/format";
 import { DoctorPortrait } from "../DoctorPortrait";
 import { Reveal } from "../Reveal";
+import { BackButton } from "@/components/BackButton";
 
 function parseHistory(text: string) {
   return lines(text).map((line) => {
@@ -37,11 +38,12 @@ export async function AboutPage({ doctor }: { doctor: Doctor }) {
       <section aria-labelledby="about-title" className="hero-glow bg-white bg-[radial-gradient(55%_60%_at_95%_0%,#e4f5f8_0%,transparent_70%)]">
         <div className="container-x grid items-center gap-12 py-8 sm:py-14 lg:grid-cols-12 lg:py-20">
           <div className="min-w-0 lg:col-span-7">
+            <BackButton fallback="/" className="mb-3 -ml-0.5" />
             {/* Phones: small portrait beside the name instead of a big photo below the text. */}
             <div className="flex items-center gap-4 lg:block">
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold text-accent sm:text-sm">{t.about.eyebrow}</p>
-                <h1 id="about-title" className="h-display mt-2 text-[1.6rem] sm:mt-3 sm:text-[clamp(2.2rem,1.5rem+2.6vw,3.6rem)]">{doctor.fullName}</h1>
+                <h1 id="about-title" className="h-display mt-2 text-[1.36rem] sm:mt-3 sm:text-[clamp(1.87rem,1.275rem+2.21vw,3.06rem)]">{doctor.fullName}</h1>
                 <p className="mt-1.5 text-sm font-semibold text-muted sm:mt-3 sm:text-lg">{doctor.title}</p>
               </div>
               <div className="relative aspect-[4/5] w-[96px] shrink-0 overflow-hidden rounded-2xl shadow-lift ring-4 ring-white sm:w-36 lg:hidden">

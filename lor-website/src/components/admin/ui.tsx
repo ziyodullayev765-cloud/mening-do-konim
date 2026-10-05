@@ -1,11 +1,24 @@
 import type { AppointmentStatus } from "@prisma/client";
 import { Inbox } from "lucide-react";
 import { getT } from "@/lib/i18n/server";
+import { BackButton } from "@/components/BackButton";
 
-export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  actions,
+  back = "/admin",
+}: {
+  title: string;
+  description?: string;
+  actions?: React.ReactNode;
+  /** Where the back arrow goes when there is no history; `false` hides it (dashboard). */
+  back?: string | false;
+}) {
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
+        {back && <BackButton fallback={back} className="mb-2 -ml-0.5" />}
         <h1 className="font-serif text-3xl text-ink lg:text-4xl">{title}</h1>
         {description && <p className="mt-1.5 text-[15px] text-muted">{description}</p>}
       </div>

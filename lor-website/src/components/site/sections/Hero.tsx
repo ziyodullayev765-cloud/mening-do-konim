@@ -31,7 +31,7 @@ export async function Hero({ doctor, rating }: { doctor: Doctor; rating: { avera
           )}
           {/* Phones: headline with a small portrait beside it, so the photo stays on the first screen. */}
           <div className="mt-4 flex animate-fade-up items-center gap-4 [animation-delay:80ms] sm:mt-6 lg:block">
-            <h1 id="hero-title" className="h-display min-w-0 flex-1 text-[1.85rem] sm:text-[clamp(2.4rem,1.5rem+3.2vw,4rem)]">
+            <h1 id="hero-title" className="h-display min-w-0 flex-1 text-[1.573rem] sm:text-[clamp(2.04rem,1.275rem+2.72vw,3.4rem)]">
               {doctor.heroTitle || t.site.heroTitle}
             </h1>
             <div className="relative aspect-[4/5] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-lift ring-4 ring-white sm:w-36 lg:hidden">

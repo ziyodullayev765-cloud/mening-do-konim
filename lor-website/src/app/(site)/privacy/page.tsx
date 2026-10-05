@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/server";
+import { BackButton } from "@/components/BackButton";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -12,7 +13,8 @@ export default async function PrivacyPage() {
   return (
     <section className="pt-8 pb-28 sm:pt-12 lg:pb-32">
       <div className="container-x max-w-3xl">
-        <h1 className="h-display text-[1.85rem] sm:text-[clamp(2.2rem,1.6rem+2vw,3rem)]">{p.title}</h1>
+        <BackButton fallback="/" className="mb-4 -ml-0.5" />
+        <h1 className="h-display text-[1.573rem] sm:text-[clamp(1.87rem,1.36rem+1.7vw,2.55rem)]">{p.title}</h1>
         <p className="mt-2 text-sm text-muted">{p.updated}</p>
         <p className="mt-5 text-[15px] leading-relaxed text-text sm:text-[17px]">{p.intro}</p>
         <div className="mt-8 space-y-6">

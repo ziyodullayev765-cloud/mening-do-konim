@@ -49,7 +49,7 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
       <Link href="/admin/appointments" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> {t.admin.nav.appointments}
       </Link>
-      <PageHeader title={t.admin.appointments.details} />
+      <PageHeader back={false} title={t.admin.appointments.details} />
 
       <div className="grid gap-6 lg:grid-cols-5">
         <Panel className="lg:col-span-3">

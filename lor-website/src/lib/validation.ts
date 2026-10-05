@@ -61,7 +61,8 @@ export const bookingSchema = bookingSchemaFor(t);
 export const contactSchema = contactSchemaFor(t);
 
 export const loginSchema = z.object({
-  email: z.email().max(200),
+  /** Login name or email (stored in Admin.email, lower-case). */
+  email: z.string().trim().min(1).max(200),
   password: z.string().min(1).max(200),
   remember: checkbox,
 });

@@ -32,7 +32,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
       <Link href="/admin/patients" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> {t.admin.nav.patients}
       </Link>
-      <PageHeader title={patient.fullName} />
+      <PageHeader back={false} title={patient.fullName} />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Panel>
