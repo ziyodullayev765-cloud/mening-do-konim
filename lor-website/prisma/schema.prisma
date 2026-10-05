@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  /// Direct (non-pooled) connection used by migrations. On Vercel + Neon this
+  /// is provided automatically; elsewhere set it to the same value as DATABASE_URL.
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum AppointmentStatus {
+  NEW
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+/// SERVICE = consultations / examinations, PROCEDURE = operations / procedures.
+enum ServiceKind {
+  SERVICE
+  PROCEDURE
+}
+
+/// Admin-facing category. Determines `kind` (public section) — see lib/schemas/service.ts.
+enum ServiceCategory {
+  CONSULTATION
+  DIAGNOSTICS
+  TREATMENT
+  SURGERY
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  /// SHA-256 of the cookie token; the raw token is never stored.
+  tokenHash String   @unique
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+/// Single-row table holding the public doctor profile and clinic contacts.
+model Doctor {
+  id                    Int      @id @default(1)
+  fullName              String
+  title                 String
+  shortDescription      String
+  biography             String   @default("")
+  yearsExperience       Int?
+  patientsTreated       Int?
+  proceduresPerformed   Int?
+  certificationsCount   Int?
+  /// Newline-separated lists
+  education             String   @default("")
+  training              String   @default("")
+  professionalHistory   String   @default("")
+  specializations       String   @default("")
+  certifications        String   @default("")
+  memberships           String   @default("")
+  /// Main photo (hero / first screen)
+  photoUrl              String?
+  /// Second photo for the "About the doctor" section; falls back to photoUrl
+  aboutPhotoUrl         String?
+  /// Photo next to the contact details in the appointment section
+  contactPhotoUrl       String?
+  /// Optional logo shown in the header and footer (falls back to an icon)
+  logoUrl               String?
+  /// Big hero headline; falls back to the doctor's name when empty
+  heroTitle             String   @default("")
+  /// Small badge above the hero headline (e.g. city); falls back to the address
+  heroBadge             String   @default("")
+  clinicName            String   @default("")
+  city                  String   @default("")
+  country               String   @default("")
+  address               String   @default("")
+  phone                 String   @default("")
+  whatsapp              String   @default("")
+  telegram              String   @default("")
+  email                 String   @default("")
+  instagram             String   @default("")
+  facebook              String   @default("")
+  youtube               String   @default("")
+  mapQuery              String   @default("")
+  /// Russian versions (empty = fall back to the Uzbek text)
+  titleRu               String   @default("")
+  shortDescriptionRu    String   @default("")
+  heroTitleRu           String   @default("")
+  heroBadgeRu           String   @default("")
+  biographyRu           String   @default("")
+  specializationsRu     String   @default("")
+  professionalHistoryRu String   @default("")
+  educationRu           String   @default("")
+  trainingRu            String   @default("")
+  certificationsRu      String   @default("")
+  membershipsRu         String   @default("")
+  addressRu             String   @default("")
+  clinicNameRu          String   @default("")
+  updatedAt             DateTime @updatedAt
+}
+
+/// Images uploaded from the admin panel. Stored in the database because the
+/// hosting filesystem is ephemeral; served at /media/{id}.
+model Media {
+  id        String   @id @default(cuid())
+  mime      String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
+model Patient {
+  id           String        @id @default(cuid())
+  fullName     String
+  /// Normalised digits-only phone (with leading +)
+  phone        String        @unique
+  email        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+}
+
+model Service {
+  id              String          @id @default(cuid())
+  kind            ServiceKind     @default(SERVICE)
+  category        ServiceCategory @default(CONSULTATION)
+  name            String
+  description     String          @default("")
+  /// Price in UZS (so'm). Null = "price on request".
+  price           Int?
+  /// When true price is shown as "from X".
+  priceFrom       Boolean         @default(false)
+  durationMinutes Int?
+  /// Lucide icon key (see lib/icons.ts)
+  icon            String          @default("stethoscope")
+  imageUrl        String?
+  /// Procedure-only (optional) fields
+  indication      String          @default("")
+  recovery        String          @default("")
+  nameRu          String          @default("")
+  descriptionRu   String          @default("")
+  indicationRu    String          @default("")
+  recoveryRu      String          @default("")
+  showInPricing   Boolean         @default(true)
+  active          Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  appointments    Appointment[]
+
+  @@index([kind, active, sortOrder])
+  @@index([category])
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  patientId   String
+  patient     Patient           @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  serviceId   String?
+  service     Service?          @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  /// Snapshot of the service name at booking time (survives service deletion)
+  serviceName String
+  /// Clinic-local date YYYY-MM-DD
+  date        String
+  /// Clinic-local time HH:MM
+  time        String
+  status      AppointmentStatus @default(NEW)
+  note        String            @default("")
+  adminNote   String            @default("")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  // A partial unique index on (date, time) WHERE status <> 'CANCELLED' is
+  // created in the migration SQL to prevent double booking.
+
+  @@index([date, time])
+  @@index([status])
+  @@index([patientId])
+}
+
+/// Weekly working hours. dayOfWeek: 0 = Sunday ... 6 = Saturday.
+model WorkingDay {
+  dayOfWeek Int     @id
+  isOpen    Boolean @default(true)
+  openTime  String  @default("09:00")
+  closeTime String  @default("18:00")
+}
+
+model BlockedDate {
+  id     String @id @default(cuid())
+  date   String @unique
+  reason String @default("")
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  patientName String
+  text        String
+  rating      Int?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Faq {
+  id         String   @id @default(cuid())
+  question   String
+  answer     String
+  questionRu String   @default("")
+  answerRu   String   @default("")
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+/// Single-row site settings.
+model Setting {
+  id                Int     @id @default(1)
+  bookingEnabled    Boolean @default(true)
+  slotMinutes       Int     @default(30)
+  bookingWindowDays Int     @default(30)
+  /// Minimum minutes between "now" and the earliest bookable slot
+  minNoticeMinutes  Int     @default(60)
+  timezone          String  @default("Asia/Tashkent")
+  siteTitle         String  @default("")
+  metaDescription   String  @default("")
+}
