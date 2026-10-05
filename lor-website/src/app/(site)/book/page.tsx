@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
 import { Phone } from "lucide-react";
-import { db } from "@/lib/db";
-import { getDoctor, getSiteSettings } from "@/lib/data";
-import { t } from "@/lib/i18n";
+import { getPublicContent } from "@/lib/data";
+import { getLocale, getT } from "@/lib/i18n/server";
 import { telHref } from "@/lib/format";
 import { BookingWizard } from "@/components/site/booking/BookingWizard";
 
-export const metadata: Metadata = {
-  title: t.booking.title,
-  description: t.booking.lead,
-  alternates: { canonical: "/book" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.booking.title, description: t.booking.lead, alternates: { canonical: "/book" } };
+}
 
 export default async function BookPage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
-  const [{ service }, doctor, settings, services] = await Promise.all([
-    searchParams,
-    getDoctor(),
-    getSiteSettings(),
-    db.service.findMany({
-      where: { active: true },
-      orderBy: [{ kind: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
-      select: { id: true, kind: true, name: true, description: true, price: true, priceFrom: true, durationMinutes: true, icon: true },
-    }),
-  ]);
+  const locale = await getLocale();
+  const [{ service }, content, t] = await Promise.all([searchParams, getPublicContent(locale), getT()]);
+  const { doctor, settings } = content;
+  const services = [...content.services, ...content.procedures].map(({ id, kind, name, description, price, priceFrom, durationMinutes, icon }) => ({
+    id, kind, name, description, price, priceFrom, durationMinutes, icon,
+  }));
 
   const initialServiceId = services.some((s) => s.id === service) ? service! : null;
 
@@ -49,7 +43,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
   );
 }
 
-function Unavailable({ message, phone }: { message: string; phone: string }) {
+async function Unavailable({ message, phone }: { message: string; phone: string }) {
   return (
     <div className="card max-w-2xl p-8 sm:p-10">
       <p className="text-lg text-ink">{message}</p>

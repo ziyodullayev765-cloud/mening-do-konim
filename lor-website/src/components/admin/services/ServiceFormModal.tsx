@@ -36,6 +36,10 @@ function toFormValues(row: ServiceRow): ServiceFormInput {
     imageUrl: row.imageUrl ?? "",
     indication: row.indication,
     recovery: row.recovery,
+    nameRu: row.nameRu,
+    descriptionRu: row.descriptionRu,
+    indicationRu: row.indicationRu,
+    recoveryRu: row.recoveryRu,
     showInPricing: row.showInPricing,
     active: row.active,
     sortOrder: String(row.sortOrder),
@@ -217,6 +221,28 @@ function ServiceFormDialog({ service, onClose }: Props) {
               </div>
             </Section>
           )}
+
+          {/* Russian */}
+          <Section title="Ruscha (RU)" hint="Sayt rus tilida ochilganda chiqadi. Bo'sh bo'lsa, o'zbekcha matn ko'rsatiladi.">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Nomi (RU)" error={errors.nameRu?.message} htmlFor="sf-name-ru" optional>
+                <input id="sf-name-ru" className="input" placeholder="Например: Консультация ЛОР-врача" {...register("nameRu")} />
+              </Field>
+              <Field label="Qisqa tavsif (RU)" error={errors.descriptionRu?.message} htmlFor="sf-desc-ru" optional>
+                <textarea id="sf-desc-ru" rows={2} className="input" {...register("descriptionRu")} />
+              </Field>
+              {showProcedureFields && (
+                <>
+                  <Field label={`${f.indication} (RU)`} error={errors.indicationRu?.message} htmlFor="sf-ind-ru" optional>
+                    <textarea id="sf-ind-ru" rows={2} className="input" {...register("indicationRu")} />
+                  </Field>
+                  <Field label={`${f.recovery} (RU)`} error={errors.recoveryRu?.message} htmlFor="sf-rec-ru" optional>
+                    <textarea id="sf-rec-ru" rows={2} className="input" {...register("recoveryRu")} />
+                  </Field>
+                </>
+              )}
+            </div>
+          </Section>
 
           {/* Display */}
           <Section title={ui.sections.display}>

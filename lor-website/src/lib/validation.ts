@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { t } from "@/lib/i18n";
+import { t, type Dictionary } from "@/lib/i18n";
 import { DATE_RE, TIME_RE } from "@/lib/slots-shared";
 import { IMAGE_REF_ERROR, isValidImageRef } from "@/lib/media-shared";
 import { instagramUsername } from "@/lib/social";
@@ -43,23 +43,47 @@ const optionalUrl = z
 /** Uploaded image (/media/…) or external https URL. */
 const imageRef = z.string().trim().max(500).refine(isValidImageRef, IMAGE_REF_ERROR).default("");
 
-export const bookingSchema = z.object({
-  /** Optional — a patient may book without choosing a specific service. */
-  serviceId: z.string().max(50).optional().default(""),
-  date: z.string().regex(DATE_RE, t.booking.errors.date),
-  time: z.string().regex(TIME_RE, t.booking.errors.time),
-  fullName: z.string().trim().min(2, t.booking.errors.name).max(120, t.booking.errors.name),
-  phone,
-  email: optionalEmail,
-  note: text(1000),
-});
+/** Phone validator with messages in the given language. */
+const phoneFor = (d: Dictionary) =>
+  z
+    .string()
+    .trim()
+    .refine((v) => {
+      const digits = v.replace(/\D/g, "");
+      return /^[+\d\s()-]+$/.test(v) && digits.length >= 9 && digits.length <= 15;
+    }, d.booking.errors.phone);
 
-export const contactSchema = z.object({
-  name: z.string().trim().min(2, t.booking.errors.name).max(120),
-  phone,
-  email: optionalEmail,
-  message: z.string().trim().min(5, "Xabar juda qisqa.").max(2000),
-});
+const optionalEmailFor = (d: Dictionary) =>
+  z
+    .string()
+    .trim()
+    .max(200)
+    .refine((v) => v === "" || z.email().safeParse(v).success, d.booking.errors.email)
+    .default("");
+
+/** Public booking schema; messages follow the visitor's language. */
+export const bookingSchemaFor = (d: Dictionary) =>
+  z.object({
+    /** Optional — a patient may book without choosing a specific service. */
+    serviceId: z.string().max(50).optional().default(""),
+    date: z.string().regex(DATE_RE, d.booking.errors.date),
+    time: z.string().regex(TIME_RE, d.booking.errors.time),
+    fullName: z.string().trim().min(2, d.booking.errors.name).max(120, d.booking.errors.name),
+    phone: phoneFor(d),
+    email: optionalEmailFor(d),
+    note: text(1000),
+  });
+
+export const contactSchemaFor = (d: Dictionary) =>
+  z.object({
+    name: z.string().trim().min(2, d.booking.errors.name).max(120),
+    phone: phoneFor(d),
+    email: optionalEmailFor(d),
+    message: z.string().trim().min(5, d.meta.locale === "ru" ? "Сообщение слишком короткое." : "Xabar juda qisqa.").max(2000),
+  });
+
+export const bookingSchema = bookingSchemaFor(t);
+export const contactSchema = contactSchemaFor(t);
 
 export const loginSchema = z.object({
   email: z.email().max(200),
@@ -105,6 +129,19 @@ export const doctorSchema = z.object({
   facebook: optionalUrl,
   youtube: optionalUrl,
   mapQuery: text(300),
+  titleRu: text(150),
+  shortDescriptionRu: text(400),
+  heroTitleRu: text(120),
+  heroBadgeRu: text(80),
+  biographyRu: text(5000),
+  specializationsRu: text(2000),
+  professionalHistoryRu: text(3000),
+  educationRu: text(3000),
+  trainingRu: text(3000),
+  certificationsRu: text(3000),
+  membershipsRu: text(2000),
+  addressRu: text(300),
+  clinicNameRu: text(200),
 });
 
 export const testimonialSchema = z.object({
@@ -117,6 +154,8 @@ export const testimonialSchema = z.object({
 export const faqSchema = z.object({
   question: z.string().trim().min(3, t.common.required).max(300),
   answer: z.string().trim().min(3, t.common.required).max(3000),
+  questionRu: text(300),
+  answerRu: text(3000),
   active: checkbox,
 });
 

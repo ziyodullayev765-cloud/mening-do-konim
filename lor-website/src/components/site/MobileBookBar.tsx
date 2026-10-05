@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { CalendarCheck, Phone } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { telHref } from "@/lib/format";
 
 /** Sticky booking bar shown on small screens only. */
-export function MobileBookBar({ phone }: { phone: string }) {
+export async function MobileBookBar({ phone }: { phone: string }) {
+  const t = await getT();
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-6px_20px_-14px_rgb(26_43_76/0.35)] sm:hidden">
       <div className="flex gap-2">

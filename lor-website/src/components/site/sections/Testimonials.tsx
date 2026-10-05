@@ -1,12 +1,14 @@
 import { Quote, Star } from "lucide-react";
 import type { Testimonial } from "@prisma/client";
+import { getT } from "@/lib/i18n/server";
 import { Block } from "../Block";
 import { Reveal } from "../Reveal";
 
-export function Testimonials({ items }: { items: Testimonial[] }) {
+export async function Testimonials({ items }: { items: Testimonial[] }) {
+  const t = await getT();
   if (items.length === 0) return null;
   return (
-    <Block id="reviews" label="Fikrlar" title="Bemorlarimiz fikri">
+    <Block id="reviews" label={t.site.reviews} title={t.site.reviewsTitle}>
       <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {items.map((item, i) => (
           <Reveal as="li" key={item.id} delay={(i % 3) * 70}>

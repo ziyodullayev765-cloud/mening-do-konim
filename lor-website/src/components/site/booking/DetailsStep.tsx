@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { CalendarCheck, LoaderCircle } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "../I18nProvider";
+import type { Dictionary } from "@/lib/i18n";
 
 export type Details = { fullName: string; phone: string; email: string; note: string };
 
-function validate(d: Details) {
+function validate(d: Details, t: Dictionary) {
   const errors: Partial<Record<keyof Details, string>> = {};
   if (d.fullName.trim().length < 2) errors.fullName = t.booking.errors.name;
   const digits = d.phone.replace(/\D/g, "");
@@ -30,8 +31,9 @@ export function DetailsStep({
   serverErrors?: Record<string, string[]>;
   serverMessage?: string;
 }) {
+  const { t } = useI18n();
   const [touched, setTouched] = useState(false);
-  const clientErrors = touched ? validate(value) : {};
+  const clientErrors = touched ? validate(value, t) : {};
   const err = (k: keyof Details) => clientErrors[k] ?? serverErrors?.[k]?.[0];
   const set = (k: keyof Details) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     onChange({ ...value, [k]: e.target.value });
@@ -42,7 +44,7 @@ export function DetailsStep({
       onSubmit={(e) => {
         e.preventDefault();
         setTouched(true);
-        if (Object.keys(validate(value)).length === 0) onSubmit();
+        if (Object.keys(validate(value, t)).length === 0) onSubmit();
       }}
     >
       <fieldset disabled={submitting}>
@@ -90,6 +92,7 @@ function Field({
   className?: string;
   children: React.ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <div className={className}>
       <label htmlFor={id} className="label">

@@ -1,6 +1,6 @@
 "use client";
 
-import { t } from "@/lib/i18n";
+import { useI18n } from "../I18nProvider";
 import type { Availability } from "./types";
 
 function addDays(date: string, n: number) {
@@ -22,6 +22,7 @@ export function DateStep({
   selected: string | null;
   onSelect: (date: string) => void;
 }) {
+  const { t } = useI18n();
   const free = new Map(availability.dates.map((d) => [d.date, d.slots]));
   const start = addDays(availability.from, -((dow(availability.from) + 6) % 7));
   const cells: string[] = [];

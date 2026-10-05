@@ -1,8 +1,8 @@
 import { FallbackImage } from "./FallbackImage";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 /** Doctor photo, or a refined monogram placeholder until a photo is added in the admin panel. */
-export function DoctorPortrait({
+export async function DoctorPortrait({
   photoUrl,
   name,
   priority = false,
@@ -13,6 +13,7 @@ export function DoctorPortrait({
   priority?: boolean;
   sizes?: string;
 }) {
+  const t = await getT();
   const placeholder = <Monogram name={name} />;
   if (photoUrl) {
     return (
@@ -30,7 +31,8 @@ export function DoctorPortrait({
   return placeholder;
 }
 
-function Monogram({ name }: { name: string }) {
+async function Monogram({ name }: { name: string }) {
+  const t = await getT();
   const initials = name
     .replace(/[[\]]/g, "")
     .split(/\s+/)

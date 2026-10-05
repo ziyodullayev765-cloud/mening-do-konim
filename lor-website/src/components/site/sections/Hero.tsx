@@ -1,17 +1,16 @@
 import Link from "next/link";
 import { ArrowRight, Award, MapPin, Star } from "lucide-react";
 import type { Doctor } from "@prisma/client";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { isPlaceholder } from "@/lib/format";
 import { DoctorPortrait } from "../DoctorPortrait";
 import { FallbackImage } from "../FallbackImage";
 import { InstagramIcon } from "../Logo";
 import { instagramHref, instagramUsername } from "@/lib/social";
 
-const DEFAULT_TITLE = "Quloq, burun va tomoq salomatligi";
-const DEFAULT_LEAD = "Tashxis, davolash va maslahat — tajribali LOR shifokori qabulida. Onlayn yoziling, vaqtingizni tejang.";
 
-export function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: number; count: number } | null }) {
+export async function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: number; count: number } | null }) {
+  const t = await getT();
   const ok = (v: string | null | undefined) => Boolean(v) && !isPlaceholder(v);
   const location = ok(doctor.heroBadge)
     ? doctor.heroBadge
@@ -19,7 +18,7 @@ export function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: nu
       ? doctor.address
       : [doctor.city, doctor.country].filter(ok).join(", ");
   const insta = instagramUsername(doctor.instagram);
-  const lead = ok(doctor.shortDescription) ? doctor.shortDescription : DEFAULT_LEAD;
+  const lead = ok(doctor.shortDescription) ? doctor.shortDescription : t.site.heroLead;
 
   return (
     <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden bg-white bg-[radial-gradient(55%_60%_at_95%_0%,#e4f5f8_0%,transparent_70%)]">
@@ -31,7 +30,7 @@ export function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: nu
             </p>
           )}
           <h1 id="hero-title" className="h-display mt-6 animate-fade-up text-[clamp(2.4rem,1.5rem+3.2vw,4rem)] [animation-delay:80ms]">
-            {doctor.heroTitle || DEFAULT_TITLE}
+            {doctor.heroTitle || t.site.heroTitle}
           </h1>
           <p className="mt-6 max-w-xl animate-fade-up text-lg leading-relaxed text-muted [animation-delay:160ms]">{lead}</p>
 
@@ -40,7 +39,7 @@ export function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: nu
               {t.common.bookAppointment}
               <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
-            <a href="#directions" className="btn btn-secondary btn-lg">Davolash yo&apos;nalishlari</a>
+            <a href="#directions" className="btn btn-secondary btn-lg">{t.site.directionsTitle}</a>
           </div>
 
           {/* Floating metric cards */}
@@ -50,7 +49,7 @@ export function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: nu
                 <span className="grid size-10 place-items-center rounded-full bg-[#fff6e5] text-gold"><Star className="size-5 fill-gold" aria-hidden /></span>
                 <div className="leading-tight">
                   <p className="text-lg font-extrabold text-ink">{rating.average.toFixed(1)} <span className="text-sm font-semibold text-muted">/ 5</span></p>
-                  <p className="text-xs text-muted">{rating.count} ta bemor fikri</p>
+                  <p className="text-xs text-muted">{t.site.reviewsCount.replace("{count}", String(rating.count))}</p>
                 </div>
               </div>
             )}
@@ -67,7 +66,7 @@ export function Hero({ doctor, rating }: { doctor: Doctor; rating: { average: nu
                 </span>
                 <div className="min-w-0 leading-tight">
                   <p className="truncate text-[15px] font-bold text-ink">@{insta}</p>
-                  <p className="text-xs text-muted">Instagram sahifam</p>
+                  <p className="text-xs text-muted">{t.site.instagramMy}</p>
                 </div>
                 <span className="ml-1 grid size-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white transition-transform group-hover:scale-105">
                   <InstagramIcon className="size-[18px]" />

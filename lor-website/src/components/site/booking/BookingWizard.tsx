@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { ArrowLeft, ArrowRight, CalendarCheck, Check, LoaderCircle, Phone, RotateCcw } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "../I18nProvider";
 import { formatDate, formatPrice, telHref } from "@/lib/format";
 import { createBooking, type BookingResult } from "@/app/(site)/actions";
 import { ServiceStep } from "./ServiceStep";
@@ -23,6 +23,7 @@ export function BookingWizard({
   initialServiceId: string | null;
   clinicPhone: string;
 }) {
+  const { t } = useI18n();
   const [step, setStep] = useState<Step>(initialServiceId ? 1 : 0);
   const [serviceId, setServiceId] = useState<string | null>(initialServiceId);
   const [date, setDate] = useState<string | null>(null);
@@ -193,8 +194,8 @@ export function BookingWizard({
         <div className="card p-6 lg:sticky lg:top-28">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t.booking.summary}</p>
           <dl className="mt-4 divide-y divide-line">
-            <SummaryRow label={t.booking.service} value={service?.name ?? (step > 0 ? t.booking.notSelected : undefined)} sub={service ? formatPrice(service.price, service.priceFrom) : undefined} />
-            <SummaryRow label={t.booking.date} value={date ? formatDate(date, true) : undefined} />
+            <SummaryRow label={t.booking.service} value={service?.name ?? (step > 0 ? t.booking.notSelected : undefined)} sub={service ? formatPrice(service.price, service.priceFrom, t) : undefined} />
+            <SummaryRow label={t.booking.date} value={date ? formatDate(date, true, t) : undefined} />
             <SummaryRow label={t.booking.time} value={time ?? undefined} />
           </dl>
           <p className="mt-5 text-xs leading-relaxed text-muted">{t.booking.privacy}</p>
@@ -210,6 +211,7 @@ export function BookingWizard({
 }
 
 function Stepper({ step, onJump }: { step: Step; onJump: (s: Step) => void }) {
+  const { t } = useI18n();
   return (
     <ol className="grid grid-cols-4 gap-2" aria-label="Qadamlar">
       {t.booking.steps.map((label, i) => {
@@ -248,6 +250,7 @@ function SummaryRow({ label, value, sub }: { label: string; value?: string; sub?
 }
 
 function Loading() {
+  const { t } = useI18n();
   return (
     <div className="flex items-center justify-center gap-3 py-16 text-muted" role="status">
       <LoaderCircle className="size-5 animate-spin" aria-hidden /> {t.common.loading}
@@ -256,6 +259,7 @@ function Loading() {
 }
 
 function Success({ booking, phone }: { booking: NonNullable<BookingResult["booking"]>; phone: string }) {
+  const { t } = useI18n();
   return (
     <div className="card mx-auto max-w-2xl p-8 text-center sm:p-12" role="status">
       <span className="mx-auto grid size-16 place-items-center rounded-full bg-success-soft text-success">
@@ -267,7 +271,7 @@ function Success({ booking, phone }: { booking: NonNullable<BookingResult["booki
         {[
           [t.booking.service, booking.service],
           [t.booking.patient, booking.name],
-          [t.booking.date, formatDate(booking.date, true)],
+          [t.booking.date, formatDate(booking.date, true, t)],
           [t.booking.time, booking.time],
         ].map(([k, v]) => (
           <div key={k} className="bg-surface p-4">

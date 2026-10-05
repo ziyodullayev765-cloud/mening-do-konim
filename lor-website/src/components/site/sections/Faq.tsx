@@ -1,10 +1,11 @@
 import { Plus } from "lucide-react";
 import type { Faq as FaqItem } from "@prisma/client";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { Block } from "../Block";
 import { Reveal } from "../Reveal";
 
-export function Faq({ items }: { items: FaqItem[] }) {
+export async function Faq({ items }: { items: FaqItem[] }) {
+  const t = await getT();
   if (items.length === 0) return null;
   return (
     <Block id="faq" label={t.faq.eyebrow} title={t.faq.title} tone="white">

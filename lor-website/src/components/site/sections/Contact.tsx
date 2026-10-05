@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { ArrowRight, Clock, Mail, MapPin, MessageCircle, Phone, Send } from "lucide-react";
 import type { Doctor, WorkingDay } from "@prisma/client";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { isPlaceholder, telHref, telegramHref, whatsappHref } from "@/lib/format";
 import { ContactForm } from "../ContactForm";
 import { Block } from "../Block";
 import { Reveal } from "../Reveal";
 
-export function Contact({ doctor, schedule }: { doctor: Doctor; schedule: WorkingDay[] }) {
+export async function Contact({ doctor, schedule }: { doctor: Doctor; schedule: WorkingDay[] }) {
+  const t = await getT();
   const ok = (v: string) => Boolean(v) && !isPlaceholder(v);
   const mapQuery = doctor.mapQuery || (ok(doctor.address) ? doctor.address : "");
   const rows = [

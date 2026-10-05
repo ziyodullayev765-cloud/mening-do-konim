@@ -1,6 +1,6 @@
 "use client";
 
-import { t } from "@/lib/i18n";
+import { useI18n } from "../I18nProvider";
 import { formatDate } from "@/lib/format";
 
 export function TimeStep({
@@ -14,6 +14,7 @@ export function TimeStep({
   selected: string | null;
   onSelect: (time: string) => void;
 }) {
+  const { t } = useI18n();
   const groups = [
     { label: t.booking.morning, items: slots.filter((s) => s < "12:00") },
     { label: t.booking.afternoon, items: slots.filter((s) => s >= "12:00" && s < "17:00") },
@@ -23,7 +24,7 @@ export function TimeStep({
   return (
     <fieldset>
       <legend className="font-serif text-2xl text-ink">{t.booking.selectTime}</legend>
-      <p className="mt-1 text-muted">{formatDate(date, true)}</p>
+      <p className="mt-1 text-muted">{formatDate(date, true, t)}</p>
       {slots.length === 0 ? (
         <p className="mt-6 rounded-xl border border-dashed border-line-strong p-8 text-center text-muted">{t.booking.noSlots}</p>
       ) : (

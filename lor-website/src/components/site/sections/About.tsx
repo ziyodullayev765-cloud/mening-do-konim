@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Award, Briefcase, GraduationCap, Users } from "lucide-react";
 import type { Doctor } from "@prisma/client";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { formatNumber, isPlaceholder, lines } from "@/lib/format";
 import { DoctorPortrait } from "../DoctorPortrait";
 import { Reveal } from "../Reveal";
@@ -14,7 +14,8 @@ function parseHistory(text: string) {
 }
 
 /** Full "About the doctor" page content — every part is edited in Admin → Shifokor profili. */
-export function AboutPage({ doctor }: { doctor: Doctor }) {
+export async function AboutPage({ doctor }: { doctor: Doctor }) {
+  const t = await getT();
   const real = (xs: string[]) => xs.filter((x) => !isPlaceholder(x));
   const bio = real(lines(doctor.biography));
   const directions = real(lines(doctor.specializations));
@@ -44,7 +45,7 @@ export function AboutPage({ doctor }: { doctor: Doctor }) {
                 {bio.map((p, i) => <p key={i}>{p}</p>)}
               </div>
             ) : (
-              <p className="mt-8 text-muted">Biografiya tez orada qo&apos;shiladi.</p>
+              <p className="mt-8 text-muted">{t.site.bioSoon}</p>
             )}
             {stats.length > 0 && (
               <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-line pt-8">
@@ -69,7 +70,7 @@ export function AboutPage({ doctor }: { doctor: Doctor }) {
       </section>
 
       {(history.length > 0 || cards.length > 0 || directions.length > 0) && (
-        <section aria-label="Tajriba va malaka">
+        <section aria-label={t.site.aboutCardsTitle}>
           <div className="container-x grid gap-6 py-16 lg:grid-cols-12 lg:py-20">
             {history.length > 0 && (
               <Reveal className="card p-7 lg:col-span-5">

@@ -1,19 +1,20 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { Doctor } from "@prisma/client";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { isPlaceholder, telHref } from "@/lib/format";
 import { LogoMark } from "./Logo";
 
-const LINKS = [
-  { href: "/#directions", label: "Yo'nalishlar" },
-  { href: "/#prices", label: t.nav.pricing },
-  { href: "/about", label: t.nav.about },
-  { href: "/#faq", label: t.nav.faq },
-  { href: "/#contact", label: t.nav.contact },
-];
 
-export function Footer({ doctor }: { doctor: Doctor }) {
+export async function Footer({ doctor }: { doctor: Doctor }) {
+  const t = await getT();
+  const LINKS = [
+    { href: "/#directions", label: t.site.directions },
+    { href: "/#prices", label: t.site.prices },
+    { href: "/about", label: t.nav.about },
+    { href: "/#faq", label: t.nav.faq },
+    { href: "/#contact", label: t.nav.contact },
+  ];
   const ok = (v: string) => Boolean(v) && !isPlaceholder(v);
   return (
     <footer className="bg-ink pb-24 text-white/70 sm:pb-0">

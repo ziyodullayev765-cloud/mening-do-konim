@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getT();
   return (
     <main className="grid min-h-dvh place-items-center px-6">
       <div className="max-w-md text-center">

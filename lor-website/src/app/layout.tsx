@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { getDoctor, getSiteSettings } from "@/lib/data";
-import { t } from "@/lib/i18n";
+import { getLocale, getT } from "@/lib/i18n/server";
 import "./globals.css";
 
 const manrope = Manrope({ subsets: ["latin", "latin-ext", "cyrillic"], variable: "--font-manrope", display: "swap" });
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const viewport: Viewport = { themeColor: "#f8fafc", width: "device-width", initialScale: 1 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [doctor, settings] = await Promise.all([getDoctor(), getSiteSettings()]);
+  const [doctor, settings, t] = await Promise.all([getDoctor(), getSiteSettings(), getT()]);
   const title = settings.siteTitle || `${doctor.fullName} — ${doctor.title}`;
   const description =
     settings.metaDescription || doctor.shortDescription || `${doctor.fullName}: ${t.hero.specialty}.`;
@@ -34,9 +34,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
   return (
-    <html lang={t.meta.locale} className={`${manrope.variable}`}>
+    <html lang={locale} className={`${manrope.variable}`}>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

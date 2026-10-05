@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Clock } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "../I18nProvider";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceIcon } from "@/lib/icons";
 import type { BookableService } from "./types";
@@ -15,6 +15,7 @@ export function ServiceStep({
   selected: string | null;
   onSelect: (id: string | null) => void;
 }) {
+  const { t } = useI18n();
   const groups = [
     { title: t.pricing.consultations, items: services.filter((s) => s.kind === "SERVICE") },
     { title: t.pricing.procedures, items: services.filter((s) => s.kind === "PROCEDURE") },
@@ -32,7 +33,7 @@ export function ServiceStep({
               {g.items.map((s) => {
                 const Icon = serviceIcon(s.icon);
                 const active = s.id === selected;
-                const duration = formatDuration(s.durationMinutes);
+                const duration = formatDuration(s.durationMinutes, t);
                 return (
                   <label
                     key={s.id}
@@ -48,7 +49,7 @@ export function ServiceStep({
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold text-ink">{s.name}</span>
                       <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
-                        <span className="font-medium text-text">{formatPrice(s.price, s.priceFrom)}</span>
+                        <span className="font-medium text-text">{formatPrice(s.price, s.priceFrom, t)}</span>
                         {duration && (
                           <span className="flex items-center gap-1"><Clock className="size-3.5" aria-hidden />{duration}</span>
                         )}

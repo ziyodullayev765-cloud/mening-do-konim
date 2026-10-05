@@ -52,47 +52,61 @@ model Session {
 
 /// Single-row table holding the public doctor profile and clinic contacts.
 model Doctor {
-  id                  Int      @id @default(1)
-  fullName            String
-  title               String
-  shortDescription    String
-  biography           String   @default("")
-  yearsExperience     Int?
-  patientsTreated     Int?
-  proceduresPerformed Int?
-  certificationsCount Int?
+  id                    Int      @id @default(1)
+  fullName              String
+  title                 String
+  shortDescription      String
+  biography             String   @default("")
+  yearsExperience       Int?
+  patientsTreated       Int?
+  proceduresPerformed   Int?
+  certificationsCount   Int?
   /// Newline-separated lists
-  education           String   @default("")
-  training            String   @default("")
-  professionalHistory String   @default("")
-  specializations     String   @default("")
-  certifications      String   @default("")
-  memberships         String   @default("")
+  education             String   @default("")
+  training              String   @default("")
+  professionalHistory   String   @default("")
+  specializations       String   @default("")
+  certifications        String   @default("")
+  memberships           String   @default("")
   /// Main photo (hero / first screen)
-  photoUrl            String?
+  photoUrl              String?
   /// Second photo for the "About the doctor" section; falls back to photoUrl
-  aboutPhotoUrl       String?
+  aboutPhotoUrl         String?
   /// Photo next to the contact details in the appointment section
-  contactPhotoUrl     String?
+  contactPhotoUrl       String?
   /// Optional logo shown in the header and footer (falls back to an icon)
-  logoUrl             String?
+  logoUrl               String?
   /// Big hero headline; falls back to the doctor's name when empty
-  heroTitle           String   @default("")
+  heroTitle             String   @default("")
   /// Small badge above the hero headline (e.g. city); falls back to the address
-  heroBadge           String   @default("")
-  clinicName          String   @default("")
-  city                String   @default("")
-  country             String   @default("")
-  address             String   @default("")
-  phone               String   @default("")
-  whatsapp            String   @default("")
-  telegram            String   @default("")
-  email               String   @default("")
-  instagram           String   @default("")
-  facebook            String   @default("")
-  youtube             String   @default("")
-  mapQuery            String   @default("")
-  updatedAt           DateTime @updatedAt
+  heroBadge             String   @default("")
+  clinicName            String   @default("")
+  city                  String   @default("")
+  country               String   @default("")
+  address               String   @default("")
+  phone                 String   @default("")
+  whatsapp              String   @default("")
+  telegram              String   @default("")
+  email                 String   @default("")
+  instagram             String   @default("")
+  facebook              String   @default("")
+  youtube               String   @default("")
+  mapQuery              String   @default("")
+  /// Russian versions (empty = fall back to the Uzbek text)
+  titleRu               String   @default("")
+  shortDescriptionRu    String   @default("")
+  heroTitleRu           String   @default("")
+  heroBadgeRu           String   @default("")
+  biographyRu           String   @default("")
+  specializationsRu     String   @default("")
+  professionalHistoryRu String   @default("")
+  educationRu           String   @default("")
+  trainingRu            String   @default("")
+  certificationsRu      String   @default("")
+  membershipsRu         String   @default("")
+  addressRu             String   @default("")
+  clinicNameRu          String   @default("")
+  updatedAt             DateTime @updatedAt
 }
 
 /// Images uploaded from the admin panel. Stored in the database because the
@@ -133,6 +147,10 @@ model Service {
   /// Procedure-only (optional) fields
   indication      String          @default("")
   recovery        String          @default("")
+  nameRu          String          @default("")
+  descriptionRu   String          @default("")
+  indicationRu    String          @default("")
+  recoveryRu      String          @default("")
   showInPricing   Boolean         @default(true)
   active          Boolean         @default(true)
   sortOrder       Int             @default(0)
@@ -194,12 +212,14 @@ model Testimonial {
 }
 
 model Faq {
-  id        String   @id @default(cuid())
-  question  String
-  answer    String
-  active    Boolean  @default(true)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  question   String
+  answer     String
+  questionRu String   @default("")
+  answerRu   String   @default("")
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
 }
 
 model ContactMessage {

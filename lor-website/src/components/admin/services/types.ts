@@ -13,6 +13,10 @@ export type ServiceRow = {
   imageUrl: string | null;
   indication: string;
   recovery: string;
+  nameRu: string;
+  descriptionRu: string;
+  indicationRu: string;
+  recoveryRu: string;
   showInPricing: boolean;
   active: boolean;
   sortOrder: number;

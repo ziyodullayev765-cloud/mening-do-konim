@@ -64,6 +64,29 @@ export default async function ProfilePage() {
           </div>
         </Panel>
 
+        <Panel title="Ruscha matnlar (RU)">
+          <p className="-mt-1 mb-5 text-sm text-muted">
+            Sayt rus tilida ochilganda shu matnlar chiqadi. Bo&apos;sh qoldirilgan maydon o&apos;rniga o&apos;zbekcha matn ko&apos;rsatiladi.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2">
+            <TextField name="titleRu" label="Mutaxassislik (RU)" placeholder="ЛОР-врач (оториноларинголог)" defaultValue={d.titleRu} />
+            <TextField name="heroBadgeRu" label="Sarlavha ustidagi belgi (RU)" placeholder="Бухара, ул. Навои 12" defaultValue={d.heroBadgeRu} />
+            <TextField name="heroTitleRu" label="Katta sarlavha (RU)" placeholder="Здоровье уха, горла и носа" defaultValue={d.heroTitleRu} />
+            <TextField name="clinicNameRu" label="Klinika nomi (RU)" defaultValue={d.clinicNameRu} />
+            <TextArea name="shortDescriptionRu" label="Sarlavha ostidagi matn (RU)" defaultValue={d.shortDescriptionRu} rows={2} className="md:col-span-2" />
+            <TextField name="addressRu" label="To'liq manzil (RU)" defaultValue={d.addressRu} className="md:col-span-2" />
+            <div className="md:col-span-2">
+              <LinesEditor name="specializationsRu" label="Davolash yo'nalishlari (RU)" placeholder="Например: Заболевания уха" addLabel="Yo'nalish qo'shish" defaultValue={d.specializationsRu} />
+            </div>
+            <TextArea name="biographyRu" label="Biografiya (RU)" defaultValue={d.biographyRu} rows={6} className="md:col-span-2" />
+            <TextArea name="professionalHistoryRu" label="Kasbiy yo'l (RU)" hint={p.historyHint} defaultValue={d.professionalHistoryRu} />
+            <TextArea name="educationRu" label="Ta'lim (RU)" hint={p.linesHint} defaultValue={d.educationRu} />
+            <TextArea name="trainingRu" label="Malaka oshirish (RU)" hint={p.linesHint} defaultValue={d.trainingRu} />
+            <TextArea name="certificationsRu" label="Sertifikatlar (RU)" hint={p.linesHint} defaultValue={d.certificationsRu} />
+            <TextArea name="membershipsRu" label="Kasbiy a'zolik (RU)" hint={p.linesHint} defaultValue={d.membershipsRu} />
+          </div>
+        </Panel>
+
         <Panel title={p.sections.stats}>
           <p className="-mt-1 mb-5 text-sm text-muted">{p.statsHint}</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

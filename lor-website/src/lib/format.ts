@@ -1,4 +1,4 @@
-import { t } from "@/lib/i18n";
+import { t, type Dictionary } from "@/lib/i18n";
 
 const nf = new Intl.NumberFormat("ru-RU");
 
@@ -7,26 +7,27 @@ export function formatNumber(n: number) {
   return nf.format(n).replace(/\s/g, " ");
 }
 
-export function formatPrice(price: number | null | undefined, from = false) {
-  if (price == null) return t.common.priceOnRequest;
-  const amount = `${formatNumber(price)} ${t.common.currency}`;
-  return from ? t.common.priceFrom.replace("{price}", amount) : amount;
+export function formatPrice(price: number | null | undefined, from = false, d: Dictionary = t) {
+  if (price == null) return d.common.priceOnRequest;
+  const amount = `${formatNumber(price)} ${d.common.currency}`;
+  return from ? d.common.priceFrom.replace("{price}", amount) : amount;
 }
 
-export function formatDuration(minutes: number | null | undefined) {
+export function formatDuration(minutes: number | null | undefined, d: Dictionary = t) {
   if (!minutes) return null;
-  if (minutes < 60) return `${minutes} ${t.common.minutesShort}`;
+  if (minutes < 60) return `${minutes} ${d.common.minutesShort}`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m ? `${h} ${t.common.hoursShort} ${m} ${t.common.minutesShort}` : `${h} ${t.common.hoursShort}`;
+  return m ? `${h} ${d.common.hoursShort} ${m} ${d.common.minutesShort}` : `${h} ${d.common.hoursShort}`;
 }
 
 /** "2026-10-02" -> "2-oktabr, 2026" */
-export function formatDate(date: string, withWeekday = false) {
+/** uz: "2-oktabr, 2026", ru: "2 октября 2026". */
+export function formatDate(date: string, withWeekday = false, dict: Dictionary = t) {
   const [y, m, d] = date.split("-").map(Number);
   const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
-  const base = `${d}-${t.months[m - 1]}, ${y}`;
-  return withWeekday ? `${t.weekdays[dow]}, ${base}` : base;
+  const base = dict.meta.locale === "ru" ? `${d} ${dict.months[m - 1]} ${y}` : `${d}-${dict.months[m - 1]}, ${y}`;
+  return withWeekday ? `${dict.weekdays[dow]}, ${base}` : base;
 }
 
 export function formatDateTime(d: Date, timeZone: string) {

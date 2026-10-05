@@ -11,11 +11,13 @@ import { deleteFaq, moveFaq, saveFaq } from "@/app/admin/actions/content";
 
 export const metadata: Metadata = { title: t.admin.nav.faq };
 
-function FaqFields({ item }: { item?: { question: string; answer: string; active: boolean } }) {
+function FaqFields({ item }: { item?: { question: string; answer: string; questionRu: string; answerRu: string; active: boolean } }) {
   return (
     <div className="grid gap-4">
       <TextField name="question" label={t.admin.faq.question} defaultValue={item?.question} required />
       <TextArea name="answer" label={t.admin.faq.answer} defaultValue={item?.answer} rows={3} required />
+      <TextField name="questionRu" label={`${t.admin.faq.question} (RU)`} defaultValue={item?.questionRu} />
+      <TextArea name="answerRu" label={`${t.admin.faq.answer} (RU)`} defaultValue={item?.answerRu} rows={3} />
       <Checkbox name="active" label={t.admin.services.active} defaultChecked={item?.active ?? true} />
     </div>
   );

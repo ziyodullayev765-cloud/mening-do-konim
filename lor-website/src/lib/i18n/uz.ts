@@ -193,6 +193,32 @@ export const uz = {
       time: "Vaqtni tanlang.",
     },
   },
+  site: {
+    directions: "Yo'nalishlar",
+    directionsTitle: "Davolash yo'nalishlari",
+    allServices: "Barcha xizmatlar",
+    prices: "Narxlar",
+    pricesTitle: "Xizmatlar va narxlar",
+    reviews: "Fikrlar",
+    reviewsTitle: "Bemorlarimiz fikri",
+    heroTitle: "Quloq, burun va tomoq salomatligi",
+    heroLead: "Tashxis, davolash va maslahat — tajribali LOR shifokori qabulida. Onlayn yoziling, vaqtingizni tejang.",
+    instagramMy: "Instagram sahifam",
+    reviewsCount: "{count} ta bemor fikri",
+    aboutCardsTitle: "Tajriba va malaka",
+    bioSoon: "Biografiya tez orada qo'shiladi.",
+    skipToContent: "Asosiy mazmunga o'tish",
+    advantages: "Afzalliklar",
+    call: "Qo'ng'iroq qilish",
+    language: "Til",
+    fallbackDirections: ["Quloq kasalliklari", "Burun va burun yondosh bo'shliqlari", "Tomoq va hiqildoq kasalliklari", "Bolalar LOR kasalliklari"],
+    trust: [
+      { title: "Onlayn yozilish", text: "Qulay kun va vaqtni bir daqiqada tanlang — navbatda kutmang." },
+      { title: "Aniq narxlar", text: "Asosiy xizmatlar narxi oldindan ma'lum, yashirin to'lovlar yo'q." },
+      { title: "Belgilangan vaqt", text: "Qabul jadval asosida — har bir bemorga yetarli vaqt ajratiladi." },
+      { title: "Shaxsiy yondashuv", text: "Tashxis va davolash rejasi shifokor ko'rigidan so'ng tuziladi." },
+    ],
+  },
   notFound: {
     title: "Sahifa topilmadi",
     lead: "Siz qidirayotgan sahifa mavjud emas yoki ko'chirilgan.",
@@ -485,4 +511,6 @@ export const uz = {
   },
 };
 
-export type Dictionary = typeof uz;
+/** Widened type so other languages can provide their own strings. */
+type Widen<T> = T extends string ? string : T extends readonly (infer U)[] ? Widen<U>[] : { [K in keyof T]: Widen<T[K]> };
+export type Dictionary = Widen<typeof uz>;

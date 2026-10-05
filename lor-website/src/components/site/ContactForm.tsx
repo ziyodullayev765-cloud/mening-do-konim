@@ -2,11 +2,12 @@
 
 import { startTransition, useActionState, useEffect, useRef } from "react";
 import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "./I18nProvider";
 import type { ActionState } from "@/lib/action";
 import { sendContactMessage } from "@/app/(site)/actions";
 
 export function ContactForm() {
+  const { t } = useI18n();
   const [state, action, pending] = useActionState<ActionState, FormData>(sendContactMessage, {});
   const formRef = useRef<HTMLFormElement>(null);
 
