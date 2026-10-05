@@ -43,7 +43,8 @@ const optionalUrl = z
 const imageRef = z.string().trim().max(500).refine(isValidImageRef, IMAGE_REF_ERROR).default("");
 
 export const bookingSchema = z.object({
-  serviceId: z.string().min(1, t.booking.errors.service).max(50),
+  /** Optional — a patient may book without choosing a specific service. */
+  serviceId: z.string().max(50).optional().default(""),
   date: z.string().regex(DATE_RE, t.booking.errors.date),
   time: z.string().regex(TIME_RE, t.booking.errors.time),
   fullName: z.string().trim().min(2, t.booking.errors.name).max(120, t.booking.errors.name),

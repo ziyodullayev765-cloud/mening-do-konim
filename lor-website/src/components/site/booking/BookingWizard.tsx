@@ -75,7 +75,8 @@ export function BookingWizard({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
 
-  const canNext = [!!serviceId, !!date, !!time, true][step];
+  // Choosing a service is optional.
+  const canNext = [true, !!date, !!time, true][step];
 
   function next() {
     setNotice(null);
@@ -87,9 +88,9 @@ export function BookingWizard({
   }
 
   function submit() {
-    if (!serviceId || !date || !time) return;
+    if (!date || !time) return;
     startSubmit(async () => {
-      const res = await createBooking({ serviceId, date, time, ...details });
+      const res = await createBooking({ serviceId: serviceId ?? "", date, time, ...details });
       if (res.ok) {
         setResult(res);
         return;
@@ -132,7 +133,7 @@ export function BookingWizard({
               selected={serviceId}
               onSelect={(id) => {
                 setServiceId(id);
-                setStep(1);
+                if (id) setStep(1);
               }}
             />
           ) : step === 1 ? (
@@ -192,7 +193,7 @@ export function BookingWizard({
         <div className="card p-6 lg:sticky lg:top-28">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t.booking.summary}</p>
           <dl className="mt-4 divide-y divide-line">
-            <SummaryRow label={t.booking.service} value={service?.name} sub={service ? formatPrice(service.price, service.priceFrom) : undefined} />
+            <SummaryRow label={t.booking.service} value={service?.name ?? (step > 0 ? t.booking.notSelected : undefined)} sub={service ? formatPrice(service.price, service.priceFrom) : undefined} />
             <SummaryRow label={t.booking.date} value={date ? formatDate(date, true) : undefined} />
             <SummaryRow label={t.booking.time} value={time ?? undefined} />
           </dl>

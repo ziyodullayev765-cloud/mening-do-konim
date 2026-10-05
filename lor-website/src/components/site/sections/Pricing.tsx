@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Service } from "@prisma/client";
 import { t } from "@/lib/i18n";
 import { PriceTag } from "../PriceTag";
@@ -19,9 +18,6 @@ function PriceGroup({ title, items }: { title: string; items: Service[] }) {
             </div>
             <div className="flex items-center justify-between gap-5 sm:justify-end">
               <PriceTag price={s.price} from={s.priceFrom} className="whitespace-nowrap text-[17px]" />
-              <Link href={`/book?service=${s.id}`} className="btn btn-secondary btn-sm" aria-label={`${t.common.bookNow}: ${s.name}`}>
-                {t.common.bookNow}
-              </Link>
             </div>
           </li>
         ))}
@@ -39,9 +35,6 @@ export function Pricing({ items }: { items: Service[] }) {
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">
             <SectionHeading id="pricing-title" eyebrow={t.pricing.eyebrow} title={t.pricing.title} lead={t.pricing.lead} />
-            <Reveal className="mt-8">
-              <Link href="/book" className="btn btn-primary">{t.common.bookAppointment}</Link>
-            </Reveal>
           </div>
         </div>
         <div className="space-y-6 lg:col-span-8">

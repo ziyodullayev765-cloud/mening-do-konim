@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { CalendarCheck } from "lucide-react";
 import type { Service } from "@prisma/client";
 import { t } from "@/lib/i18n";
 import { formatDuration } from "@/lib/format";
@@ -46,10 +44,6 @@ export function Procedures({ procedures }: { procedures: Service[] }) {
                     </dl>
                     <div className="flex items-center justify-between gap-4 lg:col-span-3 lg:flex-col lg:items-end lg:justify-start">
                       <PriceTag price={p.price} from={p.priceFrom} className="text-xl !text-paper" />
-                      <Link href={`/book?service=${p.id}`} className="btn btn-primary btn-sm">
-                        <CalendarCheck className="size-4" aria-hidden />
-                        {t.common.bookAppointment}
-                      </Link>
                     </div>
                   </article>
                 </Reveal>

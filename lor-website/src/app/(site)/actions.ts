@@ -28,8 +28,11 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
     const settings = await getSettings();
     if (!settings.bookingEnabled) return failure(t.booking.unavailable);
 
-    const service = await db.service.findFirst({ where: { id: data.serviceId, active: true } });
-    if (!service) return failure(t.booking.errors.service, { serviceId: [t.booking.errors.service] });
+    const service = data.serviceId
+      ? await db.service.findFirst({ where: { id: data.serviceId, active: true } })
+      : null;
+    if (data.serviceId && !service) return failure(t.booking.errors.service, { serviceId: [t.booking.errors.service] });
+    const serviceName = service?.name ?? t.booking.noServiceName;
 
     const slots = await getAvailableSlots(data.date);
     if (!slots.includes(data.time)) return { ...failure(t.booking.slotTaken), slotTaken: true };
@@ -44,8 +47,8 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
       await tx.appointment.create({
         data: {
           patientId: patient.id,
-          serviceId: service.id,
-          serviceName: service.name,
+          serviceId: service?.id ?? null,
+          serviceName,
           date: data.date,
           time: data.time,
           note: data.note,
@@ -56,7 +59,7 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
     revalidatePath("/admin", "layout");
     return {
       ...success(),
-      booking: { service: service.name, date: data.date, time: data.time, name: data.fullName },
+      booking: { service: serviceName, date: data.date, time: data.time, name: data.fullName },
     };
   } catch (e) {
     // The partial unique index on (date, time) guarantees no double booking under races.

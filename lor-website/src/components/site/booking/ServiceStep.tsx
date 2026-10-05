@@ -13,7 +13,7 @@ export function ServiceStep({
 }: {
   services: BookableService[];
   selected: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
 }) {
   const groups = [
     { title: t.pricing.consultations, items: services.filter((s) => s.kind === "SERVICE") },
@@ -22,7 +22,8 @@ export function ServiceStep({
 
   return (
     <fieldset>
-      <legend className="font-serif text-2xl text-ink">{t.booking.selectService}</legend>
+      <legend className="font-serif text-2xl text-ink">{t.booking.selectServiceOptional}</legend>
+      <p className="mt-2 text-sm text-muted">{t.booking.serviceOptionalHint}</p>
       <div className="mt-6 space-y-8">
         {groups.map((g) => (
           <div key={g.title}>
@@ -39,7 +40,8 @@ export function ServiceStep({
                       active ? "border-accent shadow-[0_0_0_1px_var(--color-accent)]" : "border-line hover:border-line-strong"
                     }`}
                   >
-                    <input type="radio" name="service" value={s.id} checked={active} onChange={() => onSelect(s.id)} className="sr-only" />
+                    {/* Checkbox semantics so a chosen service can be un-selected again (choice is optional). */}
+                    <input type="checkbox" name="service" value={s.id} checked={active} onChange={() => onSelect(active ? null : s.id)} className="sr-only" />
                     <span className={`grid size-10 shrink-0 place-items-center rounded-lg ${active ? "bg-accent text-white" : "bg-accent-soft text-accent"}`}>
                       <Icon className="size-5" strokeWidth={1.7} aria-hidden />
                     </span>
