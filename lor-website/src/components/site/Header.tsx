@@ -6,12 +6,8 @@ import { CalendarCheck, Menu, Phone, X } from "lucide-react";
 import { t } from "@/lib/i18n";
 
 const NAV = [
-  { href: "/#top", label: t.nav.home },
   { href: "/#about", label: t.nav.about },
   { href: "/#services", label: t.nav.services },
-  { href: "/#procedures", label: t.nav.procedures },
-  { href: "/#pricing", label: t.nav.pricing },
-  { href: "/#experience", label: t.nav.experience },
   { href: "/#faq", label: t.nav.faq },
   { href: "/#contact", label: t.nav.contact },
 ];
@@ -60,13 +56,12 @@ export function Header({ name, title, phone }: { name: string; title: string; ph
           </span>
           <span className="min-w-0 leading-tight">
             <span className="block truncate text-[15px] font-semibold text-ink">{name}</span>
-            <span className="block truncate text-xs text-muted">{title}</span>
           </span>
         </Link>
 
         <nav aria-label="Asosiy" className="hidden xl:block">
           <ul className="flex items-center gap-1">
-            {NAV.slice(1).map((item) => (
+            {NAV.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}

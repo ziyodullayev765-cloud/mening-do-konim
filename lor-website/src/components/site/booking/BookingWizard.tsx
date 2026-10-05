@@ -257,7 +257,7 @@ function Loading() {
 
 function Success({ booking, phone }: { booking: NonNullable<BookingResult["booking"]>; phone: string }) {
   return (
-    <div className="card mx-auto max-w-2xl animate-fade-up p-8 text-center sm:p-12" role="status">
+    <div className="card mx-auto max-w-2xl p-8 text-center sm:p-12" role="status">
       <span className="mx-auto grid size-16 place-items-center rounded-full bg-success-soft text-success">
         <CalendarCheck className="size-8" aria-hidden />
       </span>

@@ -1,70 +1,64 @@
-import { Building2, MapPin } from "lucide-react";
 import type { Doctor } from "@prisma/client";
 import { t } from "@/lib/i18n";
-import { lines } from "@/lib/format";
-import { DoctorPortrait } from "../DoctorPortrait";
-import { Reveal } from "../Reveal";
+import { isPlaceholder, lines } from "@/lib/format";
+import { Block } from "../Block";
 
+function parseHistory(text: string) {
+  return lines(text).map((line) => {
+    const [a, ...rest] = line.split("|");
+    return rest.length ? { period: a.trim(), text: rest.join("|").trim() } : { period: "", text: a.trim() };
+  });
+}
+
+/** Text-only: photo and name are already shown in the hero. */
 export function About({ doctor }: { doctor: Doctor }) {
-  const expertise = lines(doctor.specializations);
-  const paragraphs = lines(doctor.biography);
-  return (
-    <section id="about" aria-labelledby="about-title" className="section">
-      <div className="container-x grid gap-14 lg:grid-cols-12 lg:gap-16">
-        <Reveal className="lg:col-span-5">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] lg:sticky lg:top-28">
-            <DoctorPortrait photoUrl={doctor.aboutPhotoUrl ?? doctor.photoUrl} name={doctor.fullName} sizes="(min-width: 1024px) 35vw, 100vw" />
-          </div>
-        </Reveal>
-        <div className="lg:col-span-7">
-          <Reveal>
-            <p className="eyebrow">{t.about.eyebrow}</p>
-            <h2 id="about-title" className="h-section mt-4">{doctor.fullName}</h2>
-            <p className="mt-3 font-serif text-xl italic text-accent">{doctor.title}</p>
-          </Reveal>
-          {paragraphs.length > 0 && (
-            <Reveal delay={80} className="mt-8 space-y-5 text-[17px] leading-[1.75] text-text/90">
-              {paragraphs.map((p, i) => (
-                <p key={i} className={i === 0 ? "first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-6xl first-letter:leading-[0.85] first-letter:text-ink" : ""}>
-                  {p}
-                </p>
-              ))}
-            </Reveal>
-          )}
+  const real = (xs: string[]) => xs.filter((x) => !isPlaceholder(x));
+  const bio = real(lines(doctor.biography));
+  const expertise = real(lines(doctor.specializations));
+  const education = real([...lines(doctor.education), ...lines(doctor.training)]);
+  const certificates = real([...lines(doctor.certifications), ...lines(doctor.memberships)]);
+  const history = parseHistory(doctor.professionalHistory).filter((h) => !isPlaceholder(h.text) && !isPlaceholder(h.period || "x"));
 
-          {expertise.length > 0 && (
-            <Reveal delay={120} className="mt-10">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t.about.expertise}</h3>
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {expertise.map((e) => (
-                  <li key={e} className="chip">{e}</li>
+  const lists = [
+    { title: t.experience.title, items: history.map((h) => ({ key: h.period + h.text, main: h.text, sub: h.period })) },
+    { title: t.qualifications.education, items: education.map((e) => ({ key: e, main: e, sub: "" })) },
+    { title: t.qualifications.certifications, items: certificates.map((c) => ({ key: c, main: c, sub: "" })) },
+  ].filter((l) => l.items.length);
+
+  if (!bio.length && !expertise.length && !lists.length) return null;
+
+  return (
+    <Block id="about" label={t.about.eyebrow}>
+      {bio.length > 0 && (
+        <div className="space-y-5 text-lg leading-relaxed text-text">
+          {bio.map((p, i) => <p key={i}>{p}</p>)}
+        </div>
+      )}
+
+      {expertise.length > 0 && (
+        <div className={bio.length ? "mt-10" : ""}>
+          <h3 className="text-sm font-semibold text-ink">{t.about.expertise}</h3>
+          <p className="mt-2 text-[16px] leading-relaxed text-muted">{expertise.join(" · ")}</p>
+        </div>
+      )}
+
+      {lists.length > 0 && (
+        <div className="mt-10 grid gap-10 sm:grid-cols-2">
+          {lists.map((l) => (
+            <div key={l.title}>
+              <h3 className="text-sm font-semibold text-ink">{l.title}</h3>
+              <ul className="mt-3 space-y-3">
+                {l.items.map((it) => (
+                  <li key={it.key} className="text-[15px] leading-snug text-text">
+                    {it.sub && <span className="block text-xs text-muted">{it.sub}</span>}
+                    {it.main}
+                  </li>
                 ))}
               </ul>
-            </Reveal>
-          )}
-
-          <Reveal delay={160} className="mt-10 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
-            {doctor.clinicName && (
-              <div className="flex gap-4 bg-surface p-6">
-                <Building2 className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{t.about.clinic}</p>
-                  <p className="mt-1.5 font-medium text-ink">{doctor.clinicName}</p>
-                </div>
-              </div>
-            )}
-            {doctor.address && (
-              <div className="flex gap-4 bg-surface p-6">
-                <MapPin className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{t.about.location}</p>
-                  <p className="mt-1.5 font-medium text-ink">{doctor.address}</p>
-                </div>
-              </div>
-            )}
-          </Reveal>
+            </div>
+          ))}
         </div>
-      </div>
-    </section>
+      )}
+    </Block>
   );
 }

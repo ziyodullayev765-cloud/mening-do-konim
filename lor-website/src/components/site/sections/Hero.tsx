@@ -1,76 +1,56 @@
 import Link from "next/link";
-import { ArrowRight, CalendarCheck, Clock, MapPin } from "lucide-react";
+import { CalendarCheck, Phone } from "lucide-react";
 import type { Doctor } from "@prisma/client";
 import { t } from "@/lib/i18n";
+import { formatNumber, isPlaceholder, telHref } from "@/lib/format";
 import { DoctorPortrait } from "../DoctorPortrait";
 
+/** The only place the doctor's photo and name appear. */
 export function Hero({ doctor, todayHours }: { doctor: Doctor; todayHours: string | null }) {
-  const location = [doctor.city, doctor.country].filter(Boolean).join(", ");
+  const location = [doctor.city, doctor.country].filter((v) => v && !isPlaceholder(v)).join(", ");
+  const facts = [
+    doctor.yearsExperience ? { label: t.trust.experience, value: `${doctor.yearsExperience}+` } : null,
+    doctor.patientsTreated ? { label: t.trust.patients, value: `${formatNumber(doctor.patientsTreated)}+` } : null,
+    { label: todayHours ? t.hero.todayHours : t.hero.closedToday, value: todayHours ?? "—" },
+    location ? { label: t.about.location, value: location } : null,
+  ].filter(Boolean) as { label: string; value: string }[];
+
   return (
-    <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(60%_60%_at_85%_0%,rgb(47_111_216/0.10),transparent_70%)]" />
-      <div className="container-x relative grid items-center gap-12 pt-8 pb-16 lg:grid-cols-12 lg:gap-10 lg:pt-14 lg:pb-24">
+    <section id="top" aria-labelledby="hero-title">
+      <div className="container-x grid items-center gap-10 pt-10 pb-16 lg:grid-cols-12 lg:gap-16 lg:pt-16 lg:pb-24">
         <div className="lg:col-span-7">
-          <p className="eyebrow animate-fade-up">{t.hero.eyebrow}</p>
-          <h1 id="hero-title" className="h-display mt-6 animate-fade-up text-[clamp(2.75rem,1.6rem+4.6vw,5.25rem)] [animation-delay:80ms]">
-            {doctor.fullName}
-          </h1>
-          <p className="mt-4 animate-fade-up font-serif text-[clamp(1.35rem,1.1rem+0.9vw,1.85rem)] italic text-accent [animation-delay:140ms]">
-            {doctor.title}
-          </p>
-          {doctor.shortDescription && (
-            <p className="mt-6 max-w-xl animate-fade-up text-[17px] leading-relaxed text-muted [animation-delay:200ms] md:text-lg">
-              {doctor.shortDescription}
-            </p>
+          <p className="eyebrow">{doctor.title}</p>
+          <h1 id="hero-title" className="h-display mt-5 text-[clamp(2.5rem,1.6rem+3.4vw,4.25rem)]">{doctor.fullName}</h1>
+          {doctor.shortDescription && !isPlaceholder(doctor.shortDescription) && (
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{doctor.shortDescription}</p>
           )}
 
-          <ul className="mt-8 flex animate-fade-up flex-wrap gap-x-6 gap-y-3 text-[15px] text-text [animation-delay:240ms]">
-            {doctor.yearsExperience != null && (
-              <li className="flex items-center gap-2">
-                <span className="font-serif text-2xl leading-none text-ink">{doctor.yearsExperience}+</span>
-                <span className="text-muted">{t.common.yearsExperience}</span>
-              </li>
-            )}
-            {location && (
-              <li className="flex items-center gap-2 text-muted">
-                <MapPin className="size-4 text-accent" aria-hidden />
-                {location}
-              </li>
-            )}
-            {doctor.clinicName && <li className="text-muted">{doctor.clinicName}</li>}
-          </ul>
-
-          <div className="mt-10 flex animate-fade-up flex-col gap-3 [animation-delay:300ms] sm:flex-row">
-            <Link href="/book" className="btn btn-primary btn-lg group">
+          <div className="mt-9 flex flex-wrap gap-3">
+            <Link href="/book" className="btn btn-primary btn-lg">
               <CalendarCheck className="size-5" aria-hidden />
               {t.common.bookAppointment}
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
-            <a href="#services" className="btn btn-secondary btn-lg">
-              {t.common.viewServices}
-            </a>
+            {doctor.phone && !isPlaceholder(doctor.phone) && (
+              <a href={telHref(doctor.phone)} className="btn btn-secondary btn-lg">
+                <Phone className="size-5" aria-hidden />
+                {doctor.phone}
+              </a>
+            )}
           </div>
+
+          <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-line pt-8 sm:grid-cols-4">
+            {facts.map((f) => (
+              <div key={f.label}>
+                <dt className="text-xs text-muted">{f.label}</dt>
+                <dd className="mt-1 font-medium text-ink tabular-nums">{f.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
         <div className="lg:col-span-5">
-          <div className="relative mx-auto max-w-md animate-fade-up [animation-delay:150ms] lg:max-w-none">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] shadow-lift">
-              <DoctorPortrait photoUrl={doctor.photoUrl} name={doctor.fullName} priority />
-            </div>
-            <div aria-hidden className="absolute -top-4 -right-4 -z-10 hidden h-full w-full rounded-[14px] border border-line-strong lg:block" />
-            <div className="absolute -bottom-6 left-4 right-4 sm:left-auto sm:-left-6 sm:right-auto">
-              <div className="card flex items-center gap-4 px-5 py-4">
-                <span className="grid size-10 place-items-center rounded-full bg-accent-soft text-accent">
-                  <Clock className="size-5" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-                    {todayHours ? t.hero.todayHours : t.hero.closedToday}
-                  </p>
-                  {todayHours && <p className="mt-0.5 font-semibold tabular-nums text-ink">{todayHours}</p>}
-                </div>
-              </div>
-            </div>
+          <div className="relative mx-auto aspect-[4/5] max-w-md overflow-hidden rounded-2xl bg-paper-2 lg:max-w-none">
+            <DoctorPortrait photoUrl={doctor.photoUrl} name={doctor.fullName} priority />
           </div>
         </div>
       </div>
