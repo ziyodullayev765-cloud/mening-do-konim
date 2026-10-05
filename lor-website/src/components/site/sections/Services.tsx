@@ -4,7 +4,6 @@ import { getT } from "@/lib/i18n/server";
 import { formatDuration, formatPrice, isPlaceholder } from "@/lib/format";
 import { Block } from "../Block";
 import { Reveal } from "../Reveal";
-import { PricesBackdrop } from "../PricesBackdrop";
 
 /** Single price list (consultations + procedures). */
 export async function Services({ services }: { services: Service[] }) {
@@ -15,7 +14,7 @@ export async function Services({ services }: { services: Service[] }) {
   ].filter((g) => g.items.length);
 
   return (
-    <Block id="prices" label={t.site.prices} title={t.site.pricesTitle} lead={t.pricing.lead} backdrop={<PricesBackdrop />}>
+    <Block id="prices" label={t.site.prices} title={t.site.pricesTitle} lead={t.pricing.lead}>
       {groups.length === 0 ? (
         <p className="text-muted">{t.services.empty}</p>
       ) : (

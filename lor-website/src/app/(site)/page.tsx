@@ -7,7 +7,6 @@ import { Highlights } from "@/components/site/sections/Highlights";
 import { Testimonials } from "@/components/site/sections/Testimonials";
 import { Faq } from "@/components/site/sections/Faq";
 import { Contact } from "@/components/site/sections/Contact";
-import { EntBackdrop } from "@/components/site/EntBackdrop";
 import { StructuredData } from "@/components/site/StructuredData";
 
 export default async function HomePage() {
@@ -27,9 +26,7 @@ export default async function HomePage() {
       <Services services={[...services, ...procedures]} />
       <Highlights doctor={doctor} />
       <Testimonials items={testimonials} />
-      {/* FAQ + Contact share one backdrop, so there is no seam between them */}
-      <div className="relative isolate overflow-hidden py-6 sm:py-10">
-        <EntBackdrop />
+      <div className="py-6 sm:py-10">
         <Faq items={faqs} />
         <Contact doctor={doctor} schedule={schedule} />
       </div>

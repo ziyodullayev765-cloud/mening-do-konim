@@ -20,14 +20,14 @@ export async function Highlights({ doctor }: { doctor: Doctor }) {
   ].filter((s): s is { value: number; label: string } => s.value != null && s.value > 0);
 
   return (
-    <section aria-label={t.site.advantages} className="bg-ink text-white">
+    <section aria-label={t.site.advantages}>
       <div className="container-x py-12 sm:py-20 lg:py-24">
         {stats.length > 0 && (
-          <dl className={`grid grid-cols-2 gap-5 border-b border-white/10 pb-8 sm:gap-8 sm:pb-14 ${stats.length >= 4 ? "lg:grid-cols-4" : stats.length === 3 ? "lg:grid-cols-3" : ""}`}>
+          <dl className={`grid grid-cols-2 gap-5 border-b border-line pb-8 sm:gap-8 sm:pb-14 ${stats.length >= 4 ? "lg:grid-cols-4" : stats.length === 3 ? "lg:grid-cols-3" : ""}`}>
             {stats.map((s, i) => (
               <Reveal key={s.label} delay={i * 80}>
-                <dd className="text-[clamp(1.615rem,1.275rem+1.7vw,2.89rem)] font-extrabold tracking-tight text-white tabular-nums">{formatNumber(s.value)}+</dd>
-                <dt className="mt-1 text-[13px] text-white/60 sm:text-[15px]">{s.label}</dt>
+                <dd className="text-[clamp(1.615rem,1.275rem+1.7vw,2.89rem)] font-extrabold tracking-tight text-ink tabular-nums">{formatNumber(s.value)}+</dd>
+                <dt className="mt-1 text-[13px] text-muted sm:text-[15px]">{s.label}</dt>
               </Reveal>
             ))}
           </dl>
@@ -37,10 +37,10 @@ export async function Highlights({ doctor }: { doctor: Doctor }) {
             const Icon = TRUST_ICONS[i % TRUST_ICONS.length];
             return (
             <Reveal as="li" key={item.title} delay={i * 80}>
-              <div className="h-full rounded-xl border border-white/10 bg-white/[0.04] p-3.5 sm:p-6 transition-colors hover:bg-white/[0.08]">
-                <Icon className="size-5 text-[#6fd3e3] sm:size-7" strokeWidth={1.7} aria-hidden />
-                <p className="mt-2.5 text-[13.5px] leading-snug font-bold text-white sm:mt-5 sm:text-base">{item.title}</p>
-                <p className="mt-1 text-xs leading-relaxed text-white/60 sm:mt-2 sm:text-sm">{item.text}</p>
+              <div className="card lift h-full p-3.5 sm:p-6">
+                <Icon className="size-5 text-accent sm:size-7" strokeWidth={1.7} aria-hidden />
+                <p className="mt-2.5 text-[13.5px] leading-snug font-bold text-ink sm:mt-5 sm:text-base">{item.title}</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted sm:mt-2 sm:text-sm">{item.text}</p>
               </div>
             </Reveal>
             );

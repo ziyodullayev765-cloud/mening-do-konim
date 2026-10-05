@@ -1,18 +1,29 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useRef } from "react";
+import { startTransition, useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
 import { useI18n } from "./I18nProvider";
 import type { ActionState } from "@/lib/action";
 import { sendContactMessage } from "@/app/(site)/actions";
+import { PLANE_DURATION_S, PaperPlane, playPting } from "./PaperPlane";
 
 export function ContactForm() {
   const { t } = useI18n();
   const [state, action, pending] = useActionState<ActionState, FormData>(sendContactMessage, {});
   const formRef = useRef<HTMLFormElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const audioRef = useRef<AudioContext | null>(null);
+  const [flight, setFlight] = useState<{ x: number; y: number } | null>(null);
+  const endFlight = useCallback(() => setFlight(null), []);
 
   useEffect(() => {
-    if (state.ok) formRef.current?.reset();
+    if (!state.ok) return;
+    formRef.current?.reset();
+    // Celebrate: the paper plane loops and flies away, then a happy "pting".
+    const r = buttonRef.current?.getBoundingClientRect();
+    if (r) setFlight({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (audioRef.current) playPting(audioRef.current, reduced ? 1.2 : PLANE_DURATION_S - 0.35);
   }, [state]);
 
   const err = (name: string) => state.errors?.[name]?.[0];
@@ -25,6 +36,11 @@ export function ContactForm() {
       onSubmit={(e) => {
         // Manual submit so typed values survive server-side validation errors.
         e.preventDefault();
+        // Audio must be unlocked inside the click; the chime itself plays after sending.
+        try {
+          audioRef.current ??= new AudioContext();
+          void audioRef.current.resume();
+        } catch {}
         const data = new FormData(e.currentTarget);
         startTransition(() => action(data));
       }}
@@ -69,11 +85,12 @@ export function ContactForm() {
           )}
           {state.ok === false && !state.errors && <p className="text-danger">{state.message}</p>}
         </div>
-        <button type="submit" className="btn btn-dark" disabled={pending}>
+        <button ref={buttonRef} type="submit" className="btn btn-dark" disabled={pending}>
           {pending ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : <Send className="size-4" aria-hidden />}
           {t.contact.send}
         </button>
       </div>
+      {flight && <PaperPlane origin={flight} onDone={endFlight} />}
     </form>
   );
 }
