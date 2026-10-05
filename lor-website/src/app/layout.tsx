@@ -14,7 +14,7 @@ const newsreader = Newsreader({
 
 export const dynamic = "force-dynamic";
 
-export const viewport: Viewport = { themeColor: "#f5f9fe", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#f3fafa", width: "device-width", initialScale: 1 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const [doctor, settings] = await Promise.all([getDoctor(), getSiteSettings()]);

@@ -42,12 +42,12 @@ function Monogram({ name }: { name: string }) {
     <div
       role="img"
       aria-label={t.hero.photoAlt}
-      className="absolute inset-0 overflow-hidden bg-[radial-gradient(120%_90%_at_20%_10%,#3a6fc0_0%,#15315a_60%)]"
+      className="absolute inset-0 overflow-hidden bg-[radial-gradient(120%_90%_at_20%_10%,#14a3a3_0%,#0f2f3a_60%)]"
     >
       <svg className="absolute inset-0 size-full opacity-[0.18]" aria-hidden>
         <defs>
           <pattern id="portrait-lines" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-            <line x1="0" y1="0" x2="0" y2="22" stroke="#e6f0fd" strokeWidth="0.6" />
+            <line x1="0" y1="0" x2="0" y2="22" stroke="#dff4f3" strokeWidth="0.6" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#portrait-lines)" />
