@@ -1,6 +1,6 @@
 import type { AppointmentStatus } from "@prisma/client";
 import { Inbox } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
   return (
@@ -22,7 +22,8 @@ const STATUS_STYLES: Record<AppointmentStatus, string> = {
   RESCHEDULED: "bg-warning-soft text-warning border-warning/20",
 };
 
-export function StatusBadge({ status }: { status: AppointmentStatus }) {
+export async function StatusBadge({ status }: { status: AppointmentStatus }) {
+  const t = await getT();
   return (
     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${STATUS_STYLES[status]}`}>
       {t.status[status]}

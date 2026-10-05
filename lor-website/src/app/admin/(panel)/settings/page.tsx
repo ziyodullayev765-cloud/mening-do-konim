@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { getSettings } from "@/lib/slots";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { Checkbox, TextArea, TextField } from "@/components/admin/fields";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { PageHeader, Panel } from "@/components/admin/ui";
 import { changePassword, saveSettings } from "@/app/admin/actions/settings";
 
-export const metadata: Metadata = { title: t.admin.nav.settings };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.settings };
+}
 
 export default async function SettingsPage() {
+  const t = await getT();
   const admin = await requireAdmin();
   const s = await getSettings();
   const st = t.admin.settings;
@@ -26,6 +31,9 @@ export default async function SettingsPage() {
               <TextField name="minNoticeMinutes" type="number" min={0} label={st.minNoticeMinutes} defaultValue={s.minNoticeMinutes} />
               <TextField name="timezone" label={st.timezone} defaultValue={s.timezone} hint="Masalan: Asia/Tashkent" />
             </div>
+          </Panel>
+          <Panel title={st.appearance}>
+            <ImageUpload name="backgroundUrl" label={st.background} hint={st.backgroundHint} defaultValue={s.backgroundUrl} aspect="aspect-[16/9]" />
           </Panel>
           <Panel title={st.seo}>
             <div className="grid gap-5">

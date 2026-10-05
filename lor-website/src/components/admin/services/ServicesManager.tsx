@@ -2,7 +2,7 @@
 
 import { useDeferredValue, useEffect, useMemo, useOptimistic, useState, useTransition } from "react";
 import { CalendarClock, Clock, Pencil, Plus, Search, SearchX, Stethoscope, Trash2, X } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceIcon } from "@/lib/icons";
 import { SERVICE_CATEGORIES } from "@/lib/schemas/service";
@@ -14,7 +14,6 @@ import { DeleteServiceDialog } from "./DeleteServiceDialog";
 import { ServiceFormModal } from "./ServiceFormModal";
 import { SORT_KEYS, type Filters, type ServiceRow, type SortKey } from "./types";
 
-const ui = t.admin.servicesUi;
 
 type OptimisticAction =
   | { type: "patch"; id: string; patch: Partial<ServiceRow> }
@@ -52,6 +51,8 @@ function sortRows(rows: ServiceRow[], sort: SortKey) {
 }
 
 export function ServicesManager({ services, initialFilters }: { services: ServiceRow[]; initialFilters: Filters }) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
   const [rows, applyOptimistic] = useOptimistic(services, reducer);
   const [, startTransition] = useTransition();
   const [filters, setFilters] = useState<Filters>(initialFilters);
@@ -256,8 +257,10 @@ type RowProps = {
 };
 
 function ServiceTableRow({ row, onEdit, onDelete, onToggle }: RowProps) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
   const Icon = serviceIcon(row.icon);
-  const duration = formatDuration(row.durationMinutes);
+  const duration = formatDuration(row.durationMinutes, t);
   return (
     <tr className={`group transition-colors hover:bg-paper-2/40 ${row.active ? "" : "bg-paper-2/30"}`}>
       <td className="px-5 py-4">
@@ -284,7 +287,7 @@ function ServiceTableRow({ row, onEdit, onDelete, onToggle }: RowProps) {
       <td className="px-4 py-4"><CategoryBadge category={row.category} /></td>
       <td className="hidden px-4 py-4 whitespace-nowrap text-muted tabular-nums lg:table-cell">{duration ?? "—"}</td>
       <td className="px-4 py-4 text-right whitespace-nowrap">
-        <span className={row.price == null ? "text-[13px] text-muted" : "font-semibold text-ink tabular-nums"}>{formatPrice(row.price, row.priceFrom)}</span>
+        <span className={row.price == null ? "text-[13px] text-muted" : "font-semibold text-ink tabular-nums"}>{formatPrice(row.price, row.priceFrom, t)}</span>
       </td>
       <td className="px-4 py-4">
         <div className="flex justify-center">
@@ -299,8 +302,10 @@ function ServiceTableRow({ row, onEdit, onDelete, onToggle }: RowProps) {
 }
 
 function ServiceCard({ row, onEdit, onDelete, onToggle }: RowProps) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
   const Icon = serviceIcon(row.icon);
-  const duration = formatDuration(row.durationMinutes);
+  const duration = formatDuration(row.durationMinutes, t);
   return (
     <li className={`card p-4 ${row.active ? "" : "bg-paper-2/40"}`}>
       <div className="flex items-start gap-3">
@@ -317,7 +322,7 @@ function ServiceCard({ row, onEdit, onDelete, onToggle }: RowProps) {
         <Switch checked={row.active} pending={row.pending} onChange={(next) => onToggle(row, next)} label={ui.toggleLabel.replace("{name}", row.name)} />
       </div>
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
-        <span className={row.price == null ? "text-[13px] text-muted" : "font-semibold text-ink tabular-nums"}>{formatPrice(row.price, row.priceFrom)}</span>
+        <span className={row.price == null ? "text-[13px] text-muted" : "font-semibold text-ink tabular-nums"}>{formatPrice(row.price, row.priceFrom, t)}</span>
         <RowActions row={row} onEdit={onEdit} onDelete={onDelete} />
       </div>
     </li>
@@ -325,6 +330,8 @@ function ServiceCard({ row, onEdit, onDelete, onToggle }: RowProps) {
 }
 
 function RowActions({ row, onEdit, onDelete }: Omit<RowProps, "onToggle">) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
   return (
     <div className="flex justify-end gap-1">
       <button type="button" onClick={() => onEdit(row)} disabled={row.pending} className="btn btn-ghost btn-sm !px-2.5" aria-label={`${ui.edit}: ${row.name}`} title={ui.edit}>
@@ -338,6 +345,8 @@ function RowActions({ row, onEdit, onDelete }: Omit<RowProps, "onToggle">) {
 }
 
 function EmptyBlock({ icon: Icon, title, lead, children }: { icon: typeof Search; title: string; lead: string; children?: React.ReactNode }) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line-strong bg-surface/60 px-6 py-16 text-center">
       <span className="grid size-12 place-items-center rounded-full bg-paper-2 text-muted"><Icon className="size-6" strokeWidth={1.5} aria-hidden /></span>

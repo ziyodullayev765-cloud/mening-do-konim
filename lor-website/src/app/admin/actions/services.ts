@@ -4,14 +4,13 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { requireAdmin } from "@/lib/auth";
 import { failure, success, type ActionState } from "@/lib/action";
-import { PRICE_MAX, kindForCategory, serviceFormSchema } from "@/lib/schemas/service";
+import { PRICE_MAX, kindForCategory, serviceFormSchemaFor } from "@/lib/schemas/service";
 import { deleteUnusedMedia } from "@/lib/media";
 import { fieldErrors, id as idSchema } from "@/lib/validation";
 
-const ui = t.admin.servicesUi;
 
 /** Public pages, booking and admin all read services — refresh them together. */
 function refreshAll() {
@@ -29,9 +28,11 @@ export type SaveServiceResult = ActionState & { id?: string };
  * them with the SAME schema the client form uses.
  */
 export async function saveService(id: string | null, values: unknown): Promise<SaveServiceResult> {
+  const t = await getT();
+  const ui = t.admin.servicesUi;
   await requireAdmin();
 
-  const parsed = serviceFormSchema.safeParse(values);
+  const parsed = serviceFormSchemaFor(t.meta.locale === "ru" ? "ru" : "uz").safeParse(values);
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
   if (id !== null && !idSchema.safeParse(id).success) return failure(ui.notFound);
 
@@ -67,6 +68,8 @@ export async function saveService(id: string | null, values: unknown): Promise<S
 
 /** Sets (not flips) the active flag, so retries and optimistic updates stay idempotent. */
 export async function setServiceActive(id: string, active: boolean): Promise<ActionState> {
+  const t = await getT();
+  const ui = t.admin.servicesUi;
   await requireAdmin();
   const parsed = z.object({ id: idSchema, active: z.boolean() }).safeParse({ id, active });
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -82,6 +85,8 @@ export async function setServiceActive(id: string, active: boolean): Promise<Act
 }
 
 export async function deleteService(id: string): Promise<ActionState> {
+  const t = await getT();
+  const ui = t.admin.servicesUi;
   await requireAdmin();
   if (!idSchema.safeParse(id).success) return failure(t.common.invalidForm);
   try {
@@ -99,6 +104,8 @@ export async function deleteService(id: string): Promise<ActionState> {
 
 /** Bulk price editor (/admin/prices). Uses the same positive-price rule as the service form. */
 export async function savePrices(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
+  const ui = t.admin.servicesUi;
   await requireAdmin();
   const ids = formData.getAll("id").map(String);
   const priceSchema = z.preprocess(
@@ -111,7 +118,7 @@ export async function savePrices(_prev: ActionState, formData: FormData): Promis
     if (!idSchema.safeParse(sid).success) continue;
     const parsed = priceSchema.safeParse(formData.get(`price_${sid}`));
     if (!parsed.success) {
-      errors[`price_${sid}`] = ["Narx musbat butun son bo'lishi kerak."];
+      errors[`price_${sid}`] = [t.meta.locale === "ru" ? "Цена должна быть положительным целым числом." : "Narx musbat butun son bo'lishi kerak."];
       continue;
     }
     // "from X" makes no sense without a price.

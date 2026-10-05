@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import { Star, Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { Checkbox, TextArea, TextField } from "@/components/admin/fields";
 import { EmptyState, PageHeader, Panel } from "@/components/admin/ui";
 import { deleteTestimonial, saveTestimonial, toggleTestimonial } from "@/app/admin/actions/content";
 
-export const metadata: Metadata = { title: t.admin.nav.testimonials };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.testimonials };
+}
 
-function TestimonialFields({ item }: { item?: { patientName: string; text: string; rating: number | null; active: boolean } }) {
+async function TestimonialFields({ item }: { item?: { patientName: string; text: string; rating: number | null; active: boolean } }) {
+  const t = await getT();
   return (
     <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
       <TextField name="patientName" label={t.admin.testimonials.patientName} defaultValue={item?.patientName} required />
@@ -23,6 +27,7 @@ function TestimonialFields({ item }: { item?: { patientName: string; text: strin
 }
 
 export default async function TestimonialsPage() {
+  const t = await getT();
   await requireAdmin();
   const items = await db.testimonial.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] });
   return (

@@ -27,12 +27,13 @@ export function mediaIdFromUrl(url: string | null | undefined) {
 export async function deleteUnusedMedia(urls: (string | null | undefined)[]) {
   const ids = [...new Set(urls.map(mediaIdFromUrl).filter((x): x is string => Boolean(x)))];
   if (ids.length === 0) return;
-  const [doctor, services] = await Promise.all([
+  const [doctor, services, setting] = await Promise.all([
     db.doctor.findUnique({ where: { id: 1 }, select: { photoUrl: true, aboutPhotoUrl: true, contactPhotoUrl: true, logoUrl: true } }),
     db.service.findMany({ where: { imageUrl: { not: null } }, select: { imageUrl: true } }),
+    db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true } }),
   ]);
   const used = new Set(
-    [doctor?.photoUrl, doctor?.aboutPhotoUrl, doctor?.contactPhotoUrl, doctor?.logoUrl, ...services.map((s) => s.imageUrl)]
+    [doctor?.photoUrl, doctor?.aboutPhotoUrl, doctor?.contactPhotoUrl, doctor?.logoUrl, setting?.backgroundUrl, ...services.map((s) => s.imageUrl)]
       .map(mediaIdFromUrl)
       .filter(Boolean),
   );

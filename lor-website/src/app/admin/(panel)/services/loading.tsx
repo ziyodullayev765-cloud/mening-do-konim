@@ -1,7 +1,7 @@
 /** Skeleton matching the services table layout to avoid layout shift. */
 export default function Loading() {
   return (
-    <div role="status" aria-label="Yuklanmoqda" className="animate-pulse">
+    <div role="status" aria-label="…" className="animate-pulse">
       <div className="mb-8 flex items-end justify-between">
         <div>
           <div className="h-9 w-72 rounded bg-line" />

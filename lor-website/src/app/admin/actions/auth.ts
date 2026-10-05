@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { failure, type ActionState } from "@/lib/action";
 import { createSession, destroySession } from "@/lib/auth";
 import { clientIp, rateLimit, resetRateLimit } from "@/lib/rate-limit";
@@ -13,6 +13,7 @@ import { loginSchema } from "@/lib/validation";
 const DUMMY_HASH = bcrypt.hashSync("timing-equaliser-not-a-real-password", 12);
 
 export async function login(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   const parsed = loginSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.admin.login.invalid);
   const { email, password, remember } = parsed.data;
@@ -33,6 +34,7 @@ export async function login(_prev: ActionState, formData: FormData): Promise<Act
 }
 
 export async function logout() {
+  const t = await getT();
   await destroySession();
   redirect("/admin/login");
 }

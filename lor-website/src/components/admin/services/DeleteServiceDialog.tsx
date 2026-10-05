@@ -1,11 +1,10 @@
 "use client";
 
 import { AlertTriangle, EyeOff, Trash2 } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 import { Modal } from "../Modal";
 import type { ServiceRow } from "./types";
 
-const ui = t.admin.servicesUi;
 
 export function DeleteServiceDialog({
   service,
@@ -18,6 +17,8 @@ export function DeleteServiceDialog({
   onConfirm: (service: ServiceRow) => void;
   onHideInstead: (service: ServiceRow) => void;
 }) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
   return (
     <Modal
       open={service !== null}

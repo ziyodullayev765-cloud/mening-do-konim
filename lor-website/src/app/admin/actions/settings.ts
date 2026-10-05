@@ -4,16 +4,18 @@ import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { requireAdmin } from "@/lib/auth";
 import { failure, success, type ActionState } from "@/lib/action";
 import { TIME_RE } from "@/lib/slots-shared";
 import { toMinutes } from "@/lib/slots";
-import { blockedDateSchema, fieldErrors, id, passwordSchema, settingsSchema } from "@/lib/validation";
+import { deleteUnusedMedia } from "@/lib/media";
+import { adminSchemasFor, fieldErrors, id } from "@/lib/validation";
 
 /* ---------- Weekly schedule ---------- */
 
 export async function saveSchedule(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const days = [];
   const errors: Record<string, string[]> = {};
@@ -40,8 +42,9 @@ export async function saveSchedule(_prev: ActionState, formData: FormData): Prom
 }
 
 export async function addBlockedDate(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
-  const parsed = blockedDateSchema.safeParse(Object.fromEntries(formData));
+  const parsed = adminSchemasFor(t).blockedDateSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
   try {
     await db.blockedDate.create({ data: parsed.data });
@@ -56,6 +59,7 @@ export async function addBlockedDate(_prev: ActionState, formData: FormData): Pr
 }
 
 export async function removeBlockedDate(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -67,17 +71,22 @@ export async function removeBlockedDate(_prev: ActionState, formData: FormData):
 /* ---------- Site settings ---------- */
 
 export async function saveSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
-  const parsed = settingsSchema.safeParse(Object.fromEntries(formData));
+  const parsed = adminSchemasFor(t).settingsSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
-  await db.setting.upsert({ where: { id: 1 }, create: { id: 1, ...parsed.data }, update: parsed.data });
+  const data = { ...parsed.data, backgroundUrl: parsed.data.backgroundUrl || null };
+  const before = await db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true } });
+  await db.setting.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
+  if (before?.backgroundUrl && before.backgroundUrl !== data.backgroundUrl) await deleteUnusedMedia([before.backgroundUrl]);
   revalidatePath("/", "layout");
   return success(t.admin.settings.saved);
 }
 
 export async function changePassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   const admin = await requireAdmin();
-  const parsed = passwordSchema.safeParse(Object.fromEntries(formData));
+  const parsed = adminSchemasFor(t).passwordSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
   const record = await db.admin.findUniqueOrThrow({ where: { id: admin.id } });
   if (!(await bcrypt.compare(parsed.data.currentPassword, record.passwordHash))) {

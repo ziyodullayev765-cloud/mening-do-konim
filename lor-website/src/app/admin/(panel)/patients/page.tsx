@@ -3,13 +3,17 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { formatDate } from "@/lib/format";
 import { EmptyState, PageHeader } from "@/components/admin/ui";
 
-export const metadata: Metadata = { title: t.admin.nav.patients };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.patients };
+}
 
 export default async function PatientsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const t = await getT();
   await requireAdmin();
   const q = (await searchParams).q?.trim().slice(0, 100) || undefined;
   const patients = await db.patient.findMany({
@@ -64,7 +68,7 @@ export default async function PatientsPage({ searchParams }: { searchParams: Pro
                     </td>
                     <td className="px-5 py-3.5 tabular-nums">{p.phone}</td>
                     <td className="px-5 py-3.5 tabular-nums">{p._count.appointments}</td>
-                    <td className="px-5 py-3.5 text-muted">{p.appointments[0] ? formatDate(p.appointments[0].date) : "—"}</td>
+                    <td className="px-5 py-3.5 text-muted">{p.appointments[0] ? formatDate(p.appointments[0].date, false, t) : "—"}</td>
                   </tr>
                 ))}
               </tbody>

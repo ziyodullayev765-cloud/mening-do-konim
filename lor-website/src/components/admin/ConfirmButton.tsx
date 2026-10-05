@@ -1,14 +1,14 @@
 "use client";
 
 import { useRef } from "react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 
 /** Submit button that asks for confirmation in a modal before submitting its form. */
 export function ConfirmButton({
   children,
   message,
   className = "btn btn-secondary btn-sm",
-  confirmLabel = t.common.confirm,
+  confirmLabel,
   danger = true,
   name,
   value,
@@ -21,6 +21,7 @@ export function ConfirmButton({
   name?: string;
   value?: string;
 }) {
+  const { t } = useI18n();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const hiddenRef = useRef<HTMLButtonElement>(null);
@@ -51,7 +52,7 @@ export function ConfirmButton({
                 btn?.form?.requestSubmit(btn);
               }}
             >
-              {confirmLabel}
+              {confirmLabel ?? t.common.confirm}
             </button>
           </div>
         </div>

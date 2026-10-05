@@ -1,8 +1,10 @@
 "use client";
 
 import { useFieldError } from "./ActionForm";
+import { useI18n } from "@/components/site/I18nProvider";
 
 export function PriceInput({ name, defaultValue, label }: { name: string; defaultValue: number | null; label: string }) {
+  const { t } = useI18n();
   const error = useFieldError(name);
   return (
     <div>
@@ -19,7 +21,7 @@ export function PriceInput({ name, defaultValue, label }: { name: string; defaul
           aria-invalid={!!error}
           className="input pr-14 tabular-nums"
         />
-        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs text-muted">so&apos;m</span>
+        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs text-muted">{t.common.currency}</span>
       </div>
       {error && <p className="mt-1 text-xs text-danger">{error}</p>}
     </div>

@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { requireAdmin } from "@/lib/auth";
 import { deleteUnusedMedia } from "@/lib/media";
 import { failure, success, type ActionState } from "@/lib/action";
-import { doctorSchema, faqSchema, fieldErrors, id, testimonialSchema } from "@/lib/validation";
+import { adminSchemasFor, fieldErrors, id } from "@/lib/validation";
 
 function refreshSite() {
   revalidatePath("/", "layout");
@@ -15,8 +15,9 @@ function refreshSite() {
 /* ---------- Doctor profile ---------- */
 
 export async function saveProfile(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
-  const parsed = doctorSchema.safeParse(Object.fromEntries(formData));
+  const parsed = adminSchemasFor(t).doctorSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
   const data = {
     ...parsed.data,
@@ -35,8 +36,9 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
 /* ---------- Testimonials ---------- */
 
 export async function saveTestimonial(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
-  const parsed = testimonialSchema.safeParse(Object.fromEntries(formData));
+  const parsed = adminSchemasFor(t).testimonialSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
   const tid = formData.get("id");
   if (typeof tid === "string" && tid) {
@@ -50,6 +52,7 @@ export async function saveTestimonial(_prev: ActionState, formData: FormData): P
 }
 
 export async function deleteTestimonial(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -59,6 +62,7 @@ export async function deleteTestimonial(_prev: ActionState, formData: FormData):
 }
 
 export async function toggleTestimonial(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -72,8 +76,9 @@ export async function toggleTestimonial(_prev: ActionState, formData: FormData):
 /* ---------- FAQ ---------- */
 
 export async function saveFaq(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
-  const parsed = faqSchema.safeParse(Object.fromEntries(formData));
+  const parsed = adminSchemasFor(t).faqSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
   const fid = formData.get("id");
   if (typeof fid === "string" && fid) {
@@ -87,6 +92,7 @@ export async function saveFaq(_prev: ActionState, formData: FormData): Promise<A
 }
 
 export async function deleteFaq(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -97,6 +103,7 @@ export async function deleteFaq(_prev: ActionState, formData: FormData): Promise
 
 /** Swaps the FAQ with its neighbour. formData: id, direction ("up" | "down"). */
 export async function moveFaq(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   const direction = formData.get("direction");
@@ -116,6 +123,7 @@ export async function moveFaq(_prev: ActionState, formData: FormData): Promise<A
 /* ---------- Contact messages ---------- */
 
 export async function toggleMessageRead(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -127,6 +135,7 @@ export async function toggleMessageRead(_prev: ActionState, formData: FormData):
 }
 
 export async function deleteMessage(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = id.safeParse(formData.get("id"));
   if (!parsed.success) return failure(t.common.invalidForm);

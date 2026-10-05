@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarCheck, CheckCheck, Mail, Phone, X } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
+import { autoRu } from "@/lib/i18n/content-ru";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { getSettings } from "@/lib/slots";
 import { PageHeader, Panel, StatusBadge } from "@/components/admin/ui";
@@ -13,9 +14,14 @@ import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { TextArea, TextField } from "@/components/admin/fields";
 import { rescheduleAppointment, saveAppointmentNote, setAppointmentStatus } from "@/app/admin/actions/appointments";
 
-export const metadata: Metadata = { title: t.admin.appointments.details };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.appointments.details };
+}
 
 export default async function AppointmentPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getT();
+  const svc = (name: string) => (t.meta.locale === "ru" ? autoRu(name) : name);
   await requireAdmin();
   const { id } = await params;
   const [a, settings] = await Promise.all([
@@ -28,8 +34,8 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
     [t.admin.appointments.patient, <Link key="p" href={`/admin/patients/${a.patientId}`} className="font-semibold text-accent hover:underline">{a.patient.fullName}</Link>],
     [t.admin.appointments.phone, <a key="ph" href={`tel:${a.patient.phone}`} className="inline-flex items-center gap-1.5 tabular-nums hover:text-accent"><Phone className="size-3.5" aria-hidden />{a.patient.phone}</a>],
     [t.admin.appointments.email, a.patient.email ? <a key="e" href={`mailto:${a.patient.email}`} className="inline-flex items-center gap-1.5 hover:text-accent"><Mail className="size-3.5" aria-hidden />{a.patient.email}</a> : "—"],
-    [t.admin.appointments.service, a.serviceName],
-    [t.admin.appointments.date, formatDate(a.date, true)],
+    [t.admin.appointments.service, svc(a.serviceName)],
+    [t.admin.appointments.date, formatDate(a.date, true, t)],
     [t.admin.appointments.time, <span key="t" className="tabular-nums">{a.time}</span>],
     [t.admin.appointments.status, <StatusBadge key="s" status={a.status} />],
     [t.admin.appointments.note, a.note ? <span key="n" className="whitespace-pre-line">{a.note}</span> : "—"],

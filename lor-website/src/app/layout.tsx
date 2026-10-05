@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { getDoctor, getSiteSettings } from "@/lib/data";
-import { getLocale, getT } from "@/lib/i18n/server";
+import { getLocale, getT, getTheme } from "@/lib/i18n/server";
 import "./globals.css";
 
 const manrope = Manrope({ subsets: ["latin", "latin-ext", "cyrillic"], variable: "--font-manrope", display: "swap" });
@@ -50,9 +50,9 @@ export async function generateMetadata(): Promise<Metadata> {
 const RESET_SCROLL_ON_RELOAD = `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.hash)history.replaceState(history.state,"",location.pathname+location.search);addEventListener("load",function(){setTimeout(function(){history.scrollRestoration="auto"},300)});addEventListener("pagehide",function(){history.scrollRestoration="manual"});addEventListener("pageshow",function(e){if(e.persisted)history.scrollRestoration="auto"})}catch(e){}`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
+  const [locale, theme] = await Promise.all([getLocale(), getTheme()]);
   return (
-    <html lang={locale} className={`${manrope.variable}`}>
+    <html lang={locale} data-theme={theme} className={`${manrope.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: RESET_SCROLL_ON_RELOAD }} />
       </head>

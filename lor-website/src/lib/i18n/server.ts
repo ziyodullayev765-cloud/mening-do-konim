@@ -9,6 +9,17 @@ export const getLocale = cache(async (): Promise<Locale> => {
   return isLocale(value) ? value : DEFAULT_LOCALE;
 });
 
+/** Colour theme from the `theme` cookie (set by the sun/moon toggle). */
+export const getTheme = cache(async (): Promise<"light" | "dark"> =>
+  (await cookies()).get("theme")?.value === "dark" ? "dark" : "light",
+);
+
+/** Picks the Uzbek or Russian variant of an inline (non-dictionary) string. */
+export async function getL() {
+  const locale = await getLocale();
+  return (uz: string, ru: string) => (locale === "ru" ? ru : uz);
+}
+
 export async function getT() {
   return dictionaries[await getLocale()];
 }

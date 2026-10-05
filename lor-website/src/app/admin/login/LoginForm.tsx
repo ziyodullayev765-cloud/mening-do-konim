@@ -2,11 +2,12 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 import type { ActionState } from "@/lib/action";
 import { login } from "../actions/auth";
 
 export function LoginForm() {
+  const { t } = useI18n();
   const [state, action, pending] = useActionState<ActionState, FormData>(login, {});
   const [show, setShow] = useState(false);
   return (

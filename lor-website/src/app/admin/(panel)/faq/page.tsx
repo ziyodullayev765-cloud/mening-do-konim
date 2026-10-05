@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { Checkbox, TextArea, TextField } from "@/components/admin/fields";
 import { EmptyState, PageHeader, Panel } from "@/components/admin/ui";
 import { deleteFaq, moveFaq, saveFaq } from "@/app/admin/actions/content";
 
-export const metadata: Metadata = { title: t.admin.nav.faq };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.faq };
+}
 
-function FaqFields({ item }: { item?: { question: string; answer: string; questionRu: string; answerRu: string; active: boolean } }) {
+async function FaqFields({ item }: { item?: { question: string; answer: string; questionRu: string; answerRu: string; active: boolean } }) {
+  const t = await getT();
   return (
     <div className="grid gap-4">
       <TextField name="question" label={t.admin.faq.question} defaultValue={item?.question} required />
@@ -24,6 +28,7 @@ function FaqFields({ item }: { item?: { question: string; answer: string; questi
 }
 
 export default async function FaqPage() {
+  const t = await getT();
   await requireAdmin();
   const items = await db.faq.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] });
   return (

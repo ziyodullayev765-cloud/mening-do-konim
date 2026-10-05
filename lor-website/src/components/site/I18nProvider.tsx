@@ -11,5 +11,8 @@ export function I18nProvider({ locale, children }: { locale: Locale; children: R
 }
 
 export function useI18n() {
-  return useContext(I18nContext);
+  const ctx = useContext(I18nContext);
+  /** Picks the Uzbek or Russian variant of an inline (non-dictionary) string. */
+  const L = (uz: string, ru: string) => (ctx.locale === "ru" ? ru : uz);
+  return { ...ctx, L };
 }

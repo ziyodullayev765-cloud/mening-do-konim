@@ -213,7 +213,7 @@ export function BookingWizard({
 function Stepper({ step, onJump }: { step: Step; onJump: (s: Step) => void }) {
   const { t } = useI18n();
   return (
-    <ol className="grid grid-cols-4 gap-2" aria-label="Qadamlar">
+    <ol className="grid grid-cols-4 gap-2" aria-label={t.booking.steps.join(" · ")}>
       {t.booking.steps.map((label, i) => {
         const done = i < step;
         const current = i === step;

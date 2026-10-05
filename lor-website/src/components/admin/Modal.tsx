@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { X } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 
 /**
  * Accessible modal built on native <dialog>: focus trap, Esc handling and
@@ -26,6 +26,7 @@ export function Modal({
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg";
 }) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const descId = useId();

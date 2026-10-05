@@ -4,20 +4,26 @@ import type { Prisma } from "@prisma/client";
 import { Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
+import { autoRu } from "@/lib/i18n/content-ru";
 import { formatDate } from "@/lib/format";
 import { clinicNow, getSettings } from "@/lib/slots";
 import { DATE_RE } from "@/lib/slots-shared";
 import { statusSchema } from "@/lib/validation";
 import { EmptyState, PageHeader, StatusBadge } from "@/components/admin/ui";
 
-export const metadata: Metadata = { title: t.admin.nav.appointments };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.appointments };
+}
 
 const PAGE_SIZE = 50;
 
 type Search = { q?: string; status?: string; service?: string; date?: string; upcoming?: string; page?: string };
 
 export default async function AppointmentsPage({ searchParams }: { searchParams: Promise<Search> }) {
+  const t = await getT();
+  const svc = (name: string) => (t.meta.locale === "ru" ? autoRu(name) : name);
   await requireAdmin();
   const sp = await searchParams;
   const status = statusSchema.safeParse(sp.status).data;
@@ -108,13 +114,13 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
                   <tr key={a.id} className={`hover:bg-paper-2/40 ${a.date === today ? "bg-accent-soft/25" : ""}`}>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       <span className="font-semibold tabular-nums text-ink">{a.time}</span>
-                      <span className="ml-2 text-muted">{formatDate(a.date)}</span>
+                      <span className="ml-2 text-muted">{formatDate(a.date, false, t)}</span>
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="block font-medium text-ink">{a.patient.fullName}</span>
                       <span className="text-muted tabular-nums">{a.patient.phone}</span>
                     </td>
-                    <td className="px-5 py-3.5 text-text">{a.serviceName}</td>
+                    <td className="px-5 py-3.5 text-text">{svc(a.serviceName)}</td>
                     <td className="px-5 py-3.5"><StatusBadge status={a.status} /></td>
                     <td className="px-5 py-3.5 text-right">
                       <Link href={`/admin/appointments/${a.id}`} className="btn btn-secondary btn-sm">{t.admin.appointments.open}</Link>
@@ -128,7 +134,7 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
       )}
 
       {pages > 1 && (
-        <nav className="mt-6 flex items-center justify-center gap-2" aria-label="Sahifalar">
+        <nav className="mt-6 flex items-center justify-center gap-2" aria-label={t.admin.nav.appointments}>
           {page > 1 && <Link href={qs(page - 1)} className="btn btn-secondary btn-sm">{t.common.back}</Link>}
           <span className="px-3 text-sm text-muted tabular-nums">{page} / {pages}</span>
           {page < pages && <Link href={qs(page + 1)} className="btn btn-secondary btn-sm">{t.common.next}</Link>}

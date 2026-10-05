@@ -246,4 +246,6 @@ model Setting {
   timezone          String  @default("Asia/Tashkent")
   siteTitle         String  @default("")
   metaDescription   String  @default("")
+  /// Optional background image for the public site (shown softly behind the content)
+  backgroundUrl     String?
 }

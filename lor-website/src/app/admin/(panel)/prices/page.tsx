@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { EmptyState, PageHeader } from "@/components/admin/ui";
 import { PriceInput } from "@/components/admin/PriceInput";
 import { savePrices } from "@/app/admin/actions/services";
 
-export const metadata: Metadata = { title: t.admin.nav.prices };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.prices };
+}
 
 export default async function PricesPage() {
+  const t = await getT();
   await requireAdmin();
   const items = await db.service.findMany({ orderBy: [{ kind: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }] });
   return (

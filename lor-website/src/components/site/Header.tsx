@@ -8,6 +8,7 @@ import { useI18n } from "./I18nProvider";
 import { isPlaceholder, telHref } from "@/lib/format";
 import { LogoMark } from "./Logo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ThemeToggle } from "../ThemeToggle";
 
 
 type Props = { name: string; phone: string; email: string; address: string; todayHours: string | null; hasReviews: boolean; logoUrl: string | null };
@@ -69,6 +70,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
               {todayHours ? `${t.hero.todayHours}: ${todayHours}` : t.hero.closedToday}
             </span>
             <a href="/#faq" className="hover:text-accent">{t.nav.faq}</a>
+            <ThemeToggle labels={{ light: t.site.themeLight, dark: t.site.themeDark }} className="!size-7" />
             <LanguageSwitcher />
           </div>
         </div>
@@ -82,7 +84,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
             <span className="truncate text-[17px] font-extrabold tracking-tight text-ink lg:max-w-[180px] xl:max-w-none">{name}</span>
           </Link>
 
-          <nav aria-label="Asosiy" className="hidden lg:block">
+          <nav aria-label={t.nav.home} className="hidden lg:block">
             <ul className="flex items-center gap-1">
               {nav.map((item) => (
                 <li key={item.href}>
@@ -102,7 +104,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
             {ok(phone) && (
               <a
                 href={telHref(phone)}
-                className="btn btn-secondary !px-3 2xl:!px-4"
+                className="btn btn-secondary hidden !px-3 sm:inline-flex 2xl:!px-4"
                 aria-label={`${t.site.call}: ${phone}`}
                 title={t.site.call}
               >
@@ -110,6 +112,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
                 <span className="hidden 2xl:inline">{phone}</span>
               </a>
             )}
+            <ThemeToggle labels={{ light: t.site.themeLight, dark: t.site.themeDark }} className="md:hidden" />
             <LanguageSwitcher className="md:hidden" />
             <Link href="/book" className="btn btn-primary hidden sm:inline-flex">
               {t.common.bookAppointment}
@@ -130,7 +133,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
 
         {open && (
           <div id="mobile-menu" className="absolute inset-x-0 top-full h-[calc(100dvh-77px)] overflow-y-auto border-t border-line bg-white md:h-[calc(100dvh-118px)] lg:hidden">
-            <nav aria-label="Mobil" className="container-x py-6">
+            <nav aria-label={t.nav.openMenu} className="container-x py-6">
               <ul className="divide-y divide-line">
                 {nav.map((item) => (
                   <li key={item.href}>

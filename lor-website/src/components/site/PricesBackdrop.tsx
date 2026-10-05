@@ -5,7 +5,7 @@
  */
 export function PricesBackdrop() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[linear-gradient(135deg,#f1fbfc_0%,#f6f7fd_55%,#f3f0fb_100%)]">
+    <div aria-hidden className="prices-wash pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[linear-gradient(135deg,#f1fbfc_0%,#f6f7fd_55%,#f3f0fb_100%)]">
       {/* Drifting blurred blobs */}
       <span className="prices-blob left-[-12%] top-[-10%] size-[26rem] bg-[radial-gradient(circle_at_40%_40%,#9fe3ea_0%,#b9b3ef_55%,transparent_72%)] [animation-duration:22s]" />
       <span className="prices-blob right-[-14%] bottom-[-14%] size-[30rem] bg-[radial-gradient(circle_at_55%_45%,#8fdde6_0%,#c3bcf3_55%,transparent_72%)] [animation-delay:-8s] [animation-duration:26s]" />

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { clinicNow, getSettings } from "@/lib/slots";
 import { SERVICE_CATEGORIES, type ServiceCategoryKey } from "@/lib/schemas/service";
 import { ServicesManager } from "@/components/admin/services/ServicesManager";
 import { SORT_KEYS, type Filters, type ServiceRow, type SortKey } from "@/components/admin/services/types";
 
-export const metadata: Metadata = { title: t.admin.servicesUi.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.servicesUi.title };
+}
 
 type Search = { q?: string; category?: string; status?: string; sort?: string };
 
@@ -22,6 +25,7 @@ function parseFilters(sp: Search): Filters {
 }
 
 export default async function ServicesPage({ searchParams }: { searchParams: Promise<Search> }) {
+  const t = await getT();
   await requireAdmin();
   const [sp, settings] = await Promise.all([searchParams, getSettings()]);
   const today = clinicNow(settings.timezone).date;

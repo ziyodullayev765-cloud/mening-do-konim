@@ -27,7 +27,7 @@ export default async function HomePage() {
       <Services services={[...services, ...procedures]} />
       <Highlights doctor={doctor} />
       <Testimonials items={testimonials} />
-      {/* FAQ + Contact share one patterned backdrop, so there is no seam between them */}
+      {/* FAQ + Contact share one backdrop, so there is no seam between them */}
       <div className="relative isolate overflow-hidden py-6 sm:py-10">
         <EntBackdrop />
         <Faq items={faqs} />

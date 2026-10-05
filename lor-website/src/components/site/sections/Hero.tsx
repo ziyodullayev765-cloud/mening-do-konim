@@ -21,7 +21,7 @@ export async function Hero({ doctor, rating }: { doctor: Doctor; rating: { avera
   const lead = ok(doctor.shortDescription) ? doctor.shortDescription : t.site.heroLead;
 
   return (
-    <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden bg-white bg-[radial-gradient(55%_60%_at_95%_0%,#e4f5f8_0%,transparent_70%)]">
+    <section id="top" aria-labelledby="hero-title" className="hero-glow relative overflow-hidden bg-white bg-[radial-gradient(55%_60%_at_95%_0%,#e4f5f8_0%,transparent_70%)]">
       <div className="container-x relative grid items-center gap-12 pt-6 pb-10 sm:pt-10 sm:pb-16 lg:grid-cols-12 lg:pt-14 lg:pb-24">
         <div className="min-w-0 lg:col-span-6">
           {location && (

@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useMemo } from "react";
 import { Controller, useForm, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Clock, LoaderCircle } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { SERVICE_ICONS } from "@/lib/icons";
 import {
   SERVICE_CATEGORIES,
   emptyServiceForm,
   isProcedureCategory,
-  serviceFormSchema,
+  serviceFormSchemaFor,
   type ServiceFormInput,
   type ServiceFormOutput,
 } from "@/lib/schemas/service";
@@ -20,9 +20,6 @@ import { Modal } from "../Modal";
 import { toast } from "../toast";
 import { CATEGORY_STYLES } from "./CategoryBadge";
 import type { ServiceRow } from "./types";
-
-const ui = t.admin.servicesUi;
-const f = ui.fields;
 
 function toFormValues(row: ServiceRow): ServiceFormInput {
   return {
@@ -58,16 +55,23 @@ type Props = {
  * from the row — no reset() effect that could overwrite what the user types.
  */
 export function ServiceFormModal(props: Props) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
   if (!props.open) return null;
   return <ServiceFormDialog {...props} />;
 }
 
 function ServiceFormDialog({ service, onClose }: Props) {
+  const { t, L, locale } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
+  const schema = useMemo(() => serviceFormSchemaFor(locale), [locale]);
   const [saving, startSaving] = useTransition();
   const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   const form = useForm<ServiceFormInput, unknown, ServiceFormOutput>({
-    resolver: zodResolver(serviceFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: service ? toFormValues(service) : emptyServiceForm,
     // Validate on first submit, then live while typing — no layout jumps on blur.
     mode: "onSubmit",
@@ -223,12 +227,12 @@ function ServiceFormDialog({ service, onClose }: Props) {
           )}
 
           {/* Russian */}
-          <Section title="Ruscha (RU)" hint="Sayt rus tilida ochilganda chiqadi. Bo'sh bo'lsa, o'zbekcha matn ko'rsatiladi.">
+          <Section title={L("Ruscha (RU)", "На русском (RU)")} hint={L("Sayt rus tilida ochilganda chiqadi. Bo'sh bo'lsa, o'zbekcha matn ko'rsatiladi.", "Показывается, когда сайт открыт на русском. Если пусто — показывается текст на узбекском.")}>
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Nomi (RU)" error={errors.nameRu?.message} htmlFor="sf-name-ru" optional>
+              <Field label={`${f.name} (RU)`} error={errors.nameRu?.message} htmlFor="sf-name-ru" optional>
                 <input id="sf-name-ru" className="input" placeholder="Например: Консультация ЛОР-врача" {...register("nameRu")} />
               </Field>
-              <Field label="Qisqa tavsif (RU)" error={errors.descriptionRu?.message} htmlFor="sf-desc-ru" optional>
+              <Field label={`${f.description} (RU)`} error={errors.descriptionRu?.message} htmlFor="sf-desc-ru" optional>
                 <textarea id="sf-desc-ru" rows={2} className="input" {...register("descriptionRu")} />
               </Field>
               {showProcedureFields && (
@@ -292,10 +296,13 @@ function ServiceFormDialog({ service, onClose }: Props) {
 
 /** Live preview of how the card will look on the public site. */
 function Preview({ values }: { values: ServiceFormInput }) {
+  const { t, locale } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
   const Icon = (SERVICE_ICONS[values.icon as keyof typeof SERVICE_ICONS] ?? SERVICE_ICONS.stethoscope).icon;
-  const parsed = serviceFormSchema.safeParse(values);
+  const parsed = serviceFormSchemaFor(locale).safeParse(values);
   const price = parsed.success ? parsed.data.price : null;
-  const duration = parsed.success ? formatDuration(parsed.data.durationMinutes) : null;
+  const duration = parsed.success ? formatDuration(parsed.data.durationMinutes, t) : null;
   return (
     <aside className="hidden lg:block">
       <div className="sticky top-0">
@@ -308,7 +315,7 @@ function Preview({ values }: { values: ServiceFormInput }) {
           {values.description && <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-muted">{values.description}</p>}
           <div className="mt-4 border-t border-line pt-4">
             <p className={`font-semibold tabular-nums ${price == null ? "text-sm text-muted" : "text-ink"}`}>
-              {formatPrice(price, values.priceFrom && price != null)}
+              {formatPrice(price, values.priceFrom && price != null, t)}
             </p>
             {duration && (
               <p className="mt-1 flex items-center gap-1.5 text-xs text-muted"><Clock className="size-3.5" aria-hidden />{duration}</p>
@@ -321,6 +328,9 @@ function Preview({ values }: { values: ServiceFormInput }) {
 }
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
   return (
     <section className="space-y-5">
       <div>
@@ -337,6 +347,9 @@ function Field({
 }: {
   label: string; htmlFor: string; error?: string; hint?: string; optional?: boolean; required?: boolean; children: React.ReactNode;
 }) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
   return (
     <div>
       <label htmlFor={htmlFor} className="label">
@@ -351,11 +364,17 @@ function Field({
 }
 
 function FieldError({ message }: { message?: string }) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
   if (!message) return null;
   return <p role="alert" className="mt-1.5 text-sm text-danger">{message}</p>;
 }
 
 function Checkbox({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const { t } = useI18n();
+  const ui = t.admin.servicesUi;
+  const f = ui.fields;
   return (
     <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-ink">
       <input type="checkbox" className="size-4 accent-[var(--color-accent)]" {...props} />

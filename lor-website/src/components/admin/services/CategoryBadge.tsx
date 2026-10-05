@@ -1,4 +1,6 @@
-import { t } from "@/lib/i18n";
+"use client";
+
+import { useI18n } from "@/components/site/I18nProvider";
 import type { ServiceCategoryKey } from "@/lib/schemas/service";
 
 export const CATEGORY_STYLES: Record<ServiceCategoryKey, { badge: string; dot: string }> = {
@@ -9,6 +11,7 @@ export const CATEGORY_STYLES: Record<ServiceCategoryKey, { badge: string; dot: s
 };
 
 export function CategoryBadge({ category }: { category: ServiceCategoryKey }) {
+  const { t } = useI18n();
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${CATEGORY_STYLES[category].badge}`}>
       <span className={`size-1.5 rounded-full ${CATEGORY_STYLES[category].dot}`} aria-hidden />

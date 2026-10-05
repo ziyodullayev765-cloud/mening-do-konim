@@ -3,13 +3,12 @@ import type { Faq as FaqItem } from "@prisma/client";
 import { getT } from "@/lib/i18n/server";
 import { Block } from "../Block";
 import { Reveal } from "../Reveal";
-import { CaduceusMark } from "../EntBackdrop";
 
 export async function Faq({ items }: { items: FaqItem[] }) {
   const t = await getT();
   if (items.length === 0) return null;
   return (
-    <Block id="faq" label={t.faq.eyebrow} title={t.faq.title} panel={{ decor: <CaduceusMark className="absolute -left-6 top-1/2 -z-10 h-[85%] -translate-y-1/2 text-[#1e9db2] opacity-[0.10] sm:left-4" /> }}>
+    <Block id="faq" label={t.faq.eyebrow} title={t.faq.title} panel={{}}>
       <Reveal className="mx-auto max-w-2xl space-y-2 sm:space-y-3">
         {items.map((f) => (
           <details key={f.id} className="group glass-card overflow-hidden !rounded-xl">

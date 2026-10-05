@@ -5,7 +5,7 @@
  * Must stay free of server-only imports.
  */
 import { z } from "zod";
-import { IMAGE_REF_ERROR, isValidImageRef } from "@/lib/media-shared";
+import { imageRefError, isValidImageRef } from "@/lib/media-shared";
 
 export const SERVICE_CATEGORIES = ["CONSULTATION", "DIAGNOSTICS", "TREATMENT", "SURGERY"] as const;
 export type ServiceCategoryKey = (typeof SERVICE_CATEGORIES)[number];
@@ -30,20 +30,37 @@ export const PRICE_MAX = 1_000_000_000;
 export const DURATION_MIN = 5;
 export const DURATION_MAX = 600;
 
-const msg = {
-  nameMin: "Xizmat nomini to'liq kiriting (kamida 3 ta belgi).",
-  nameMax: "Nom 120 belgidan oshmasligi kerak.",
-  category: "Kategoriyani tanlang.",
-  priceNumber: "Narx faqat raqamlardan iborat bo'lishi kerak.",
-  pricePositive: "Narx musbat son bo'lishi kerak.",
-  priceMax: "Narx juda katta.",
-  priceFromNeedsPrice: "\"…dan\" ko'rinishi uchun narxni kiriting.",
-  durationNumber: "Davomiylik butun son (daqiqa) bo'lishi kerak.",
-  durationRange: `Davomiylik ${DURATION_MIN}–${DURATION_MAX} daqiqa oralig'ida bo'lishi kerak.`,
-  sortNumber: "Tartib raqami butun son bo'lishi kerak.",
-  url: "Rasm manzili https:// bilan boshlanishi kerak.",
-  tooLong: (n: number) => `${n} belgidan oshmasligi kerak.`,
-  icon: "Belgini tanlang.",
+type Locale = "uz" | "ru";
+
+const MESSAGES = {
+  uz: {
+    nameMin: "Xizmat nomini to'liq kiriting (kamida 3 ta belgi).",
+    nameMax: "Nom 120 belgidan oshmasligi kerak.",
+    category: "Kategoriyani tanlang.",
+    priceNumber: "Narx faqat raqamlardan iborat bo'lishi kerak.",
+    pricePositive: "Narx musbat son bo'lishi kerak.",
+    priceMax: "Narx juda katta.",
+    priceFromNeedsPrice: "\"…dan\" ko'rinishi uchun narxni kiriting.",
+    durationNumber: "Davomiylik butun son (daqiqa) bo'lishi kerak.",
+    durationRange: `Davomiylik ${DURATION_MIN}–${DURATION_MAX} daqiqa oralig'ida bo'lishi kerak.`,
+    sortNumber: "Tartib raqami butun son bo'lishi kerak.",
+    tooLong: (n: number) => `${n} belgidan oshmasligi kerak.`,
+    icon: "Belgini tanlang.",
+  },
+  ru: {
+    nameMin: "Введите полное название услуги (не менее 3 символов).",
+    nameMax: "Название не должно превышать 120 символов.",
+    category: "Выберите категорию.",
+    priceNumber: "Цена должна состоять только из цифр.",
+    pricePositive: "Цена должна быть положительным числом.",
+    priceMax: "Слишком большая цена.",
+    priceFromNeedsPrice: "Для вида «от …» укажите цену.",
+    durationNumber: "Длительность должна быть целым числом (минуты).",
+    durationRange: `Длительность должна быть от ${DURATION_MIN} до ${DURATION_MAX} минут.`,
+    sortNumber: "Порядковый номер должен быть целым числом.",
+    tooLong: (n: number) => `Не более ${n} символов.`,
+    icon: "Выберите иконку.",
+  },
 };
 
 /**
@@ -62,9 +79,10 @@ function optionalInt(opts: { min: number; max: number; notNumber: string; range:
     .refine((v) => v === null || v <= opts.max, opts.range);
 }
 
-const text = (max: number) => z.string().trim().max(max, msg.tooLong(max));
-
-export const serviceFormSchema = z
+export function serviceFormSchemaFor(locale: Locale = "uz") {
+  const msg = MESSAGES[locale];
+  const text = (max: number) => z.string().trim().max(max, msg.tooLong(max));
+  return z
   .object({
     name: z.string().trim().min(3, msg.nameMin).max(120, msg.nameMax),
     category: z.enum(SERVICE_CATEGORIES, { error: msg.category }),
@@ -77,7 +95,7 @@ export const serviceFormSchema = z
       .string()
       .trim()
       .max(500, msg.tooLong(500))
-      .refine(isValidImageRef, IMAGE_REF_ERROR),
+      .refine(isValidImageRef, imageRefError(locale)),
     indication: text(500),
     recovery: text(500),
     nameRu: text(120),
@@ -93,6 +111,9 @@ export const serviceFormSchema = z
       ctx.addIssue({ code: "custom", path: ["priceFrom"], message: msg.priceFromNeedsPrice });
     }
   });
+}
+
+export const serviceFormSchema = serviceFormSchemaFor("uz");
 
 /** What the form holds (strings for numeric inputs). */
 export type ServiceFormInput = z.input<typeof serviceFormSchema>;

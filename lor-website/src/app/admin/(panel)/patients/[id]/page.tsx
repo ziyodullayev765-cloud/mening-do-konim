@@ -4,13 +4,19 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
+import { autoRu } from "@/lib/i18n/content-ru";
 import { formatDate } from "@/lib/format";
 import { EmptyState, PageHeader, Panel, StatusBadge } from "@/components/admin/ui";
 
-export const metadata: Metadata = { title: t.admin.nav.patients };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.patients };
+}
 
 export default async function PatientPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getT();
+  const svc = (name: string) => (t.meta.locale === "ru" ? autoRu(name) : name);
   await requireAdmin();
   const { id } = await params;
   const patient = await db.patient.findUnique({
@@ -19,7 +25,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
   });
   if (!patient) notFound();
 
-  const servicesBooked = [...new Set(patient.appointments.map((a) => a.serviceName))];
+  const servicesBooked = [...new Set(patient.appointments.map((a) => svc(a.serviceName)))];
 
   return (
     <>
@@ -63,10 +69,10 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
                 <li key={a.id}>
                   <Link href={`/admin/appointments/${a.id}`} className="flex items-center gap-4 py-3 hover:bg-paper-2/40">
                     <span className="w-36 shrink-0 text-sm">
-                      <span className="block font-semibold text-ink">{formatDate(a.date)}</span>
+                      <span className="block font-semibold text-ink">{formatDate(a.date, false, t)}</span>
                       <span className="tabular-nums text-muted">{a.time}</span>
                     </span>
-                    <span className="min-w-0 flex-1 truncate">{a.serviceName}</span>
+                    <span className="min-w-0 flex-1 truncate">{svc(a.serviceName)}</span>
                     <StatusBadge status={a.status} />
                   </Link>
                 </li>

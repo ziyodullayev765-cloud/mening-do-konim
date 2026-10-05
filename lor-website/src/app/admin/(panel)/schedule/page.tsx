@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { formatDate } from "@/lib/format";
 import { clinicNow, getSettings, getWeekSchedule } from "@/lib/slots";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
@@ -12,9 +12,13 @@ import { ScheduleRow } from "@/components/admin/ScheduleRow";
 import { EmptyState, PageHeader, Panel } from "@/components/admin/ui";
 import { addBlockedDate, removeBlockedDate, saveSchedule } from "@/app/admin/actions/settings";
 
-export const metadata: Metadata = { title: t.admin.nav.schedule };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.admin.nav.schedule };
+}
 
 export default async function SchedulePage() {
+  const t = await getT();
   await requireAdmin();
   const settings = await getSettings();
   const today = clinicNow(settings.timezone).date;
@@ -54,7 +58,7 @@ export default async function SchedulePage() {
                 {blocked.map((b) => (
                   <li key={b.id} className="flex items-center gap-3 py-3">
                     <div className="flex-1">
-                      <p className="font-medium text-ink">{formatDate(b.date, true)}</p>
+                      <p className="font-medium text-ink">{formatDate(b.date, true, t)}</p>
                       {b.reason && <p className="text-sm text-muted">{b.reason}</p>}
                     </div>
                     <ActionForm action={removeBlockedDate}>

@@ -2,12 +2,15 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
+import { autoRu } from "@/lib/i18n/content-ru";
 import { formatDate } from "@/lib/format";
 import { clinicNow, getSettings } from "@/lib/slots";
 import { EmptyState, PageHeader, Panel, StatusBadge } from "@/components/admin/ui";
 
 export default async function DashboardPage() {
+  const t = await getT();
+  const svc = (name: string) => (t.meta.locale === "ru" ? autoRu(name) : name);
   await requireAdmin();
   const settings = await getSettings();
   const today = clinicNow(settings.timezone).date;
@@ -47,7 +50,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PageHeader title={t.admin.nav.dashboard} description={formatDate(today, true)} />
+      <PageHeader title={t.admin.nav.dashboard} description={formatDate(today, true, t)} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
@@ -74,7 +77,7 @@ export default async function DashboardPage() {
                     <span className="w-14 font-semibold tabular-nums text-ink">{a.time}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium text-ink">{a.patient.fullName}</span>
-                      <span className="block truncate text-sm text-muted">{a.serviceName}</span>
+                      <span className="block truncate text-sm text-muted">{svc(a.serviceName)}</span>
                     </span>
                     <StatusBadge status={a.status} />
                   </Link>
@@ -101,10 +104,10 @@ export default async function DashboardPage() {
                   <Link href={`/admin/appointments/${a.id}`} className="flex items-center gap-4 py-3 hover:bg-paper-2/40">
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium text-ink">{a.patient.fullName}</span>
-                      <span className="block truncate text-sm text-muted">{a.serviceName}</span>
+                      <span className="block truncate text-sm text-muted">{svc(a.serviceName)}</span>
                     </span>
                     <span className="text-right text-sm tabular-nums text-muted">
-                      {formatDate(a.date)}
+                      {formatDate(a.date, false, t)}
                       <span className="block font-semibold text-ink">{a.time}</span>
                     </span>
                   </Link>

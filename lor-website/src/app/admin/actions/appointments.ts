@@ -3,7 +3,7 @@
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 import { requireAdmin } from "@/lib/auth";
 import { failure, success, type ActionState } from "@/lib/action";
 import { isSlotFreeForAdmin } from "@/lib/slots";
@@ -17,6 +17,7 @@ function refresh(appointmentId: string) {
 }
 
 export async function setAppointmentStatus(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = z.object({ id, status: statusSchema }).safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm);
@@ -34,6 +35,7 @@ export async function setAppointmentStatus(_prev: ActionState, formData: FormDat
 }
 
 export async function rescheduleAppointment(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = z
     .object({
@@ -62,6 +64,7 @@ export async function rescheduleAppointment(_prev: ActionState, formData: FormDa
 }
 
 export async function saveAppointmentNote(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = z.object({ id, adminNote: z.string().trim().max(2000) }).safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm);

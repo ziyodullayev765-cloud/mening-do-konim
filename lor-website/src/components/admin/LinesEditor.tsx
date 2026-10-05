@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { useI18n } from "@/components/site/I18nProvider";
 
 /**
  * Edit a newline-separated list as separate inputs with add / remove /
@@ -13,7 +14,7 @@ export function LinesEditor({
   hint,
   defaultValue,
   placeholder,
-  addLabel = "Qo'shish",
+  addLabel,
 }: {
   name: string;
   label: string;
@@ -22,6 +23,7 @@ export function LinesEditor({
   placeholder?: string;
   addLabel?: string;
 }) {
+  const { L } = useI18n();
   const initial = defaultValue.split("\n").map((s) => s.trim()).filter(Boolean);
   const [items, setItems] = useState<{ id: number; value: string }[]>(
     (initial.length ? initial : [""]).map((value, i) => ({ id: i, value })),
@@ -59,20 +61,20 @@ export function LinesEditor({
               onChange={(e) => update(item.id, e.target.value)}
               aria-label={`${label} ${i + 1}`}
             />
-            <button type="button" className="btn btn-ghost btn-sm !px-2" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Yuqoriga">
+            <button type="button" className="btn btn-ghost btn-sm !px-2" onClick={() => move(i, -1)} disabled={i === 0} aria-label={L("Yuqoriga", "Выше")}>
               <ArrowUp className="size-4" aria-hidden />
             </button>
-            <button type="button" className="btn btn-ghost btn-sm !px-2" onClick={() => move(i, 1)} disabled={i === items.length - 1} aria-label="Pastga">
+            <button type="button" className="btn btn-ghost btn-sm !px-2" onClick={() => move(i, 1)} disabled={i === items.length - 1} aria-label={L("Pastga", "Ниже")}>
               <ArrowDown className="size-4" aria-hidden />
             </button>
-            <button type="button" className="btn btn-ghost btn-sm !px-2 text-danger" onClick={() => remove(item.id)} aria-label="O'chirish">
+            <button type="button" className="btn btn-ghost btn-sm !px-2 text-danger" onClick={() => remove(item.id)} aria-label={L("O'chirish", "Удалить")}>
               <Trash2 className="size-4" aria-hidden />
             </button>
           </li>
         ))}
       </ol>
       <button type="button" onClick={add} className="btn btn-secondary btn-sm mt-3">
-        <Plus className="size-4" aria-hidden /> {addLabel}
+        <Plus className="size-4" aria-hidden /> {addLabel ?? L("Qo'shish", "Добавить")}
       </button>
       {hint && <p className="mt-2 text-xs text-muted">{hint}</p>}
     </div>

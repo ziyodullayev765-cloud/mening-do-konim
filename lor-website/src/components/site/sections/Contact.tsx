@@ -6,7 +6,6 @@ import { isPlaceholder, telHref, telegramHref, whatsappHref } from "@/lib/format
 import { ContactForm } from "../ContactForm";
 import { Block } from "../Block";
 import { Reveal } from "../Reveal";
-import { CaduceusMark } from "../EntBackdrop";
 
 export async function Contact({ doctor, schedule }: { doctor: Doctor; schedule: WorkingDay[] }) {
   const t = await getT();
@@ -30,7 +29,6 @@ export async function Contact({ doctor, schedule }: { doctor: Doctor; schedule: 
     <Block id="contact" label={t.contact.eyebrow} title={t.contact.title} panel={{}}>
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
         <Reveal className="glass-card relative isolate overflow-hidden p-4 sm:p-6 lg:col-span-5">
-          <CaduceusMark className="absolute left-1/2 top-1/2 -z-10 h-[80%] -translate-x-1/2 -translate-y-1/2 text-[#1e9db2] opacity-[0.09]" />
           <ul className="space-y-3.5 sm:space-y-5">
             {rows.map((r) => (
               <li key={r.label} className="flex gap-3 sm:gap-4">

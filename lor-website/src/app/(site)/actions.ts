@@ -1,5 +1,6 @@
 "use server";
 
+import { autoRu } from "@/lib/i18n/content-ru";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
@@ -36,7 +37,7 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
     if (data.serviceId && !service) return failure(t.booking.errors.service, { serviceId: [t.booking.errors.service] });
     // Stored in Uzbek (admin language); the visitor sees their own language.
     const serviceName = service?.name ?? uz.booking.noServiceName;
-    const shownServiceName = service ? (t.meta.locale === "ru" && service.nameRu.trim()) || service.name : t.booking.noServiceName;
+    const shownServiceName = service ? (t.meta.locale === "ru" ? service.nameRu.trim() || autoRu(service.name) : service.name) : t.booking.noServiceName;
 
     const slots = await getAvailableSlots(data.date);
     if (!slots.includes(data.time)) return { ...failure(t.booking.slotTaken), slotTaken: true };

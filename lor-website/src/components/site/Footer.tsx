@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import type { Doctor } from "@prisma/client";
 import { getT } from "@/lib/i18n/server";
 import { isPlaceholder, telHref } from "@/lib/format";
@@ -25,7 +25,7 @@ export async function Footer({ doctor }: { doctor: Doctor }) {
             <span className="text-lg font-extrabold text-white">{doctor.fullName}</span>
           </div>
           <p className="mt-3 max-w-sm text-sm leading-relaxed sm:mt-4 sm:text-[15px]">{doctor.title}</p>
-          <Link href="/book" className="btn btn-primary mt-6">{t.common.bookAppointment}</Link>
+          <Link href="/privacy" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white/80 underline-offset-4 hover:text-white hover:underline sm:mt-6"><ShieldCheck className="size-4 text-[#6fd3e3]" aria-hidden />{t.footer.privacy}</Link>
         </div>
         <nav aria-label={t.footer.quickLinks} className="col-span-1 md:col-span-3">
           <p className="font-bold text-white">{t.footer.quickLinks}</p>

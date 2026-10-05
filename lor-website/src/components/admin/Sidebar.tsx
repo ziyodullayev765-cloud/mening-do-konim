@@ -7,26 +7,28 @@ import {
   BadgeDollarSign, CalendarClock, CalendarDays, CircleHelp, ExternalLink, Inbox, LayoutDashboard,
   LogOut, Menu, Quote, Settings, Stethoscope, UserRound, Users, X,
 } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 import { logout } from "@/app/admin/actions/auth";
+import { AdminPrefs } from "./AdminPrefs";
 
-const NAV = [
-  { href: "/admin", label: t.admin.nav.dashboard, icon: LayoutDashboard, exact: true },
-  { href: "/admin/appointments", label: t.admin.nav.appointments, icon: CalendarDays, badge: "newAppointments" },
-  { href: "/admin/patients", label: t.admin.nav.patients, icon: Users },
-  { href: "/admin/services", label: t.admin.nav.services, icon: Stethoscope },
-  { href: "/admin/prices", label: t.admin.nav.prices, icon: BadgeDollarSign },
-  { href: "/admin/profile", label: t.admin.nav.profile, icon: UserRound },
-  { href: "/admin/schedule", label: t.admin.nav.schedule, icon: CalendarClock },
-  { href: "/admin/testimonials", label: t.admin.nav.testimonials, icon: Quote },
-  { href: "/admin/faq", label: t.admin.nav.faq, icon: CircleHelp },
-  { href: "/admin/messages", label: t.admin.nav.messages, icon: Inbox, badge: "unreadMessages" },
-  { href: "/admin/settings", label: t.admin.nav.settings, icon: Settings },
-] as const;
 
 type Counts = { newAppointments: number; unreadMessages: number };
 
 export function Sidebar({ adminName, counts }: { adminName: string; counts: Counts }) {
+  const { t } = useI18n();
+  const NAV = [
+    { href: "/admin", label: t.admin.nav.dashboard, icon: LayoutDashboard, exact: true },
+    { href: "/admin/appointments", label: t.admin.nav.appointments, icon: CalendarDays, badge: "newAppointments" },
+    { href: "/admin/patients", label: t.admin.nav.patients, icon: Users },
+    { href: "/admin/services", label: t.admin.nav.services, icon: Stethoscope },
+    { href: "/admin/prices", label: t.admin.nav.prices, icon: BadgeDollarSign },
+    { href: "/admin/profile", label: t.admin.nav.profile, icon: UserRound },
+    { href: "/admin/schedule", label: t.admin.nav.schedule, icon: CalendarClock },
+    { href: "/admin/testimonials", label: t.admin.nav.testimonials, icon: Quote },
+    { href: "/admin/faq", label: t.admin.nav.faq, icon: CircleHelp },
+    { href: "/admin/messages", label: t.admin.nav.messages, icon: Inbox, badge: "unreadMessages" },
+    { href: "/admin/settings", label: t.admin.nav.settings, icon: Settings },
+  ] as const;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -62,6 +64,7 @@ export function Sidebar({ adminName, counts }: { adminName: string; counts: Coun
         })}
       </ul>
       <div className="space-y-1 border-t border-white/10 p-3">
+        <AdminPrefs className="px-3 pb-2" />
         <Link href="/" target="_blank" className="flex items-center gap-3 rounded-md px-3 py-2.5 text-[14px] text-white/60 hover:bg-white/5 hover:text-white">
           <ExternalLink className="size-[18px]" strokeWidth={1.7} aria-hidden /> {t.admin.nav.viewSite}
         </Link>
@@ -80,6 +83,7 @@ export function Sidebar({ adminName, counts }: { adminName: string; counts: Coun
     <>
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-ink px-4 lg:hidden">
         <span className="text-sm font-semibold text-white">{t.admin.brand}</span>
+        <AdminPrefs className="ml-auto mr-1" />
         <button type="button" onClick={() => setOpen((v) => !v)} className="p-2 text-white" aria-label={open ? t.nav.closeMenu : t.nav.openMenu} aria-expanded={open}>
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>

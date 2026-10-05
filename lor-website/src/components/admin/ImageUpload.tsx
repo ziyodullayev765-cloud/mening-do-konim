@@ -3,15 +3,16 @@
 import { useId, useRef, useState } from "react";
 import { ImagePlus, LoaderCircle, RefreshCw, Trash2 } from "lucide-react";
 import { useFieldError } from "./ActionForm";
+import { useI18n } from "@/components/site/I18nProvider";
 
 const MAX_SIDE = 1800;
 const ACCEPT = "image/jpeg,image/png,image/webp";
 
 /** Downscales large photos in the browser so uploads stay small and fast. */
-async function prepareImage(file: File): Promise<Blob> {
-  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Faqat JPG, PNG yoki WEBP rasm tanlang.");
+async function prepareImage(file: File, L: (uz: string, ru: string) => string): Promise<Blob> {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error(L("Faqat JPG, PNG yoki WEBP rasm tanlang.", "Выберите изображение JPG, PNG или WEBP."));
   const bitmap = await createImageBitmap(file).catch(() => null);
-  if (!bitmap) throw new Error("Rasmni o'qib bo'lmadi.");
+  if (!bitmap) throw new Error(L("Rasmni o'qib bo'lmadi.", "Не удалось прочитать изображение."));
   const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
   const keepPng = file.type === "image/png"; // logos often need transparency
   if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
@@ -22,7 +23,7 @@ async function prepareImage(file: File): Promise<Blob> {
   const blob = await new Promise<Blob | null>((resolve) =>
     canvas.toBlob(resolve, keepPng ? "image/png" : "image/webp", 0.86),
   );
-  if (!blob) throw new Error("Rasmni tayyorlab bo'lmadi.");
+  if (!blob) throw new Error(L("Rasmni tayyorlab bo'lmadi.", "Не удалось подготовить изображение."));
   return blob;
 }
 
@@ -52,6 +53,7 @@ export function ImageUpload({
   aspect?: string;
   fit?: "cover" | "contain";
 }) {
+  const { L } = useI18n();
   const [inner, setInner] = useState(defaultValue ?? "");
   const url = value ?? inner;
   const setUrl = (u: string) => (onChange ? onChange(u) : setInner(u));
@@ -67,15 +69,15 @@ export function ImageUpload({
     setLocalError(null);
     setBusy(true);
     try {
-      const blob = await prepareImage(file);
+      const blob = await prepareImage(file, L);
       const body = new FormData();
       body.append("file", blob, file.name);
       const res = await fetch("/api/admin/upload", { method: "POST", body });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json.url) throw new Error(json.error ?? "Yuklashda xatolik.");
+      if (!res.ok || !json.url) throw new Error(json.error ?? L("Yuklashda xatolik.", "Ошибка загрузки."));
       setUrl(json.url);
     } catch (e) {
-      setLocalError(e instanceof Error ? e.message : "Yuklashda xatolik.");
+      setLocalError(e instanceof Error ? e.message : L("Yuklashda xatolik.", "Ошибка загрузки."));
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -121,24 +123,24 @@ export function ImageUpload({
             className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-muted hover:text-accent"
           >
             <ImagePlus className="size-8" strokeWidth={1.5} aria-hidden />
-            <span className="text-sm font-semibold">Rasm yuklash</span>
-            <span className="text-xs">yoki shu yerga sudrab tashlang</span>
+            <span className="text-sm font-semibold">{L("Rasm yuklash", "Загрузить изображение")}</span>
+            <span className="text-xs">{L("yoki shu yerga sudrab tashlang", "или перетащите сюда")}</span>
           </button>
         )}
         {busy && (
           <div className="absolute inset-0 grid place-items-center bg-white/70 backdrop-blur-sm" role="status">
-            <LoaderCircle className="size-7 animate-spin text-accent" aria-label="Yuklanmoqda" />
+            <LoaderCircle className="size-7 animate-spin text-accent" aria-label={L("Yuklanmoqda", "Загрузка")} />
           </div>
         )}
       </div>
       <div className="mt-2.5 flex flex-wrap items-center gap-2">
         <button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={() => fileRef.current?.click()}>
           {url ? <RefreshCw className="size-3.5" aria-hidden /> : <ImagePlus className="size-3.5" aria-hidden />}
-          {url ? "Almashtirish" : "Tanlash"}
+          {url ? L("Almashtirish", "Заменить") : L("Tanlash", "Выбрать")}
         </button>
         {url && (
           <button type="button" className="btn btn-ghost btn-sm text-danger" disabled={busy} onClick={() => setUrl("")}>
-            <Trash2 className="size-3.5" aria-hidden /> Olib tashlash
+            <Trash2 className="size-3.5" aria-hidden /> {L("Olib tashlash", "Удалить")}
           </button>
         )}
       </div>

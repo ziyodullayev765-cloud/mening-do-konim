@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Phone } from "lucide-react";
+import Link from "next/link";
+import { Phone, X } from "lucide-react";
 import { getPublicContent } from "@/lib/data";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { telHref } from "@/lib/format";
@@ -23,10 +24,15 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
   return (
     <section className="pt-6 pb-28 sm:pt-8 lg:pt-14 lg:pb-32">
       <div className="container-x">
+        <div className="flex items-start justify-between gap-4">
         <div className="max-w-2xl">
           <p className="eyebrow">{doctor.fullName}</p>
           <h1 className="h-display mt-3 text-[1.85rem] sm:mt-4 sm:text-[clamp(2.4rem,1.8rem+2.4vw,3.75rem)]">{t.booking.title}</h1>
           <p className="mt-2 text-[15px] text-muted sm:mt-4 sm:text-lg">{t.booking.lead}</p>
+        </div>
+          <Link href="/" className="btn btn-secondary shrink-0 !px-3 sm:!px-4" aria-label={t.booking.exit}>
+            <X className="size-4" aria-hidden /> <span className="hidden sm:inline">{t.booking.exit}</span>
+          </Link>
         </div>
 
         <div className="mt-6 sm:mt-10 lg:mt-14">

@@ -15,7 +15,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <I18nProvider locale={locale}>
       <NoCopy />
-      <div className="no-copy">
+      {settings.backgroundUrl && (
+        // Admin-chosen background: fixed behind the page, softened by an overlay so text stays readable.
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={settings.backgroundUrl} alt="" className="size-full object-cover" />
+          <div className="site-bg-veil absolute inset-0" />
+        </div>
+      )}
+      <div className={`no-copy${settings.backgroundUrl ? " has-site-bg" : ""}`}>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-white">
         {locale === "ru" ? "Перейти к содержимому" : "Asosiy mazmunga o'tish"}
       </a>

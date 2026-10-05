@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import type { WorkingDay } from "@prisma/client";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/site/I18nProvider";
 import { useFieldError } from "./ActionForm";
 
 export function ScheduleRow({ day, label }: { day: WorkingDay; label: string }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(day.isOpen);
   const error = useFieldError(`to_${day.dayOfWeek}`);
   const dow = day.dayOfWeek;

@@ -7,3 +7,7 @@ export function isValidImageRef(value: string) {
 }
 
 export const IMAGE_REF_ERROR = "Rasmni yuklang yoki https:// bilan boshlanadigan manzil kiriting.";
+
+export function imageRefError(locale: "uz" | "ru" = "uz") {
+  return locale === "ru" ? "Загрузите изображение или укажите адрес, начинающийся с https://." : IMAGE_REF_ERROR;
+}
