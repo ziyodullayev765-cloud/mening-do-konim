@@ -10,6 +10,7 @@ export function Block({
   action,
   tone = "plain",
   backdrop,
+  panel,
   children,
 }: {
   id: string;
@@ -20,12 +21,16 @@ export function Block({
   tone?: "plain" | "white";
   /** Optional decorative layer drawn behind the section content. */
   backdrop?: React.ReactNode;
+  /** Wrap heading + content in a frosted glass panel; `decor` is drawn faintly inside it. */
+  panel?: { decor?: React.ReactNode };
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className={backdrop ? "relative isolate overflow-hidden" : tone === "white" ? "bg-white" : ""}>
+    <section id={id} aria-labelledby={`${id}-title`} className={backdrop ? "relative isolate overflow-hidden" : panel ? "" : tone === "white" ? "bg-white" : ""}>
       {backdrop}
-      <div className="container-x py-12 sm:py-20 lg:py-24">
+      <div className={panel ? "container-x py-6 sm:py-10" : "container-x py-12 sm:py-20 lg:py-24"}>
+        <div className={panel ? "glass-panel relative isolate mx-auto max-w-4xl overflow-hidden px-4 py-6 sm:px-10 sm:py-10" : ""}>
+        {panel?.decor}
         <Reveal className="flex flex-col gap-2.5 sm:flex-row sm:gap-4 sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-bold text-accent sm:text-sm">{label}</p>
@@ -38,7 +43,8 @@ export function Block({
             </a>
           )}
         </Reveal>
-        <div className="mt-6 sm:mt-10 lg:mt-12">{children}</div>
+        <div className={panel ? "mt-5 sm:mt-8" : "mt-6 sm:mt-10 lg:mt-12"}>{children}</div>
+        </div>
       </div>
     </section>
   );

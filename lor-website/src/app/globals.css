@@ -133,10 +133,19 @@
   /* Pinned site header: frosted "liquid glass" over the page */
   .glass-header {
     background: linear-gradient(180deg, rgb(255 255 255 / .72), rgb(255 255 255 / .58));
-    border-bottom: 1px solid rgb(255 255 255 / .8);
-    box-shadow: 0 1px 0 rgb(26 43 76 / .06);
     -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
   }
+  /* FAQ / Contact: large frosted panel over the ENT pattern */
+  .glass-panel {
+    border-radius: 24px;
+    background: linear-gradient(160deg, rgb(255 255 255 / .62), rgb(255 255 255 / .38));
+    border: 1px solid rgb(255 255 255 / .85);
+    box-shadow: 0 1px 0 rgb(255 255 255 / .9) inset, 0 30px 60px -34px rgb(26 43 76 / .30);
+    -webkit-backdrop-filter: blur(14px) saturate(150%); backdrop-filter: blur(14px) saturate(150%);
+  }
+  .ent-pattern { animation: ent-drift 60s linear infinite; }
+  @keyframes ent-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-260px, -170px, 0); } }
+  @media (prefers-reduced-motion: reduce) { .ent-pattern { animation: none; } }
   /* Prices section only: liquid-glass card over the animated backdrop */
   .glass-card {
     position: relative; border-radius: 16px;

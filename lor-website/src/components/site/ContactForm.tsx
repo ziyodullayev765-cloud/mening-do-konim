@@ -20,7 +20,7 @@ export function ContactForm() {
   return (
     <form
       ref={formRef}
-      className="card p-6 sm:p-8"
+      className="glass-card p-4 sm:p-6"
       noValidate
       onSubmit={(e) => {
         // Manual submit so typed values survive server-side validation errors.
