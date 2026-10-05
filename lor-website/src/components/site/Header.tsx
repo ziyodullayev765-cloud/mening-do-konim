@@ -46,8 +46,10 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
 
   return (
     <>
+      {/* Utility bar + header stay pinned together as one liquid-glass panel */}
+      <div className={`glass-header sticky top-0 z-40 transition-shadow duration-300 ${scrolled || open ? "shadow-[0_10px_30px_-18px_rgb(26_43_76/0.35)]" : ""}`}>
       {/* Top utility bar */}
-      <div className="hidden border-b border-line bg-paper-2 text-[13px] text-muted md:block">
+      <div className="hidden border-b border-white/60 text-[13px] text-muted md:block">
         <div className="container-x flex h-10 items-center justify-between gap-6">
           <div className="flex min-w-0 items-center gap-6">
             {ok(email) && (
@@ -72,8 +74,8 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
         </div>
       </div>
 
-      {/* Main sticky header */}
-      <header className={`sticky top-0 z-40 border-b bg-white transition-shadow duration-300 ${scrolled || open ? "border-line shadow-[0_6px_20px_-12px_rgb(26_43_76/0.25)]" : "border-transparent"}`}>
+      {/* Main header */}
+      <header className="relative">
         <div className="container-x flex h-[76px] items-center justify-between gap-6">
           <Link href="/" className="flex min-w-0 items-center gap-3" onClick={() => setOpen(false)}>
             <LogoMark className="size-10 shrink-0" logoUrl={logoUrl} />
@@ -127,7 +129,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
         </div>
 
         {open && (
-          <div id="mobile-menu" className="fixed inset-x-0 top-[76px] bottom-0 overflow-y-auto border-t border-line bg-white lg:hidden">
+          <div id="mobile-menu" className="absolute inset-x-0 top-full h-[calc(100dvh-77px)] overflow-y-auto border-t border-line bg-white md:h-[calc(100dvh-118px)] lg:hidden">
             <nav aria-label="Mobil" className="container-x py-6">
               <ul className="divide-y divide-line">
                 {nav.map((item) => (
@@ -146,6 +148,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
           </div>
         )}
       </header>
+      </div>
     </>
   );
 }
