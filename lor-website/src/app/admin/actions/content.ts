@@ -17,7 +17,11 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
   await requireAdmin();
   const parsed = doctorSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
-  const data = { ...parsed.data, photoUrl: parsed.data.photoUrl || null };
+  const data = {
+    ...parsed.data,
+    photoUrl: parsed.data.photoUrl || null,
+    aboutPhotoUrl: parsed.data.aboutPhotoUrl || null,
+  };
   await db.doctor.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
   refreshSite();
   return success(t.admin.profile.saved);

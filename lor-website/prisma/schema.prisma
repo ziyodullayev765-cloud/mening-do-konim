@@ -68,7 +68,10 @@ model Doctor {
   specializations     String   @default("")
   certifications      String   @default("")
   memberships         String   @default("")
+  /// Main photo (hero / first screen)
   photoUrl            String?
+  /// Second photo for the "About the doctor" section; falls back to photoUrl
+  aboutPhotoUrl       String?
   clinicName          String   @default("")
   city                String   @default("")
   country             String   @default("")

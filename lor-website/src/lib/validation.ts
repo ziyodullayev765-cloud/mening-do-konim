@@ -77,6 +77,7 @@ export const doctorSchema = z.object({
   certifications: text(3000),
   memberships: text(2000),
   photoUrl: optionalUrl,
+  aboutPhotoUrl: optionalUrl,
   clinicName: text(200),
   city: text(100),
   country: text(100),

@@ -13,7 +13,7 @@ export function About({ doctor }: { doctor: Doctor }) {
       <div className="container-x grid gap-14 lg:grid-cols-12 lg:gap-16">
         <Reveal className="lg:col-span-5">
           <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] lg:sticky lg:top-28">
-            <DoctorPortrait photoUrl={doctor.photoUrl} name={doctor.fullName} sizes="(min-width: 1024px) 35vw, 100vw" />
+            <DoctorPortrait photoUrl={doctor.aboutPhotoUrl ?? doctor.photoUrl} name={doctor.fullName} sizes="(min-width: 1024px) 35vw, 100vw" />
           </div>
         </Reveal>
         <div className="lg:col-span-7">

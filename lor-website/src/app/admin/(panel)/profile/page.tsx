@@ -23,7 +23,22 @@ export default async function ProfilePage() {
             <TextField name="title" label="Mutaxassislik / unvon" defaultValue={d.title} required />
             <TextArea name="shortDescription" label="Qisqa tavsif (bosh sahifa)" defaultValue={d.shortDescription} rows={2} className="md:col-span-2" />
             <TextArea name="biography" label="Biografiya" hint="Har bir xatboshini yangi qatordan yozing." defaultValue={d.biography} rows={6} className="md:col-span-2" />
-            <TextField name="photoUrl" type="url" label="Surat URL manzili" placeholder="https://…" defaultValue={d.photoUrl ?? ""} className="md:col-span-2" />
+            <TextField
+              name="photoUrl"
+              type="url"
+              label="1-surat: bosh ekran (Qabulga yozilish tugmasi yonida)"
+              placeholder="https://…"
+              hint="Saytni ochganda birinchi ko'rinadigan surat."
+              defaultValue={d.photoUrl ?? ""}
+            />
+            <TextField
+              name="aboutPhotoUrl"
+              type="url"
+              label={"2-surat: \"Shifokor haqida\" bo'limi"}
+              placeholder="https://…"
+              hint="Bo'sh qoldirilsa, 1-surat ishlatiladi."
+              defaultValue={d.aboutPhotoUrl ?? ""}
+            />
           </div>
         </Panel>
 
