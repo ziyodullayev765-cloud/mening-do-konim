@@ -8,7 +8,14 @@ const manrope = Manrope({ subsets: ["latin", "latin-ext", "cyrillic"], variable:
 
 export const dynamic = "force-dynamic";
 
-export const viewport: Viewport = { themeColor: "#f8fafc", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = {
+  themeColor: "#f8fafc",
+  width: "device-width",
+  initialScale: 1,
+  // Requested: no pinch-zoom or auto-zoom on the site.
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const [doctor, settings, t] = await Promise.all([getDoctor(), getSiteSettings(), getT()]);

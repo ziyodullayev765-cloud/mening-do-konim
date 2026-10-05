@@ -24,7 +24,11 @@ npm run db:seed               # admin hisobi + boshlang'ich ma'lumotlar
 npm run dev                   # http://localhost:3000 , admin: /admin
 ```
 
-## Production (masalan, Render)
+## Production: Vercel (tavsiya) yoki Render
+
+**Vercel:** vercel.com/new → repo import → **Root Directory: `lor-website`**. Storage → Neon Postgres ulang (DATABASE_URL va DATABASE_URL_UNPOOLED avtomatik qo'shiladi). Environment: `SITE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`. Build `vercel-build` skripti orqali avtomatik: migratsiya + seed + build.
+
+### Render
 
 1. PostgreSQL bazasi yarating va `DATABASE_URL` ni oling.
 2. Web Service: Root directory `lor-website`
