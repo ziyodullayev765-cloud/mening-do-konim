@@ -3,8 +3,10 @@ import {
   Sparkles, Stethoscope, Syringe, Wind, Pill, Scissors, type LucideIcon,
 } from "lucide-react";
 
-/** Icons selectable for services in the admin panel. */
-export const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
+import type { SERVICE_ICON_KEYS } from "@/lib/schemas/service";
+
+/** Icons selectable for services in the admin panel (keys validated by the service schema). */
+export const SERVICE_ICONS: Record<(typeof SERVICE_ICON_KEYS)[number], { icon: LucideIcon; label: string }> = {
   stethoscope: { icon: Stethoscope, label: "Ko'rik" },
   ear: { icon: Ear, label: "Quloq" },
   wind: { icon: Wind, label: "Burun / nafas" },
@@ -22,5 +24,5 @@ export const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> 
 };
 
 export function serviceIcon(key: string) {
-  return (SERVICE_ICONS[key] ?? SERVICE_ICONS.stethoscope).icon;
+  return (SERVICE_ICONS[key as keyof typeof SERVICE_ICONS] ?? SERVICE_ICONS.stethoscope).icon;
 }

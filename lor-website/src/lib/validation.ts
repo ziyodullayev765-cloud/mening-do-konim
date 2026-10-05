@@ -61,22 +61,6 @@ export const loginSchema = z.object({
   remember: checkbox,
 });
 
-export const serviceSchema = z.object({
-  kind: z.enum(["SERVICE", "PROCEDURE"]),
-  name: z.string().trim().min(2, t.common.required).max(150),
-  description: text(1500),
-  price: optionalInt(0, 1_000_000_000),
-  priceFrom: checkbox,
-  durationMinutes: optionalInt(1, 24 * 60),
-  icon: trimmed(40).default("stethoscope"),
-  imageUrl: optionalUrl,
-  indication: text(1000),
-  recovery: text(1000),
-  showInPricing: checkbox,
-  active: checkbox,
-  sortOrder: optionalInt(-1000, 100000),
-});
-
 export const doctorSchema = z.object({
   fullName: z.string().trim().min(2, t.common.required).max(150),
   title: z.string().trim().min(2, t.common.required).max(150),

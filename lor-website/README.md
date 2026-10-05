@@ -10,7 +10,7 @@ Premium ENT/LOR shifokori uchun to'liq full-stack sayt: ommaviy sayt, onlayn qab
 
 **Onlayn yozilish** (`/book`) — Xizmat → Sana → Vaqt → Ma'lumotlar → Tasdiq. Faqat ish jadvalidagi bo'sh vaqtlar ko'rsatiladi; ishlamaydigan kunlar, eng kam ogohlantirish vaqti va yozilish oynasi hisobga olinadi. Ikki marta band qilish ma'lumotlar bazasi darajasida (partial unique index) bloklanadi.
 
-**Admin panel** (`/admin`) — Bosh panel (haqiqiy statistika), qabullar (qidiruv, sana/xizmat/holat filtri, tasdiqlash, bekor qilish, ko'chirish, yakunlash, ichki izoh), bemorlar (tarix), xizmatlar va muolajalar (CRUD, yoqish/o'chirish), narxlar (tez tahrirlash), shifokor profili, ish jadvali + ishlamaydigan kunlar, fikrlar, FAQ (tartiblash), xabarlar, sozlamalar (yozilish, SEO, parol).
+**Admin panel** (`/admin`) — Bosh panel (haqiqiy statistika), qabullar (qidiruv, sana/xizmat/holat filtri, tasdiqlash, bekor qilish, ko'chirish, yakunlash, ichki izoh), bemorlar (tarix), xizmatlar (kategoriya: konsultatsiya/diagnostika/muolaja/operatsiya; qidiruv, filtr, saralash, modal orqali qo'shish/tahrirlash, optimistik yoqish/o'chirish), narxlar (tez tahrirlash), shifokor profili, ish jadvali + ishlamaydigan kunlar, fikrlar, FAQ (tartiblash), xabarlar, sozlamalar (yozilish, SEO, parol).
 
 **Xavfsizlik** — bcrypt parol xeshlari; serverda saqlanadigan sessiyalar (cookie'da tasodifiy token, bazada faqat SHA-256 xeshi; `httpOnly`, `sameSite=lax`, productionda `secure`); har bir admin sahifa va action'da `requireAdmin()`; Zod bilan server tomonda validatsiya; Prisma (SQL injection'dan himoya); login/yozilish/aloqa uchun rate limiting; Server Actions'ning o'rnatilgan Origin tekshiruvi (CSRF); xavfsizlik sarlavhalari; barcha sirlar faqat muhit o'zgaruvchilarida.
 

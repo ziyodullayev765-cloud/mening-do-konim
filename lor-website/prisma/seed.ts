@@ -66,13 +66,13 @@ async function main() {
 
   if ((await db.service.count()) === 0) {
     const services: Prisma.ServiceCreateManyInput[] = [
-      { kind: "SERVICE", name: "LOR konsultatsiyasi", description: "Shikoyatlarni o'rganish, quloq, burun va tomoqni ko'rikdan o'tkazish, davolash rejasini tuzish.", price: 250000, durationMinutes: 30, icon: "stethoscope", sortOrder: 1 },
-      { kind: "SERVICE", name: "Endoskopik tekshiruv", description: "Burun bo'shlig'i va hiqildoqni endoskop yordamida batafsil ko'rish.", price: 300000, durationMinutes: 30, icon: "microscope", sortOrder: 2 },
-      { kind: "SERVICE", name: "Quloq tekshiruvi", description: "Tashqi va o'rta quloqni otoskopik ko'rikdan o'tkazish.", durationMinutes: 20, icon: "ear", sortOrder: 3 },
-      { kind: "SERVICE", name: "Burun tekshiruvi", description: "Burun bo'shlig'i va nafas olish holatini baholash.", durationMinutes: 20, icon: "wind", sortOrder: 4 },
-      { kind: "SERVICE", name: "Tomoq tekshiruvi", description: "Tomoq, bodomcha bezlar va hiqildoq holatini baholash.", durationMinutes: 20, icon: "mic", sortOrder: 5 },
-      { kind: "SERVICE", name: "Bolalar LOR qabuli", description: "Bolalar uchun moslashtirilgan LOR ko'rigi va maslahat.", durationMinutes: 30, icon: "baby", sortOrder: 6 },
-      { kind: "PROCEDURE", name: "LOR muolajasi", description: "[Muolaja tavsifi — admin paneldan tahrirlang.]", price: 2500000, priceFrom: true, icon: "scissors", sortOrder: 1 },
+      { kind: "SERVICE", category: "CONSULTATION", name: "LOR konsultatsiyasi", description: "Shikoyatlarni o'rganish, quloq, burun va tomoqni ko'rikdan o'tkazish, davolash rejasini tuzish.", price: 250000, durationMinutes: 30, icon: "stethoscope", sortOrder: 1 },
+      { kind: "SERVICE", category: "DIAGNOSTICS", name: "Endoskopik tekshiruv", description: "Burun bo'shlig'i va hiqildoqni endoskop yordamida batafsil ko'rish.", price: 300000, durationMinutes: 30, icon: "microscope", sortOrder: 2 },
+      { kind: "SERVICE", category: "DIAGNOSTICS", name: "Quloq tekshiruvi", description: "Tashqi va o'rta quloqni otoskopik ko'rikdan o'tkazish.", durationMinutes: 20, icon: "ear", sortOrder: 3 },
+      { kind: "SERVICE", category: "DIAGNOSTICS", name: "Burun tekshiruvi", description: "Burun bo'shlig'i va nafas olish holatini baholash.", durationMinutes: 20, icon: "wind", sortOrder: 4 },
+      { kind: "SERVICE", category: "DIAGNOSTICS", name: "Tomoq tekshiruvi", description: "Tomoq, bodomcha bezlar va hiqildoq holatini baholash.", durationMinutes: 20, icon: "mic", sortOrder: 5 },
+      { kind: "SERVICE", category: "CONSULTATION", name: "Bolalar LOR qabuli", description: "Bolalar uchun moslashtirilgan LOR ko'rigi va maslahat.", durationMinutes: 30, icon: "baby", sortOrder: 6 },
+      { kind: "PROCEDURE", category: "TREATMENT", name: "LOR muolajasi", description: "[Muolaja tavsifi — admin paneldan tahrirlang.]", price: 2500000, priceFrom: true, icon: "scissors", sortOrder: 1 },
     ];
     await db.service.createMany({ data: services });
     console.log("Demo services created (review before launch)");

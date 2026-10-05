@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   BadgeDollarSign, CalendarClock, CalendarDays, CircleHelp, ExternalLink, Inbox, LayoutDashboard,
-  LogOut, Menu, Quote, Scissors, Settings, Stethoscope, UserRound, Users, X,
+  LogOut, Menu, Quote, Settings, Stethoscope, UserRound, Users, X,
 } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { logout } from "@/app/admin/actions/auth";
@@ -15,7 +15,6 @@ const NAV = [
   { href: "/admin/appointments", label: t.admin.nav.appointments, icon: CalendarDays, badge: "newAppointments" },
   { href: "/admin/patients", label: t.admin.nav.patients, icon: Users },
   { href: "/admin/services", label: t.admin.nav.services, icon: Stethoscope },
-  { href: "/admin/procedures", label: t.admin.nav.procedures, icon: Scissors },
   { href: "/admin/prices", label: t.admin.nav.prices, icon: BadgeDollarSign },
   { href: "/admin/profile", label: t.admin.nav.profile, icon: UserRound },
   { href: "/admin/schedule", label: t.admin.nav.schedule, icon: CalendarClock },

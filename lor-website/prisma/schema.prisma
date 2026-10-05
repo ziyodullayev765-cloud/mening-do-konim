@@ -21,6 +21,14 @@ enum ServiceKind {
   PROCEDURE
 }
 
+/// Admin-facing category. Determines `kind` (public section) — see lib/schemas/service.ts.
+enum ServiceCategory {
+  CONSULTATION
+  DIAGNOSTICS
+  TREATMENT
+  SURGERY
+}
+
 model Admin {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -88,29 +96,31 @@ model Patient {
 }
 
 model Service {
-  id              String        @id @default(cuid())
-  kind            ServiceKind   @default(SERVICE)
+  id              String          @id @default(cuid())
+  kind            ServiceKind     @default(SERVICE)
+  category        ServiceCategory @default(CONSULTATION)
   name            String
-  description     String        @default("")
+  description     String          @default("")
   /// Price in UZS (so'm). Null = "price on request".
   price           Int?
   /// When true price is shown as "from X".
-  priceFrom       Boolean       @default(false)
+  priceFrom       Boolean         @default(false)
   durationMinutes Int?
   /// Lucide icon key (see lib/icons.ts)
-  icon            String        @default("stethoscope")
+  icon            String          @default("stethoscope")
   imageUrl        String?
   /// Procedure-only (optional) fields
-  indication      String        @default("")
-  recovery        String        @default("")
-  showInPricing   Boolean       @default(true)
-  active          Boolean       @default(true)
-  sortOrder       Int           @default(0)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  indication      String          @default("")
+  recovery        String          @default("")
+  showInPricing   Boolean         @default(true)
+  active          Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
   appointments    Appointment[]
 
   @@index([kind, active, sortOrder])
+  @@index([category])
 }
 
 model Appointment {
@@ -130,12 +140,12 @@ model Appointment {
   adminNote   String            @default("")
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
+  // A partial unique index on (date, time) WHERE status <> 'CANCELLED' is
+  // created in the migration SQL to prevent double booking.
 
   @@index([date, time])
   @@index([status])
   @@index([patientId])
-  // A partial unique index on (date, time) WHERE status <> 'CANCELLED' is
-  // created in the migration SQL to prevent double booking.
 }
 
 /// Weekly working hours. dayOfWeek: 0 = Sunday ... 6 = Saturday.
