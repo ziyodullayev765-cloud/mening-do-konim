@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth";
 import { getL, getT } from "@/lib/i18n/server";
-import { getBotUsername, telegramConfigured } from "@/lib/telegram";
+import { db } from "@/lib/db";
+import { ensureWebhook, getAccessCode, getBotUsername, telegramConfigured } from "@/lib/telegram";
 import { Send } from "lucide-react";
 import { getSettings } from "@/lib/slots";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { Checkbox, TextArea, TextField } from "@/components/admin/fields";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { PageHeader, Panel } from "@/components/admin/ui";
-import { changePassword, connectTelegram, disconnectTelegram, saveSettings, testTelegram } from "@/app/admin/actions/settings";
+import { changePassword, regenerateTelegramCode, removeTelegramChat, saveSettings, testTelegram } from "@/app/admin/actions/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -21,7 +22,14 @@ export default async function SettingsPage() {
   const s = await getSettings();
   const L = await getL();
   const tgReady = telegramConfigured();
-  const bot = tgReady ? await getBotUsername() : null;
+  const [bot, webhookOk, code, chats] = tgReady
+    ? await Promise.all([
+        getBotUsername(),
+        ensureWebhook(),
+        getAccessCode(),
+        db.telegramChat.findMany({ where: { verified: true }, orderBy: { createdAt: "asc" } }),
+      ])
+    : [null, false, "", []];
   const st = t.admin.settings;
   return (
     <>
@@ -58,40 +66,54 @@ export default async function SettingsPage() {
               <p className="text-muted">
                 {L("Yangi qabul yoki xabar kelganda bemorning ismi, telefoni va qabul vaqti Telegram'ga yuboriladi.", "При новой записи или сообщении имя, телефон пациента и время приёма отправляются в Telegram.")}
               </p>
-              {s.telegramChatId ? (
-                <p className="rounded-lg border border-success/30 bg-success-soft px-3 py-2 font-semibold text-success">
-                  {L("Ulangan", "Подключено")}: {s.telegramChatName ?? s.telegramChatId}
-                </p>
-              ) : (
-                <ol className="list-decimal space-y-1.5 pl-5 text-text">
-                  <li>
-                    {L("Telegram'da botni oching", "Откройте бота в Telegram")}
-                    {bot && (
-                      <>
-                        {": "}
-                        <a href={`https://t.me/${bot}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent hover:underline">@{bot}</a>
-                      </>
-                    )}
-                  </li>
-                  <li>{L("/start tugmasini bosing (yoki istalgan xabar yozing).", "Нажмите /start (или напишите любое сообщение).")}</li>
-                  <li>{L("Shu yerda \"Ulash\" tugmasini bosing.", "Нажмите здесь «Подключить».")}</li>
-                </ol>
-              )}
-              <div className="flex flex-wrap gap-2">
-                <ActionForm action={connectTelegram}>
-                  <SubmitButton className="btn btn-primary btn-sm"><Send className="size-4" aria-hidden /> {s.telegramChatId ? L("Qayta ulash", "Переподключить") : L("Ulash", "Подключить")}</SubmitButton>
+              <ol className="list-decimal space-y-1.5 pl-5 text-text">
+                <li>
+                  {L("Telegram'da botni oching", "Откройте бота в Telegram")}
+                  {bot && (
+                    <>
+                      {": "}
+                      <a href={`https://t.me/${bot}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent hover:underline">@{bot}</a>
+                    </>
+                  )}
+                </li>
+                <li>{L("/start bosing — bot kirish kodini so'raydi.", "Нажмите /start — бот попросит код доступа.")}</li>
+                <li>{L("Quyidagi kodni yuboring.", "Отправьте код ниже.")}</li>
+              </ol>
+              <div className="flex flex-wrap items-center gap-3 rounded-lg border border-line bg-paper-2/50 px-4 py-3">
+                <span className="text-muted">{L("Kirish kodi", "Код доступа")}:</span>
+                <span className="font-mono text-xl font-bold tracking-[0.25em] text-ink select-all">{code}</span>
+                <ActionForm action={regenerateTelegramCode} className="ml-auto">
+                  <SubmitButton className="btn btn-ghost btn-sm">{L("Yangi kod", "Новый код")}</SubmitButton>
                 </ActionForm>
-                {s.telegramChatId && (
-                  <>
-                    <ActionForm action={testTelegram}>
-                      <SubmitButton className="btn btn-secondary btn-sm">{L("Sinov xabari", "Тестовое сообщение")}</SubmitButton>
-                    </ActionForm>
-                    <ActionForm action={disconnectTelegram}>
-                      <SubmitButton className="btn btn-ghost btn-sm text-danger">{L("Uzish", "Отключить")}</SubmitButton>
-                    </ActionForm>
-                  </>
+              </div>
+              {!webhookOk && (
+                <p className="rounded-lg border border-warning/30 bg-warning-soft px-3 py-2 text-warning">
+                  {L("Bot hali saytga ulanmagan (webhook). Sahifani birozdan keyin yangilang.", "Бот ещё не подключён к сайту (webhook). Обновите страницу чуть позже.")}
+                </p>
+              )}
+              <div>
+                <p className="mb-2 font-semibold text-ink">{L("Ulangan chatlar", "Подключённые чаты")}</p>
+                {chats.length === 0 ? (
+                  <p className="text-muted">{L("Hozircha yo'q.", "Пока нет.")}</p>
+                ) : (
+                  <ul className="divide-y divide-line rounded-lg border border-line">
+                    {chats.map((c) => (
+                      <li key={c.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                        <span className="min-w-0 truncate font-medium text-ink">{c.name || c.chatId}</span>
+                        <ActionForm action={removeTelegramChat}>
+                          <input type="hidden" name="id" value={c.id} />
+                          <SubmitButton className="btn btn-ghost btn-sm text-danger">{L("Uzish", "Отключить")}</SubmitButton>
+                        </ActionForm>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
+              {chats.length > 0 && (
+                <ActionForm action={testTelegram}>
+                  <SubmitButton className="btn btn-secondary btn-sm"><Send className="size-4" aria-hidden /> {L("Sinov xabari", "Тестовое сообщение")}</SubmitButton>
+                </ActionForm>
+              )}
             </div>
           )}
         </Panel>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { after } from "next/server";
 import { requireAdmin } from "@/lib/auth";
+import { ensureWebhook } from "@/lib/telegram";
 import { db } from "@/lib/db";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { I18nProvider } from "@/components/site/I18nProvider";
@@ -17,6 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const admin = await requireAdmin();
+  // Keep the Telegram bot pointed at this site (no-op once set; outside the request path).
+  after(() => ensureWebhook());
   const [newAppointments, unreadMessages] = await Promise.all([
     db.appointment.count({ where: { status: "NEW" } }),
     db.contactMessage.count({ where: { isRead: false } }),

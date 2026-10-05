@@ -248,7 +248,19 @@ model Setting {
   metaDescription   String  @default("")
   /// Optional background image for the public site (shown softly behind the content)
   backgroundUrl     String?
-  /// Telegram chat that receives new-booking notifications (bot token is in TELEGRAM_BOT_TOKEN)
-  telegramChatId    String?
-  telegramChatName  String?
+  /// Code people send to the Telegram bot to start receiving booking notifications
+  telegramCode      String?
+}
+
+/// Telegram chats that receive new-booking notifications (bot token is in TELEGRAM_BOT_TOKEN).
+/// A chat is created on /start and becomes `verified` after sending the access code.
+model TelegramChat {
+  id             String    @id @default(cuid())
+  chatId         String    @unique
+  name           String    @default("")
+  verified       Boolean   @default(false)
+  failedAttempts Int       @default(0)
+  lockedUntil    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
