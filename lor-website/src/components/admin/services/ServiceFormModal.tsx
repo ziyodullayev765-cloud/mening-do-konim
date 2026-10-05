@@ -16,6 +16,7 @@ import {
   type ServiceFormOutput,
 } from "@/lib/schemas/service";
 import { saveService } from "@/app/admin/actions/services";
+import { ImageUpload } from "../ImageUpload";
 import { Modal } from "../Modal";
 import { toast } from "../toast";
 import { CATEGORY_STYLES } from "./CategoryBadge";
@@ -247,17 +248,27 @@ function ServiceFormDialog({ service, onClose }: Props) {
               />
               <FieldError message={errors.icon?.message} />
             </fieldset>
-            <div className="grid gap-5 sm:grid-cols-[1fr_9rem]">
-              <Field label={f.imageUrl} error={errors.imageUrl?.message} htmlFor="sf-img">
-                <input id="sf-img" type="url" className="input" placeholder="https://…" aria-invalid={!!errors.imageUrl} {...register("imageUrl")} />
-              </Field>
+            <Controller
+              control={control}
+              name="imageUrl"
+              render={({ field }) => (
+                <ImageUpload
+                  label="Xizmat rasmi (ixtiyoriy)"
+                  hint="Saytdagi xizmat kartasining yuqori qismida chiqadi. Bo'lmasa, belgi ko'rsatiladi."
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.imageUrl?.message}
+                  aspect="aspect-[16/10]"
+                />
+              )}
+            />
+            <div className="grid gap-5 sm:grid-cols-[9rem]">
               <Field label={f.sortOrder} hint={f.sortOrderHint} error={errors.sortOrder?.message} htmlFor="sf-sort">
                 <input id="sf-sort" inputMode="numeric" className="input tabular-nums" aria-invalid={!!errors.sortOrder} {...register("sortOrder")} />
               </Field>
             </div>
             <div className="space-y-3">
               <Checkbox label={f.active} {...register("active")} />
-              <Checkbox label={f.showInPricing} {...register("showInPricing")} />
             </div>
           </Section>
         </fieldset>
@@ -279,6 +290,10 @@ function Preview({ values }: { values: ServiceFormInput }) {
       <div className="sticky top-0">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted">{t.admin.servicesUi.preview}</p>
         <div className={`card p-5 transition-opacity ${values.active ? "" : "opacity-50"}`}>
+          {values.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={values.imageUrl} alt="" className="mb-4 aspect-[16/10] w-full rounded-xl object-cover" />
+          )}
           <span className="grid size-10 place-items-center rounded-lg border border-line bg-accent-soft/60 text-accent">
             <Icon className="size-5" strokeWidth={1.6} aria-hidden />
           </span>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { t } from "@/lib/i18n";
 import { requireAdmin } from "@/lib/auth";
+import { deleteUnusedMedia } from "@/lib/media";
 import { failure, success, type ActionState } from "@/lib/action";
 import { doctorSchema, faqSchema, fieldErrors, id, testimonialSchema } from "@/lib/validation";
 
@@ -21,8 +22,16 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     ...parsed.data,
     photoUrl: parsed.data.photoUrl || null,
     aboutPhotoUrl: parsed.data.aboutPhotoUrl || null,
+    contactPhotoUrl: parsed.data.contactPhotoUrl || null,
+    logoUrl: parsed.data.logoUrl || null,
   };
+  const before = await db.doctor.findUnique({
+    where: { id: 1 },
+    select: { photoUrl: true, aboutPhotoUrl: true, contactPhotoUrl: true, logoUrl: true },
+  });
   await db.doctor.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
+  // Remove uploads that were replaced or cleared.
+  if (before) await deleteUnusedMedia(Object.values(before));
   refreshSite();
   return success(t.admin.profile.saved);
 }
@@ -106,26 +115,4 @@ export async function moveFaq(_prev: ActionState, formData: FormData): Promise<A
   await db.$transaction(all.map((f, i) => db.faq.update({ where: { id: f.id }, data: { sortOrder: i } })));
   refreshSite();
   return success();
-}
-
-/* ---------- Contact messages ---------- */
-
-export async function toggleMessageRead(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const parsed = id.safeParse(formData.get("id"));
-  if (!parsed.success) return failure(t.common.invalidForm);
-  const msg = await db.contactMessage.findUnique({ where: { id: parsed.data } });
-  if (!msg) return failure(t.common.invalidForm);
-  await db.contactMessage.update({ where: { id: msg.id }, data: { isRead: !msg.isRead } });
-  revalidatePath("/admin", "layout");
-  return success();
-}
-
-export async function deleteMessage(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const parsed = id.safeParse(formData.get("id"));
-  if (!parsed.success) return failure(t.common.invalidForm);
-  await db.contactMessage.delete({ where: { id: parsed.data } });
-  revalidatePath("/admin", "layout");
-  return success(t.admin.services.deleted);
 }

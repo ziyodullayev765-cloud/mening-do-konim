@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { t } from "@/lib/i18n";
 import { DATE_RE, TIME_RE } from "@/lib/slots-shared";
+import { IMAGE_REF_ERROR, isValidImageRef } from "@/lib/media-shared";
 
 const trimmed = (max: number) => z.string().trim().max(max);
 
@@ -38,21 +39,21 @@ const optionalUrl = z
   .refine((v) => v === "" || /^https:\/\/\S+$/.test(v), "URL https:// bilan boshlanishi kerak.")
   .default("");
 
+const imageRef = z.string().trim().max(500).refine(isValidImageRef, IMAGE_REF_ERROR).default("");
+
+/**
+ * Appointment request. Client-safe: the public form validates with this same
+ * schema before sending, the server action re-validates it.
+ * Email is intentionally not collected — name + phone are enough to call back.
+ */
 export const bookingSchema = z.object({
   serviceId: z.string().min(1, t.booking.errors.service).max(50),
   date: z.string().regex(DATE_RE, t.booking.errors.date),
   time: z.string().regex(TIME_RE, t.booking.errors.time),
   fullName: z.string().trim().min(2, t.booking.errors.name).max(120, t.booking.errors.name),
   phone,
-  email: optionalEmail,
-  note: text(1000),
-});
-
-export const contactSchema = z.object({
-  name: z.string().trim().min(2, t.booking.errors.name).max(120),
-  phone,
-  email: optionalEmail,
-  message: z.string().trim().min(5, "Xabar juda qisqa.").max(2000),
+  /** "Qisqa shikoyat" — short description of the complaint */
+  note: z.string().trim().max(500, t.booking.errors.complaint).default(""),
 });
 
 export const loginSchema = z.object({
@@ -76,8 +77,11 @@ export const doctorSchema = z.object({
   specializations: text(2000),
   certifications: text(3000),
   memberships: text(2000),
-  photoUrl: optionalUrl,
-  aboutPhotoUrl: optionalUrl,
+  heroTitle: text(120),
+  photoUrl: imageRef,
+  aboutPhotoUrl: imageRef,
+  contactPhotoUrl: imageRef,
+  logoUrl: imageRef,
   clinicName: text(200),
   city: text(100),
   country: text(100),

@@ -5,6 +5,7 @@
  * Must stay free of server-only imports.
  */
 import { z } from "zod";
+import { IMAGE_REF_ERROR, isValidImageRef } from "@/lib/media-shared";
 
 export const SERVICE_CATEGORIES = ["CONSULTATION", "DIAGNOSTICS", "TREATMENT", "SURGERY"] as const;
 export type ServiceCategoryKey = (typeof SERVICE_CATEGORIES)[number];
@@ -76,7 +77,7 @@ export const serviceFormSchema = z
       .string()
       .trim()
       .max(500, msg.tooLong(500))
-      .refine((v) => v === "" || /^https:\/\/[^\s]+\.[^\s]+$/.test(v), msg.url),
+      .refine(isValidImageRef, IMAGE_REF_ERROR),
     indication: text(500),
     recovery: text(500),
     showInPricing: z.boolean(),

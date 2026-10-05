@@ -72,6 +72,12 @@ model Doctor {
   photoUrl            String?
   /// Second photo for the "About the doctor" section; falls back to photoUrl
   aboutPhotoUrl       String?
+  /// Photo next to the contact details in the appointment section
+  contactPhotoUrl     String?
+  /// Optional logo shown in the header and footer (falls back to an icon)
+  logoUrl             String?
+  /// Big hero headline; falls back to the doctor's name when empty
+  heroTitle           String   @default("")
   clinicName          String   @default("")
   city                String   @default("")
   country             String   @default("")
@@ -85,6 +91,16 @@ model Doctor {
   youtube             String   @default("")
   mapQuery            String   @default("")
   updatedAt           DateTime @updatedAt
+}
+
+/// Images uploaded from the admin panel. Stored in the database because the
+/// hosting filesystem is ephemeral; served at /media/{id}.
+model Media {
+  id        String   @id @default(cuid())
+  mime      String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
 }
 
 model Patient {

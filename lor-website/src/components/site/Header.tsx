@@ -4,24 +4,23 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CalendarCheck, Menu, Phone, X } from "lucide-react";
 import { t } from "@/lib/i18n";
+import { telHref } from "@/lib/format";
+import { requestBooking } from "./booking/client";
+import { Logo } from "./Logo";
 
 const NAV = [
-  { href: "/#top", label: t.nav.home },
-  { href: "/#about", label: t.nav.about },
   { href: "/#services", label: t.nav.services },
-  { href: "/#procedures", label: t.nav.procedures },
-  { href: "/#pricing", label: t.nav.pricing },
-  { href: "/#experience", label: t.nav.experience },
+  { href: "/#about", label: t.nav.about },
   { href: "/#faq", label: t.nav.faq },
-  { href: "/#contact", label: t.nav.contact },
+  { href: "/#appointment", label: t.nav.contact },
 ];
 
-export function Header({ name, title, phone }: { name: string; title: string; phone: string }) {
+export function Header({ name, title, phone, logoUrl }: { name: string; title: string; phone: string; logoUrl: string | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -37,41 +36,26 @@ export function Header({ name, title, phone }: { name: string; title: string; ph
     };
   }, [open]);
 
-  const initials = name
-    .replace(/[[\]]/g, "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join("");
-
   return (
-    <header
-      className={`sticky top-0 z-40 transition-[background-color,box-shadow,border-color] duration-300 ${
-        scrolled || open
-          ? "border-b border-line bg-paper/90 shadow-[0_1px_0_rgb(14_26_43/0.02)] backdrop-blur-md"
-          : "border-b border-transparent bg-paper/0"
-      }`}
-    >
-      <div className="container-x flex h-[72px] items-center justify-between gap-6">
-        <Link href="/" className="group flex min-w-0 items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="grid size-10 shrink-0 place-items-center rounded-full border border-ink/15 bg-ink font-serif text-[15px] text-paper">
-            {initials || "Dr"}
-          </span>
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-5 sm:pt-4">
+      <div
+        className={`glass pointer-events-auto mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 rounded-full pr-2 pl-3 transition-shadow duration-300 sm:pl-4 ${
+          scrolled ? "shadow-lift" : ""
+        }`}
+      >
+        <Link href="/" className="flex min-w-0 items-center gap-3" onClick={() => setOpen(false)}>
+          <Logo logoUrl={logoUrl} />
           <span className="min-w-0 leading-tight">
-            <span className="block truncate text-[15px] font-semibold text-ink">{name}</span>
+            <span className="block truncate font-serif text-[15px] font-semibold text-ink">{name}</span>
             <span className="block truncate text-xs text-muted">{title}</span>
           </span>
         </Link>
 
-        <nav aria-label="Asosiy" className="hidden xl:block">
+        <nav aria-label="Asosiy" className="hidden lg:block">
           <ul className="flex items-center gap-1">
-            {NAV.slice(1).map((item) => (
+            {NAV.map((item) => (
               <li key={item.href}>
-                <a
-                  href={item.href}
-                  className="rounded-md px-3 py-2 text-[14px] font-medium text-text/80 transition-colors hover:text-ink"
-                >
+                <a href={item.href} className="rounded-full px-4 py-2 text-[14px] font-medium text-text/80 transition-colors hover:bg-white/60 hover:text-ink">
                   {item.label}
                 </a>
               </li>
@@ -79,20 +63,20 @@ export function Header({ name, title, phone }: { name: string; title: string; ph
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {phone && (
-            <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="btn btn-ghost hidden lg:inline-flex" aria-label={t.contact.phone}>
-              <Phone className="size-4" aria-hidden />
-              <span className="hidden 2xl:inline">{phone}</span>
+            <a href={telHref(phone)} className="btn btn-ghost hidden !rounded-full xl:inline-flex" aria-label={t.contact.phone}>
+              <Phone className="size-4 text-accent" aria-hidden />
+              <span className="text-sm">{phone}</span>
             </a>
           )}
-          <Link href="/book" className="btn btn-primary hidden sm:inline-flex">
+          <button type="button" onClick={() => requestBooking()} className="btn btn-primary hidden sm:inline-flex">
             <CalendarCheck className="size-4" aria-hidden />
             {t.common.bookAppointment}
-          </Link>
+          </button>
           <button
             type="button"
-            className="btn btn-ghost xl:hidden"
+            className="btn btn-ghost !rounded-full lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
@@ -103,39 +87,38 @@ export function Header({ name, title, phone }: { name: string; title: string; ph
         </div>
       </div>
 
-      <div
-        id="mobile-menu"
-        hidden={!open}
-        className="xl:hidden fixed inset-x-0 top-[72px] bottom-0 overflow-y-auto border-t border-line bg-paper"
-      >
-        <nav aria-label="Mobil" className="container-x py-6">
-          <ul className="divide-y divide-line">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center justify-between py-4 font-serif text-2xl text-ink"
-                >
-                  {item.label}
+      {open && (
+        <div id="mobile-menu" className="glass pointer-events-auto mx-auto mt-2 max-w-[1200px] rounded-3xl p-3 lg:hidden">
+          <nav aria-label="Mobil">
+            <ul>
+              {NAV.map((item) => (
+                <li key={item.href}>
+                  <a href={item.href} onClick={() => setOpen(false)} className="block rounded-2xl px-4 py-3.5 font-serif text-lg font-medium text-ink hover:bg-white/60">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-2 grid gap-2 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  requestBooking();
+                }}
+                className="btn btn-primary btn-lg w-full"
+              >
+                <CalendarCheck className="size-5" aria-hidden /> {t.common.bookAppointment}
+              </button>
+              {phone && (
+                <a href={telHref(phone)} className="btn btn-secondary btn-lg w-full">
+                  <Phone className="size-5" aria-hidden /> {phone}
                 </a>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8 grid gap-3">
-            <Link href="/book" onClick={() => setOpen(false)} className="btn btn-primary btn-lg w-full">
-              <CalendarCheck className="size-5" aria-hidden />
-              {t.common.bookAppointment}
-            </Link>
-            {phone && (
-              <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="btn btn-secondary btn-lg w-full">
-                <Phone className="size-5" aria-hidden />
-                {phone}
-              </a>
-            )}
-          </div>
-        </nav>
-      </div>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

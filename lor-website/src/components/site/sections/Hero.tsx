@@ -1,77 +1,81 @@
-import Link from "next/link";
-import { ArrowRight, CalendarCheck, Clock, MapPin } from "lucide-react";
+import { Award, BadgeCheck, MapPin } from "lucide-react";
 import type { Doctor } from "@prisma/client";
 import { t } from "@/lib/i18n";
 import { DoctorPortrait } from "../DoctorPortrait";
+import { BookTrigger } from "../booking/BookTrigger";
+import { QuickBookBar } from "../booking/QuickBookBar";
+import type { BookableService } from "../booking/types";
 
-export function Hero({ doctor, todayHours }: { doctor: Doctor; todayHours: string | null }) {
+export function Hero({ doctor, services, todayHours }: { doctor: Doctor; services: BookableService[]; todayHours: string | null }) {
   const location = [doctor.city, doctor.country].filter(Boolean).join(", ");
   return (
-    <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(60%_60%_at_85%_0%,rgb(27_107_112/0.10),transparent_70%)]" />
-      <div className="container-x relative grid items-center gap-12 pt-8 pb-16 lg:grid-cols-12 lg:gap-10 lg:pt-14 lg:pb-24">
-        <div className="lg:col-span-7">
-          <p className="eyebrow animate-fade-up">{t.hero.eyebrow}</p>
-          <h1 id="hero-title" className="h-display mt-6 animate-fade-up text-[clamp(2.75rem,1.6rem+4.6vw,5.25rem)] [animation-delay:80ms]">
-            {doctor.fullName}
-          </h1>
-          <p className="mt-4 animate-fade-up font-serif text-[clamp(1.35rem,1.1rem+0.9vw,1.85rem)] italic text-accent [animation-delay:140ms]">
-            {doctor.title}
-          </p>
-          {doctor.shortDescription && (
-            <p className="mt-6 max-w-xl animate-fade-up text-[17px] leading-relaxed text-muted [animation-delay:200ms] md:text-lg">
-              {doctor.shortDescription}
-            </p>
-          )}
+    <section id="top" aria-labelledby="hero-title" className="relative px-3 pt-3 sm:px-5 sm:pt-4">
+      <div className="bg-sky-hero relative mx-auto max-w-[1400px] overflow-hidden rounded-[32px] pt-24 sm:rounded-[40px] sm:pt-28">
+        {/* soft decorative blobs */}
+        <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-white/40 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute bottom-0 left-1/3 size-80 rounded-full bg-[#7fb0ee]/30 blur-3xl" />
 
-          <ul className="mt-8 flex animate-fade-up flex-wrap gap-x-6 gap-y-3 text-[15px] text-text [animation-delay:240ms]">
-            {doctor.yearsExperience != null && (
-              <li className="flex items-center gap-2">
-                <span className="font-serif text-2xl leading-none text-ink">{doctor.yearsExperience}+</span>
-                <span className="text-muted">{t.common.yearsExperience}</span>
-              </li>
+        <div className="container-x relative grid gap-8 lg:min-h-[640px] lg:grid-cols-12 lg:gap-10">
+          {/* Text */}
+          <div className="pb-2 lg:order-2 lg:col-span-6 lg:self-center lg:pb-36">
+            <p className="eyebrow animate-fade-up">{doctor.title}</p>
+            <h1 id="hero-title" className="h-display mt-4 animate-fade-up text-[clamp(2.1rem,1.5rem+2.4vw,3.4rem)] [animation-delay:80ms]">
+              {doctor.heroTitle || t.home.heroTitleFallback}
+            </h1>
+            {doctor.shortDescription && (
+              <p className="mt-5 max-w-lg animate-fade-up text-[17px] leading-relaxed text-text/80 [animation-delay:160ms]">
+                {doctor.shortDescription}
+              </p>
             )}
-            {location && (
-              <li className="flex items-center gap-2 text-muted">
-                <MapPin className="size-4 text-accent" aria-hidden />
-                {location}
-              </li>
-            )}
-            {doctor.clinicName && <li className="text-muted">{doctor.clinicName}</li>}
-          </ul>
-
-          <div className="mt-10 flex animate-fade-up flex-col gap-3 [animation-delay:300ms] sm:flex-row">
-            <Link href="/book" className="btn btn-primary btn-lg group">
-              <CalendarCheck className="size-5" aria-hidden />
-              {t.common.bookAppointment}
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-            </Link>
-            <a href="#services" className="btn btn-secondary btn-lg">
-              {t.common.viewServices}
-            </a>
-          </div>
-        </div>
-
-        <div className="lg:col-span-5">
-          <div className="relative mx-auto max-w-md animate-fade-up [animation-delay:150ms] lg:max-w-none">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] shadow-lift">
-              <DoctorPortrait photoUrl={doctor.photoUrl} name={doctor.fullName} priority />
+            <div className="mt-8 flex animate-fade-up flex-wrap items-center gap-3 [animation-delay:220ms]">
+              <BookTrigger className="btn btn-primary btn-lg max-sm:flex-1">{t.common.bookAppointment}</BookTrigger>
+              <a href="#services" className="btn btn-lg border border-white/80 bg-white/50 text-ink backdrop-blur hover:bg-white/80">
+                {t.common.viewServices}
+              </a>
             </div>
-            <div aria-hidden className="absolute -top-4 -right-4 -z-10 hidden h-full w-full rounded-[14px] border border-line-strong lg:block" />
-            <div className="absolute -bottom-6 left-4 right-4 sm:left-auto sm:-left-6 sm:right-auto">
-              <div className="card flex items-center gap-4 px-5 py-4">
-                <span className="grid size-10 place-items-center rounded-full bg-accent-soft text-accent">
-                  <Clock className="size-5" aria-hidden />
+            {location && (
+              <p className="mt-6 flex items-center gap-2 text-sm text-text/70">
+                <MapPin className="size-4 text-accent" aria-hidden /> {location}
+                {doctor.clinicName && <span className="text-text/50">· {doctor.clinicName}</span>}
+              </p>
+            )}
+          </div>
+
+          {/* Photo with floating glass cards */}
+          <div className="relative lg:order-1 lg:col-span-6 lg:self-end">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-[460px] overflow-hidden rounded-t-[200px] rounded-b-none border-x-8 border-t-8 border-white/40">
+              <DoctorPortrait photoUrl={doctor.photoUrl} name={doctor.fullName} priority sizes="(min-width: 1024px) 40vw, 90vw" />
+            </div>
+
+            {doctor.yearsExperience != null && doctor.yearsExperience > 0 && (
+              <div className="glass absolute top-[22%] left-0 flex items-center gap-3 rounded-full py-2 pr-5 pl-2 sm:left-4 lg:left-0">
+                <span className="grid size-10 place-items-center rounded-full bg-accent text-white">
+                  <Award className="size-5" aria-hidden />
                 </span>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-                    {todayHours ? t.hero.todayHours : t.hero.closedToday}
-                  </p>
-                  {todayHours && <p className="mt-0.5 font-semibold tabular-nums text-ink">{todayHours}</p>}
-                </div>
+                <span className="leading-tight">
+                  <span className="block font-serif text-lg font-semibold text-ink">{doctor.yearsExperience}+</span>
+                  <span className="block text-xs text-muted">{t.home.experienceChip}</span>
+                </span>
+              </div>
+            )}
+
+            <div className="glass absolute top-[48%] right-0 w-56 rounded-3xl p-4 sm:right-4 lg:right-0">
+              <div className="flex items-center gap-2">
+                <BadgeCheck className="size-5 shrink-0 text-accent" aria-hidden />
+                <p className="truncate text-sm font-semibold text-ink">{doctor.fullName}</p>
+              </div>
+              <p className="mt-1 text-xs text-muted">{doctor.title}</p>
+              <div className="mt-3 border-t border-white/70 pt-3 text-xs">
+                <span className="text-muted">{todayHours ? t.hero.todayHours : t.hero.closedToday}</span>
+                {todayHours && <span className="ml-2 font-semibold text-ink tabular-nums">{todayHours}</span>}
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Quick booking bar (liquid glass) */}
+        <div className="container-x relative pb-6 sm:pb-8 lg:absolute lg:inset-x-0 lg:bottom-0">
+          <QuickBookBar services={services} />
         </div>
       </div>
     </section>

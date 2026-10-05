@@ -48,7 +48,7 @@ Seed faqat **joy egallovchi** ma'lumot qo'yadi — `[KVADRAT QAVS]` ichidagi ham
 
 - Til: o'zbek (lotin). Barcha matnlar `src/lib/i18n/uz.ts` da — yangi til qo'shish uchun faylni nusxalab tarjima qiling.
 - Rate limiter xotirada ishlaydi (bitta server uchun yetarli). Bir nechta instansiyada Redis kabi umumiy saqlash kerak.
-- Rasmlar URL orqali kiritiladi (fayl yuklash yo'q). TODO: kerak bo'lsa obyekt saqlash (S3/R2) bilan yuklashni qo'shish.
+- Rasmlar admin paneldan yuklanadi (brauzerda siqiladi, PostgreSQL'da saqlanadi, `/media/<id>` orqali beriladi) — Render diski vaqtinchalik bo'lgani uchun. Katta hajmlar uchun keyinchalik S3/R2 ga o'tkazish mumkin.
 - Ikki marta band qilishdan himoya `prisma/migrations/*_init/migration.sql` dagi qo'lda yozilgan partial index'ga tayanadi. Kelajakda `prisma migrate dev` uni o'chirishni taklif qilsa — rad eting va index'ni saqlang.
 
 ## Tuzilma

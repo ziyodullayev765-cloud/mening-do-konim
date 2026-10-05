@@ -8,6 +8,7 @@ import { t } from "@/lib/i18n";
 import { requireAdmin } from "@/lib/auth";
 import { failure, success, type ActionState } from "@/lib/action";
 import { PRICE_MAX, kindForCategory, serviceFormSchema } from "@/lib/schemas/service";
+import { deleteUnusedMedia } from "@/lib/media";
 import { fieldErrors, id as idSchema } from "@/lib/validation";
 
 const ui = t.admin.servicesUi;
@@ -49,9 +50,11 @@ export async function saveService(id: string | null, values: unknown): Promise<S
     });
     if (duplicate) return failure(ui.duplicate, { name: [ui.duplicate] });
 
+    const previous = id ? await db.service.findUnique({ where: { id }, select: { imageUrl: true } }) : null;
     const saved = id
       ? await db.service.update({ where: { id }, data, select: { id: true } })
       : await db.service.create({ data, select: { id: true } });
+    if (previous?.imageUrl && previous.imageUrl !== data.imageUrl) await deleteUnusedMedia([previous.imageUrl]);
 
     refreshAll();
     return { ...success(id ? ui.updated : ui.created), id: saved.id };
@@ -83,7 +86,8 @@ export async function deleteService(id: string): Promise<ActionState> {
   if (!idSchema.safeParse(id).success) return failure(t.common.invalidForm);
   try {
     // Appointments keep their serviceName snapshot; serviceId becomes null (onDelete: SetNull).
-    const s = await db.service.delete({ where: { id }, select: { name: true } });
+    const s = await db.service.delete({ where: { id }, select: { name: true, imageUrl: true } });
+    await deleteUnusedMedia([s.imageUrl]);
     refreshAll();
     return success(ui.deleted.replace("{name}", s.name));
   } catch (e) {

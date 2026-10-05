@@ -1,68 +1,100 @@
-import { Building2, MapPin } from "lucide-react";
+import { Briefcase, GraduationCap } from "lucide-react";
 import type { Doctor } from "@prisma/client";
 import { t } from "@/lib/i18n";
-import { lines } from "@/lib/format";
+import { formatNumber, lines } from "@/lib/format";
 import { DoctorPortrait } from "../DoctorPortrait";
 import { Reveal } from "../Reveal";
 
+function parseHistory(text: string) {
+  return lines(text).map((line) => {
+    const [a, ...rest] = line.split("|");
+    return rest.length ? { period: a.trim(), text: rest.join("|").trim() } : { period: "", text: a.trim() };
+  });
+}
+
 export function About({ doctor }: { doctor: Doctor }) {
-  const expertise = lines(doctor.specializations);
   const paragraphs = lines(doctor.biography);
+  const expertise = lines(doctor.specializations);
+  const education = [...lines(doctor.education), ...lines(doctor.training), ...lines(doctor.certifications), ...lines(doctor.memberships)];
+  const history = parseHistory(doctor.professionalHistory);
+  // Only real, entered figures are shown.
+  const stats = [
+    { value: doctor.yearsExperience, label: t.trust.experience },
+    { value: doctor.patientsTreated, label: t.trust.patients },
+    { value: doctor.proceduresPerformed, label: t.trust.procedures },
+  ].filter((s): s is { value: number; label: string } => s.value != null && s.value > 0);
+
   return (
-    <section id="about" aria-labelledby="about-title" className="section">
-      <div className="container-x grid gap-14 lg:grid-cols-12 lg:gap-16">
+    <section id="about" aria-labelledby="about-title" className="section bg-gradient-to-b from-paper to-paper-2/70">
+      <div className="container-x grid gap-12 lg:grid-cols-12 lg:gap-16">
         <Reveal className="lg:col-span-5">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] lg:sticky lg:top-28">
-            <DoctorPortrait photoUrl={doctor.aboutPhotoUrl ?? doctor.photoUrl} name={doctor.fullName} sizes="(min-width: 1024px) 35vw, 100vw" />
+          <div className="relative lg:sticky lg:top-28">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#e3efff] to-[#bcd6f6] shadow-lift">
+              <DoctorPortrait photoUrl={doctor.aboutPhotoUrl ?? doctor.photoUrl} name={doctor.fullName} sizes="(min-width: 1024px) 35vw, 100vw" />
+            </div>
+            {stats.length > 0 && (
+              <div className="glass absolute inset-x-4 -bottom-6 grid grid-cols-3 gap-2 rounded-3xl p-4 text-center">
+                {stats.map((s) => (
+                  <div key={s.label}>
+                    <p className="font-serif text-2xl font-semibold text-ink tabular-nums">{formatNumber(s.value)}+</p>
+                    <p className="mt-0.5 text-[11px] leading-tight text-muted">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </Reveal>
+
         <div className="lg:col-span-7">
           <Reveal>
-            <p className="eyebrow">{t.about.eyebrow}</p>
-            <h2 id="about-title" className="h-section mt-4">{doctor.fullName}</h2>
-            <p className="mt-3 font-serif text-xl italic text-accent">{doctor.title}</p>
+            <p className="eyebrow">{t.home.aboutEyebrow}</p>
+            <h2 id="about-title" className="h-section mt-3">{doctor.fullName}</h2>
+            <p className="mt-2 font-medium text-accent">{doctor.title}</p>
           </Reveal>
+
           {paragraphs.length > 0 && (
-            <Reveal delay={80} className="mt-8 space-y-5 text-[17px] leading-[1.75] text-text/90">
-              {paragraphs.map((p, i) => (
-                <p key={i} className={i === 0 ? "first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-6xl first-letter:leading-[0.85] first-letter:text-ink" : ""}>
-                  {p}
-                </p>
-              ))}
+            <Reveal delay={60} className="mt-6 space-y-4 text-[16.5px] leading-[1.75] text-text/90">
+              {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
             </Reveal>
           )}
 
           {expertise.length > 0 && (
-            <Reveal delay={120} className="mt-10">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t.about.expertise}</h3>
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {expertise.map((e) => (
-                  <li key={e} className="chip">{e}</li>
-                ))}
-              </ul>
+            <Reveal delay={100} className="mt-7 flex flex-wrap gap-2">
+              {expertise.map((e) => <span key={e} className="chip border-accent/15 bg-accent-soft text-accent-strong">{e}</span>)}
             </Reveal>
           )}
 
-          <Reveal delay={160} className="mt-10 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
-            {doctor.clinicName && (
-              <div className="flex gap-4 bg-surface p-6">
-                <Building2 className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{t.about.clinic}</p>
-                  <p className="mt-1.5 font-medium text-ink">{doctor.clinicName}</p>
+          {(education.length > 0 || history.length > 0) && (
+            <Reveal delay={140} className="mt-10 grid gap-4 sm:grid-cols-2">
+              {education.length > 0 && (
+                <div className="rounded-3xl border border-white bg-white p-6 shadow-soft">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
+                    <GraduationCap className="size-5 text-accent" aria-hidden /> {t.home.education}
+                  </h3>
+                  <ul className="mt-4 space-y-2.5 text-[15px] text-text/90">
+                    {education.map((e) => (
+                      <li key={e} className="flex gap-2.5"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden />{e}</li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            )}
-            {doctor.address && (
-              <div className="flex gap-4 bg-surface p-6">
-                <MapPin className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{t.about.location}</p>
-                  <p className="mt-1.5 font-medium text-ink">{doctor.address}</p>
+              )}
+              {history.length > 0 && (
+                <div className="rounded-3xl border border-white bg-white p-6 shadow-soft">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
+                    <Briefcase className="size-5 text-accent" aria-hidden /> {t.home.career}
+                  </h3>
+                  <ul className="mt-4 space-y-3 text-[15px]">
+                    {history.map((h, i) => (
+                      <li key={i}>
+                        {h.period && <span className="block text-xs font-semibold text-accent">{h.period}</span>}
+                        <span className="text-text/90">{h.text}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            )}
-          </Reveal>
+              )}
+            </Reveal>
+          )}
         </div>
       </div>
     </section>

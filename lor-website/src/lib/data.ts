@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { getSettings, getWeekSchedule } from "@/lib/slots";
+import { SERVICE_CATEGORIES } from "@/lib/schemas/service";
 
 export const getDoctor = cache(async () => {
   return (
@@ -23,11 +24,16 @@ export const getPublicContent = cache(async () => {
     getWeekSchedule(),
     getSiteSettings(),
   ]);
+  const categoryCounts = SERVICE_CATEGORIES.map((category) => ({
+    category,
+    count: services.filter((s) => s.category === category).length,
+  })).filter((c) => c.count > 0);
   return {
     doctor,
-    services: services.filter((s) => s.kind === "SERVICE"),
-    procedures: services.filter((s) => s.kind === "PROCEDURE"),
-    pricing: services.filter((s) => s.showInPricing),
+    services,
+    /** Minimal fields for the booking form (no internal data sent to the browser). */
+    bookable: services.map(({ id, category, name, price, priceFrom, durationMinutes }) => ({ id, category, name, price, priceFrom, durationMinutes })),
+    categoryCounts,
     testimonials,
     faqs,
     schedule,
