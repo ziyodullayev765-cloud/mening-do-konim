@@ -20,6 +20,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         address={doctor.address}
         todayHours={todayHours}
         hasReviews={testimonials.length > 0}
+        logoUrl={doctor.logoUrl}
       />
       <main id="main">{children}</main>
       <Footer doctor={doctor} />

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { t } from "@/lib/i18n";
 import { DATE_RE, TIME_RE } from "@/lib/slots-shared";
 import { IMAGE_REF_ERROR, isValidImageRef } from "@/lib/media-shared";
+import { instagramUsername } from "@/lib/social";
 
 const trimmed = (max: number) => z.string().trim().max(max);
 
@@ -82,6 +83,8 @@ export const doctorSchema = z.object({
   certifications: text(3000),
   memberships: text(2000),
   heroTitle: text(120),
+  heroBadge: text(80),
+  logoUrl: imageRef,
   photoUrl: imageRef,
   aboutPhotoUrl: imageRef,
   clinicName: text(200),
@@ -92,7 +95,13 @@ export const doctorSchema = z.object({
   whatsapp: text(40),
   telegram: text(100),
   email: optionalEmail,
-  instagram: optionalUrl,
+  /** Accepts "username", "@username" or an instagram.com link; stored as the bare username. */
+  instagram: z
+    .string()
+    .trim()
+    .max(200)
+    .transform((v) => instagramUsername(v))
+    .refine((v) => v === "" || /^[A-Za-z0-9._]{1,30}$/.test(v), "Instagram username noto'g'ri (faqat harf, raqam, nuqta va _)."),
   facebook: optionalUrl,
   youtube: optionalUrl,
   mapQuery: text(300),

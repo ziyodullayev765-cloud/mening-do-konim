@@ -78,6 +78,8 @@ model Doctor {
   logoUrl             String?
   /// Big hero headline; falls back to the doctor's name when empty
   heroTitle           String   @default("")
+  /// Small badge above the hero headline (e.g. city); falls back to the address
+  heroBadge           String   @default("")
   clinicName          String   @default("")
   city                String   @default("")
   country             String   @default("")

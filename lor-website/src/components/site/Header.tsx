@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowRight, Clock, Mail, MapPin, Menu, Phone, X } from "lucide-react";
 import { t } from "@/lib/i18n";
@@ -10,15 +11,16 @@ import { LogoMark } from "./Logo";
 const NAV = [
   { href: "/#directions", label: "Yo'nalishlar" },
   { href: "/#prices", label: t.nav.pricing },
-  { href: "/#about", label: t.nav.about },
+  { href: "/about", label: t.nav.about },
   { href: "/#reviews", label: "Fikrlar" },
   { href: "/#contact", label: t.nav.contact },
 ];
 
-type Props = { name: string; phone: string; email: string; address: string; todayHours: string | null; hasReviews: boolean };
+type Props = { name: string; phone: string; email: string; address: string; todayHours: string | null; hasReviews: boolean; logoUrl: string | null };
 
-export function Header({ name, phone, email, address, todayHours, hasReviews }: Props) {
+export function Header({ name, phone, email, address, todayHours, hasReviews, logoUrl }: Props) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const ok = (v: string) => Boolean(v) && !isPlaceholder(v);
   const nav = NAV.filter((n) => hasReviews || n.href !== "/#reviews");
@@ -74,7 +76,7 @@ export function Header({ name, phone, email, address, todayHours, hasReviews }: 
       <header className={`sticky top-0 z-40 border-b bg-white transition-shadow duration-300 ${scrolled || open ? "border-line shadow-[0_6px_20px_-12px_rgb(26_43_76/0.25)]" : "border-transparent"}`}>
         <div className="container-x flex h-[76px] items-center justify-between gap-6">
           <Link href="/" className="flex min-w-0 items-center gap-3" onClick={() => setOpen(false)}>
-            <LogoMark className="size-10 shrink-0" />
+            <LogoMark className="size-10 shrink-0" logoUrl={logoUrl} />
             <span className="truncate text-[17px] font-extrabold tracking-tight text-ink">{name}</span>
           </Link>
 
@@ -82,7 +84,11 @@ export function Header({ name, phone, email, address, todayHours, hasReviews }: 
             <ul className="flex items-center gap-1">
               {nav.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} className="rounded-lg px-3.5 py-2 text-[15px] font-semibold text-ink/80 transition-colors hover:text-accent">
+                  <a
+                    href={item.href}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    className={`rounded-lg px-3.5 py-2 text-[15px] font-semibold transition-colors hover:text-accent ${pathname === item.href ? "text-accent" : "text-ink/80"}`}
+                  >
                     {item.label}
                   </a>
                 </li>

@@ -5,6 +5,7 @@ import { t } from "@/lib/i18n";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { TextArea, TextField } from "@/components/admin/fields";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { LinesEditor } from "@/components/admin/LinesEditor";
 import { PageHeader, Panel } from "@/components/admin/ui";
 import { saveProfile } from "@/app/admin/actions/content";
 
@@ -16,29 +17,50 @@ export default async function ProfilePage() {
   const p = t.admin.profile;
   return (
     <>
-      <PageHeader title={t.admin.nav.profile} />
+      <PageHeader title={t.admin.nav.profile} description="Saytdagi barcha matn va rasmlar shu yerdan boshqariladi." />
       <ActionForm action={saveProfile} className="space-y-6">
-        <Panel title={p.sections.main}>
+        <Panel title="Bosh ekran">
           <div className="grid gap-5 md:grid-cols-2">
             <TextField name="fullName" label="F.I.Sh." defaultValue={d.fullName} required />
             <TextField name="title" label="Mutaxassislik / unvon" defaultValue={d.title} required />
-            <TextArea name="shortDescription" label="Qisqa tavsif (bosh sahifa)" defaultValue={d.shortDescription} rows={2} className="md:col-span-2" />
-            <TextArea name="biography" label="Biografiya" hint="Har bir xatboshini yangi qatordan yozing." defaultValue={d.biography} rows={6} className="md:col-span-2" />
-            <TextField name="heroTitle" label="Bosh ekran sarlavhasi" placeholder="Quloq, burun va tomoq salomatligi" hint="Bo'sh qoldirilsa, shu standart sarlavha chiqadi." defaultValue={d.heroTitle} className="md:col-span-2" />
-            <ImageUpload
-              name="photoUrl"
-              label="1-surat: bosh ekran (Qabulga yozilish tugmasi yonida)"
-              hint="Kompyuterdan tanlang yoki sudrab tashlang. Tik (portret) surat yaxshi chiqadi."
-              defaultValue={d.photoUrl}
-              aspect="aspect-[4/5]"
+            <TextField name="heroBadge" label="Sarlavha ustidagi belgi (manzil)" placeholder="Masalan: Buxoro, Navoiy ko'chasi 12" hint="Bo'sh qoldirilsa, to'liq manzil chiqadi." defaultValue={d.heroBadge} />
+            <TextField name="heroTitle" label="Katta sarlavha" placeholder="Quloq, burun va tomoq salomatligi" hint="Bo'sh qoldirilsa, shu standart sarlavha chiqadi." defaultValue={d.heroTitle} />
+            <TextArea name="shortDescription" label="Sarlavha ostidagi matn" defaultValue={d.shortDescription} rows={2} className="md:col-span-2" />
+            <TextField
+              name="instagram"
+              label="Instagram username"
+              placeholder="@username"
+              hint="Faqat username yozing (masalan: @dr.zohidullo). Bosh ekrandagi kartani bosganda Instagram ochiladi."
+              defaultValue={d.instagram ? `@${d.instagram.replace(/^@/, "")}` : ""}
+              className="md:col-span-2"
             />
-            <ImageUpload
-              name="aboutPhotoUrl"
-              label={"2-surat: \"Shifokor haqida\" bo'limi"}
-              hint="Bo'sh qoldirilsa, 1-surat ishlatiladi."
-              defaultValue={d.aboutPhotoUrl}
-              aspect="aspect-[4/5]"
-            />
+            <ImageUpload name="photoUrl" label="Bosh ekran surati" hint="Tik (portret) surat yaxshi chiqadi." defaultValue={d.photoUrl} aspect="aspect-[4/5]" />
+            <ImageUpload name="logoUrl" label="Logotip (chap yuqori burchak)" hint="Kvadrat, shaffof fonli PNG tavsiya etiladi. Bo'sh bo'lsa, standart belgi chiqadi." defaultValue={d.logoUrl} aspect="aspect-square" fit="contain" />
+          </div>
+        </Panel>
+
+        <Panel title="Davolash yo'nalishlari (bosh sahifadagi kartalar)">
+          <LinesEditor
+            name="specializations"
+            label="Yo'nalishlar"
+            placeholder="Masalan: Quloq kasalliklari"
+            addLabel="Yo'nalish qo'shish"
+            hint="Har bir qator — bitta karta. Belgi nomiga qarab avtomatik tanlanadi (quloq, burun, tomoq, bolalar, endoskopiya…)."
+            defaultValue={d.specializations}
+          />
+        </Panel>
+
+        <Panel title={"\"Shifokor haqida\" sahifasi"}>
+          <div className="grid gap-5 md:grid-cols-2">
+            <TextArea name="biography" label="Biografiya" hint="Har bir xatboshini yangi qatordan yozing." defaultValue={d.biography} rows={7} className="md:col-span-2" />
+            <ImageUpload name="aboutPhotoUrl" label="Sahifa surati" hint="Bo'sh qoldirilsa, bosh ekran surati ishlatiladi." defaultValue={d.aboutPhotoUrl} aspect="aspect-[4/5]" />
+            <div className="space-y-5">
+              <TextArea name="professionalHistory" label="Kasbiy yo'l" hint={p.historyHint} defaultValue={d.professionalHistory} />
+              <TextArea name="education" label="Ta'lim" hint={p.linesHint} defaultValue={d.education} />
+            </div>
+            <TextArea name="training" label="Malaka oshirish" hint={p.linesHint} defaultValue={d.training} />
+            <TextArea name="certifications" label="Sertifikatlar" hint={p.linesHint} defaultValue={d.certifications} />
+            <TextArea name="memberships" label="Kasbiy a'zolik" hint={p.linesHint} defaultValue={d.memberships} />
           </div>
         </Panel>
 
@@ -49,17 +71,6 @@ export default async function ProfilePage() {
             <TextField name="patientsTreated" type="number" min={0} label="Bemorlar soni" defaultValue={d.patientsTreated ?? ""} />
             <TextField name="proceduresPerformed" type="number" min={0} label="Muolajalar soni" defaultValue={d.proceduresPerformed ?? ""} />
             <TextField name="certificationsCount" type="number" min={0} label="Sertifikatlar soni" defaultValue={d.certificationsCount ?? ""} />
-          </div>
-        </Panel>
-
-        <Panel title={p.sections.background}>
-          <div className="grid gap-5 md:grid-cols-2">
-            <TextArea name="specializations" label="Asosiy yo'nalishlar" hint={p.linesHint} defaultValue={d.specializations} />
-            <TextArea name="education" label="Ta'lim" hint={p.linesHint} defaultValue={d.education} />
-            <TextArea name="training" label="Malaka oshirish" hint={p.linesHint} defaultValue={d.training} />
-            <TextArea name="professionalHistory" label="Kasbiy yo'l" hint={p.historyHint} defaultValue={d.professionalHistory} />
-            <TextArea name="certifications" label="Sertifikatlar" hint={p.linesHint} defaultValue={d.certifications} />
-            <TextArea name="memberships" label="Kasbiy a'zolik" hint={p.linesHint} defaultValue={d.memberships} />
           </div>
         </Panel>
 
@@ -78,8 +89,7 @@ export default async function ProfilePage() {
         </Panel>
 
         <Panel title={p.sections.social}>
-          <div className="grid gap-5 md:grid-cols-3">
-            <TextField name="instagram" type="url" label="Instagram" placeholder="https://instagram.com/…" defaultValue={d.instagram} />
+          <div className="grid gap-5 md:grid-cols-2">
             <TextField name="facebook" type="url" label="Facebook" placeholder="https://facebook.com/…" defaultValue={d.facebook} />
             <TextField name="youtube" type="url" label="YouTube" placeholder="https://youtube.com/…" defaultValue={d.youtube} />
           </div>

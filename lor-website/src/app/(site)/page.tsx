@@ -3,7 +3,6 @@ import { Hero } from "@/components/site/sections/Hero";
 import { Directions } from "@/components/site/sections/Directions";
 import { Services } from "@/components/site/sections/Services";
 import { Highlights } from "@/components/site/sections/Highlights";
-import { About } from "@/components/site/sections/About";
 import { Testimonials } from "@/components/site/sections/Testimonials";
 import { Faq } from "@/components/site/sections/Faq";
 import { Contact } from "@/components/site/sections/Contact";
@@ -25,7 +24,6 @@ export default async function HomePage() {
       <Directions doctor={doctor} />
       <Services services={[...services, ...procedures]} />
       <Highlights doctor={doctor} />
-      <About doctor={doctor} />
       <Testimonials items={testimonials} />
       <Faq items={faqs} />
       <Contact doctor={doctor} schedule={schedule} />

@@ -8,7 +8,7 @@ import { LogoMark } from "./Logo";
 const LINKS = [
   { href: "/#directions", label: "Yo'nalishlar" },
   { href: "/#prices", label: t.nav.pricing },
-  { href: "/#about", label: t.nav.about },
+  { href: "/about", label: t.nav.about },
   { href: "/#faq", label: t.nav.faq },
   { href: "/#contact", label: t.nav.contact },
 ];
@@ -20,7 +20,7 @@ export function Footer({ doctor }: { doctor: Doctor }) {
       <div className="container-x grid gap-10 py-14 md:grid-cols-12">
         <div className="md:col-span-5">
           <div className="flex items-center gap-3">
-            <LogoMark className="size-10" />
+            <LogoMark className="size-10" logoUrl={doctor.logoUrl} />
             <span className="text-lg font-extrabold text-white">{doctor.fullName}</span>
           </div>
           <p className="mt-4 max-w-sm text-[15px] leading-relaxed">{doctor.title}</p>

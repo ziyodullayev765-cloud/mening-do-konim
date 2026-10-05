@@ -22,11 +22,12 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     ...parsed.data,
     photoUrl: parsed.data.photoUrl || null,
     aboutPhotoUrl: parsed.data.aboutPhotoUrl || null,
+    logoUrl: parsed.data.logoUrl || null,
   };
-  const before = await db.doctor.findUnique({ where: { id: 1 }, select: { photoUrl: true, aboutPhotoUrl: true } });
+  const before = await db.doctor.findUnique({ where: { id: 1 }, select: { photoUrl: true, aboutPhotoUrl: true, logoUrl: true } });
   await db.doctor.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
   // Remove uploads that were replaced or cleared.
-  if (before) await deleteUnusedMedia([before.photoUrl, before.aboutPhotoUrl]);
+  if (before) await deleteUnusedMedia([before.photoUrl, before.aboutPhotoUrl, before.logoUrl]);
   refreshSite();
   return success(t.admin.profile.saved);
 }
