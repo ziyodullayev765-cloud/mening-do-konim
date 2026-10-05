@@ -24,20 +24,9 @@ npm run db:seed               # admin hisobi + boshlang'ich ma'lumotlar
 npm run dev                   # http://localhost:3000 , admin: /admin
 ```
 
-## Production: Vercel (tavsiya) yoki Render
+## Production: Vercel
 
-**Vercel:** vercel.com/new → repo import → **Root Directory: `lor-website`**. Storage → Neon Postgres ulang (DATABASE_URL va DATABASE_URL_UNPOOLED avtomatik qo'shiladi). Environment: `SITE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`. Build `vercel-build` skripti orqali avtomatik: migratsiya + seed + build.
-
-### Render
-
-1. PostgreSQL bazasi yarating va `DATABASE_URL` ni oling.
-2. Web Service: Root directory `lor-website`
-   - Build: `npm install && npx prisma migrate deploy && npm run build`
-   - Start: `npm start`
-3. Environment: `DATABASE_URL`, `SITE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (kamida 10 belgi).
-4. Bir marta: `npm run db:seed` (Render Shell orqali). Keyin parolni admin panel → Sozlamalar'dan almashtiring.
-
-`render.yaml` fayli ham tayyor (Blueprint sifatida ishlatish mumkin).
+vercel.com/new → repo import → **Root Directory: `lor-website`**. Storage → Neon Postgres ulang (`DATABASE_URL` va `DATABASE_URL_UNPOOLED` avtomatik qo'shiladi). Environment: `SITE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (kamida 10 belgi). Build `vercel-build` skripti orqali avtomatik: migratsiya + seed + build. Keyin parolni admin panel → Sozlamalar'dan almashtiring.
 
 ## Ishga tushirishdan oldin to'ldiring
 
@@ -52,7 +41,7 @@ Seed faqat **joy egallovchi** ma'lumot qo'yadi — `[KVADRAT QAVS]` ichidagi ham
 
 - Til: o'zbek (lotin). Barcha matnlar `src/lib/i18n/uz.ts` da — yangi til qo'shish uchun faylni nusxalab tarjima qiling.
 - Rate limiter xotirada ishlaydi (bitta server uchun yetarli). Bir nechta instansiyada Redis kabi umumiy saqlash kerak.
-- Rasmlar admin paneldan yuklanadi (brauzerda siqiladi, PostgreSQL'da saqlanadi, `/media/<id>` orqali beriladi) — Render diski vaqtinchalik bo'lgani uchun. Katta hajmlar uchun keyinchalik S3/R2 ga o'tkazish mumkin.
+- Rasmlar admin paneldan yuklanadi (brauzerda siqiladi, PostgreSQL'da saqlanadi, `/media/<id>` orqali beriladi) — serverless muhitda disk vaqtinchalik bo'lgani uchun. Katta hajmlar uchun keyinchalik S3/R2 ga o'tkazish mumkin.
 - Ikki marta band qilishdan himoya `prisma/migrations/*_init/migration.sql` dagi qo'lda yozilgan partial index'ga tayanadi. Kelajakda `prisma migrate dev` uni o'chirishni taklif qilsa — rad eting va index'ni saqlang.
 
 ## Tuzilma
