@@ -41,10 +41,21 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/**
+ * A page reload should open at the top. Otherwise the browser restores the old
+ * scroll position (or a leftover #anchor), which with smooth scrolling looks
+ * like the page sliding down by itself. Restoration is switched off only while
+ * the page unloads, so back/forward inside the site keeps working.
+ */
+const RESET_SCROLL_ON_RELOAD = `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.hash)history.replaceState(history.state,"",location.pathname+location.search);addEventListener("load",function(){setTimeout(function(){history.scrollRestoration="auto"},300)});addEventListener("pagehide",function(){history.scrollRestoration="manual"});addEventListener("pageshow",function(e){if(e.persisted)history.scrollRestoration="auto"})}catch(e){}`;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   return (
     <html lang={locale} className={`${manrope.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: RESET_SCROLL_ON_RELOAD }} />
+      </head>
       <body className="min-h-dvh">{children}</body>
     </html>
   );
