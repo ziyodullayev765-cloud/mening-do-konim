@@ -129,6 +129,25 @@
   .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); transition-delay: var(--reveal-delay, 0ms); }
   .reveal.is-visible { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+  /* Prices section only: liquid-glass card over the animated backdrop */
+  .glass-card {
+    position: relative; border-radius: 16px;
+    background: linear-gradient(160deg, rgb(255 255 255 / .78), rgb(255 255 255 / .52));
+    border: 1px solid rgb(255 255 255 / .85);
+    box-shadow: 0 1px 0 rgb(255 255 255 / .9) inset, 0 20px 50px -24px rgb(26 43 76 / .28), 0 2px 8px -4px rgb(26 43 76 / .08);
+    -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
+  }
+  .prices-blob { position: absolute; border-radius: 9999px; filter: blur(48px); opacity: .9; animation: prices-drift 24s ease-in-out infinite alternate; will-change: transform; }
+  @keyframes prices-drift {
+    0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+    50% { transform: translate3d(6%, 8%, 0) scale(1.12) rotate(25deg); }
+    100% { transform: translate3d(-5%, -4%, 0) scale(.94) rotate(-15deg); }
+  }
+  .prices-art { animation: prices-float 14s ease-in-out infinite alternate; }
+  @keyframes prices-float { from { transform: translateY(0) rotate(-1.5deg); } to { transform: translateY(-14px) rotate(1.5deg); } }
+  .prices-lines { animation: prices-sway 18s ease-in-out infinite alternate; }
+  @keyframes prices-sway { from { transform: translateX(0); } to { transform: translateX(-24px); } }
+  @media (prefers-reduced-motion: reduce) { .prices-blob, .prices-art, .prices-lines { animation: none; } }
   .lift { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
   .lift:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); border-color: rgb(30 157 178 / .35); }
 }

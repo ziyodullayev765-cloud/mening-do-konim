@@ -9,6 +9,7 @@ export function Block({
   lead,
   action,
   tone = "plain",
+  backdrop,
   children,
 }: {
   id: string;
@@ -17,10 +18,13 @@ export function Block({
   lead?: string;
   action?: { href: string; label: string };
   tone?: "plain" | "white";
+  /** Optional decorative layer drawn behind the section content. */
+  backdrop?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className={tone === "white" ? "bg-white" : ""}>
+    <section id={id} aria-labelledby={`${id}-title`} className={backdrop ? "relative isolate overflow-hidden" : tone === "white" ? "bg-white" : ""}>
+      {backdrop}
       <div className="container-x py-12 sm:py-20 lg:py-24">
         <Reveal className="flex flex-col gap-2.5 sm:flex-row sm:gap-4 sm:items-end sm:justify-between">
           <div className="max-w-2xl">
