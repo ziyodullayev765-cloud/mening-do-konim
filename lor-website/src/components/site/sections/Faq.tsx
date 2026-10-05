@@ -2,22 +2,25 @@ import { Plus } from "lucide-react";
 import type { Faq as FaqItem } from "@prisma/client";
 import { t } from "@/lib/i18n";
 import { Block } from "../Block";
+import { Reveal } from "../Reveal";
 
 export function Faq({ items }: { items: FaqItem[] }) {
   if (items.length === 0) return null;
   return (
-    <Block id="faq" label={t.faq.eyebrow} title={t.faq.title}>
-      <div className="divide-y divide-line border-y border-line">
+    <Block id="faq" label={t.faq.eyebrow} title={t.faq.title} tone="white">
+      <Reveal className="mx-auto max-w-3xl space-y-3">
         {items.map((f) => (
-          <details key={f.id} className="group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left text-[17px] font-medium text-ink hover:text-accent [&::-webkit-details-marker]:hidden">
+          <details key={f.id} className="group card overflow-hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 px-6 py-5 text-left text-[16px] font-bold text-ink hover:text-accent [&::-webkit-details-marker]:hidden">
               {f.question}
-              <Plus className="size-4 shrink-0 text-muted group-open:rotate-45" aria-hidden />
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-accent transition-transform duration-300 group-open:rotate-45">
+                <Plus className="size-4" aria-hidden />
+              </span>
             </summary>
-            <p className="pr-10 pb-6 text-[16px] leading-relaxed whitespace-pre-line text-muted">{f.answer}</p>
+            <p className="px-6 pb-6 text-[15px] leading-relaxed whitespace-pre-line text-muted">{f.answer}</p>
           </details>
         ))}
-      </div>
+      </Reveal>
     </Block>
   );
 }

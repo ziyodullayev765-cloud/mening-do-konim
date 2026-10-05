@@ -1,9 +1,11 @@
+import { Clock } from "lucide-react";
 import type { Service } from "@prisma/client";
 import { t } from "@/lib/i18n";
 import { formatDuration, formatPrice, isPlaceholder } from "@/lib/format";
 import { Block } from "../Block";
+import { Reveal } from "../Reveal";
 
-/** One list for everything: replaces the separate services, procedures and pricing sections. */
+/** Single price list (consultations + procedures). */
 export function Services({ services }: { services: Service[] }) {
   const groups = [
     { title: t.pricing.consultations, items: services.filter((s) => s.kind === "SERVICE") },
@@ -11,38 +13,33 @@ export function Services({ services }: { services: Service[] }) {
   ].filter((g) => g.items.length);
 
   return (
-    <Block id="services" label={t.nav.services} title={t.pricing.title}>
+    <Block id="prices" label="Narxlar" title="Xizmatlar va narxlar" lead={t.pricing.lead} tone="white">
       {groups.length === 0 ? (
         <p className="text-muted">{t.services.empty}</p>
       ) : (
-        <div className="space-y-12">
-          {groups.map((g) => (
-            <div key={g.title}>
-              {groups.length > 1 && <h3 className="text-sm font-semibold text-ink">{g.title}</h3>}
-              <ul className="mt-3 divide-y divide-line border-y border-line">
+        <div className="mx-auto max-w-4xl space-y-6">
+          {groups.map((g, gi) => (
+            <Reveal key={g.title} delay={gi * 80} className="card overflow-hidden">
+              <h3 className="border-b border-line bg-paper px-6 py-4 text-sm font-bold text-ink">{g.title}</h3>
+              <ul className="divide-y divide-line">
                 {g.items.map((s) => {
                   const duration = formatDuration(s.durationMinutes);
-                  const extra = [s.indication && `${t.procedures.indication}: ${s.indication}`, s.recovery && `${t.procedures.recovery}: ${s.recovery}`].filter(Boolean);
                   return (
-                    <li key={s.id} className="flex flex-col gap-2 py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+                    <li key={s.id} className="flex items-start justify-between gap-6 px-6 py-4 transition-colors hover:bg-paper">
                       <div className="min-w-0">
-                        <p className="font-medium text-ink">{s.name}</p>
-                        {s.description && !isPlaceholder(s.description) && <p className="mt-1 text-[15px] leading-relaxed text-muted">{s.description}</p>}
-                        {extra.map((e) => <p key={e as string} className="mt-1 text-sm text-muted">{e}</p>)}
+                        <p className="font-semibold text-ink">{s.name}</p>
+                        {s.description && !isPlaceholder(s.description) && <p className="mt-0.5 text-sm leading-relaxed text-muted">{s.description}</p>}
+                        {duration && <p className="mt-1 flex items-center gap-1 text-xs text-muted"><Clock className="size-3.5" aria-hidden />{duration}</p>}
                       </div>
-                      <div className="flex shrink-0 items-baseline gap-4 sm:text-right">
-                        {duration && <span className="text-sm text-muted">{duration}</span>}
-                        <span className={`whitespace-nowrap tabular-nums ${s.price == null ? "text-sm text-muted" : "font-semibold text-ink"}`}>
-                          {formatPrice(s.price, s.priceFrom)}
-                        </span>
-                      </div>
+                      <span className={`shrink-0 whitespace-nowrap tabular-nums ${s.price == null ? "text-sm text-muted" : "font-bold text-ink"}`}>
+                        {formatPrice(s.price, s.priceFrom)}
+                      </span>
                     </li>
                   );
                 })}
               </ul>
-            </div>
+            </Reveal>
           ))}
-          <p className="text-sm text-muted">{t.pricing.lead}</p>
         </div>
       )}
     </Block>

@@ -81,6 +81,7 @@ export const doctorSchema = z.object({
   specializations: text(2000),
   certifications: text(3000),
   memberships: text(2000),
+  heroTitle: text(120),
   photoUrl: imageRef,
   aboutPhotoUrl: imageRef,
   clinicName: text(200),

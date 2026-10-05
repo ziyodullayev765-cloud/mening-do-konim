@@ -1,27 +1,40 @@
-/**
- * Minimal section layout: a narrow label column and a content column,
- * separated from the previous section by a hairline.
- */
+import { ArrowRight } from "lucide-react";
+import { Reveal } from "./Reveal";
+
+/** Section with a heading row (title left, optional link right) and content below. */
 export function Block({
   id,
   label,
   title,
+  lead,
+  action,
+  tone = "plain",
   children,
 }: {
   id: string;
   label: string;
-  title?: string;
+  title: string;
+  lead?: string;
+  action?: { href: string; label: string };
+  tone?: "plain" | "white";
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="border-t border-line">
-      <div className="container-x grid gap-8 py-16 lg:grid-cols-12 lg:gap-12 lg:py-24">
-        <div className="lg:col-span-4">
-          <p className="eyebrow">{label}</p>
-          {title && <h2 id={`${id}-title`} className="mt-3 font-serif text-3xl leading-tight text-ink lg:text-4xl">{title}</h2>}
-          {!title && <h2 id={`${id}-title`} className="sr-only">{label}</h2>}
-        </div>
-        <div className="lg:col-span-8">{children}</div>
+    <section id={id} aria-labelledby={`${id}-title`} className={tone === "white" ? "bg-white" : ""}>
+      <div className="container-x py-20 lg:py-24">
+        <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold text-accent">{label}</p>
+            <h2 id={`${id}-title`} className="h-section mt-2">{title}</h2>
+            {lead && <p className="mt-3 text-[17px] leading-relaxed text-muted">{lead}</p>}
+          </div>
+          {action && (
+            <a href={action.href} className="group inline-flex shrink-0 items-center gap-1.5 font-semibold text-accent hover:text-accent-strong">
+              {action.label} <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </a>
+          )}
+        </Reveal>
+        <div className="mt-10 lg:mt-12">{children}</div>
       </div>
     </section>
   );

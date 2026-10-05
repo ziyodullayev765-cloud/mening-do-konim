@@ -24,6 +24,7 @@ export default async function ProfilePage() {
             <TextField name="title" label="Mutaxassislik / unvon" defaultValue={d.title} required />
             <TextArea name="shortDescription" label="Qisqa tavsif (bosh sahifa)" defaultValue={d.shortDescription} rows={2} className="md:col-span-2" />
             <TextArea name="biography" label="Biografiya" hint="Har bir xatboshini yangi qatordan yozing." defaultValue={d.biography} rows={6} className="md:col-span-2" />
+            <TextField name="heroTitle" label="Bosh ekran sarlavhasi" placeholder="Quloq, burun va tomoq salomatligi" hint="Bo'sh qoldirilsa, shu standart sarlavha chiqadi." defaultValue={d.heroTitle} className="md:col-span-2" />
             <ImageUpload
               name="photoUrl"
               label="1-surat: bosh ekran (Qabulga yozilish tugmasi yonida)"
