@@ -18,26 +18,26 @@ export default async function ProfilePage() {
     <>
       <PageHeader title={t.admin.nav.profile} />
       <ActionForm action={saveProfile} className="space-y-6">
-        <Panel title="Sayt rasmlari">
-          <p className="-mt-1 mb-6 text-sm text-muted">
-            Rasmni tanlang yoki sudrab tashlang — u avtomatik siqiladi va saytga joylanadi. O&apos;zgarishlar &quot;Saqlash&quot; bosilgandan keyin saytda ko&apos;rinadi.
-          </p>
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-            <ImageUpload name="photoUrl" label="1. Bosh ekran surati" hint="Tik (portret) surat yaxshi chiqadi." defaultValue={d.photoUrl} aspect="aspect-[4/5]" />
-            <ImageUpload name="aboutPhotoUrl" label={"2. \"Shifokor haqida\" surati"} hint="Bo'sh bo'lsa, 1-surat ishlatiladi." defaultValue={d.aboutPhotoUrl} aspect="aspect-[4/5]" />
-            <ImageUpload name="contactPhotoUrl" label={"3. \"Aloqa\" bo'limi surati"} hint="Masalan: klinika yoki qabulxona." defaultValue={d.contactPhotoUrl} aspect="aspect-[16/10]" />
-            <ImageUpload name="logoUrl" label="4. Logotip" hint="PNG (shaffof fon) tavsiya etiladi." defaultValue={d.logoUrl} aspect="aspect-square" fit="contain" />
-          </div>
-          <p className="mt-6 text-xs text-muted">Xizmatlar rasmlari: Xizmatlar → xizmatni tahrirlash oynasida.</p>
-        </Panel>
-
         <Panel title={p.sections.main}>
           <div className="grid gap-5 md:grid-cols-2">
             <TextField name="fullName" label="F.I.Sh." defaultValue={d.fullName} required />
             <TextField name="title" label="Mutaxassislik / unvon" defaultValue={d.title} required />
             <TextArea name="shortDescription" label="Qisqa tavsif (bosh sahifa)" defaultValue={d.shortDescription} rows={2} className="md:col-span-2" />
             <TextArea name="biography" label="Biografiya" hint="Har bir xatboshini yangi qatordan yozing." defaultValue={d.biography} rows={6} className="md:col-span-2" />
-            <TextField name="heroTitle" label="Bosh ekran sarlavhasi" hint="Bo'sh qoldirilsa, standart sarlavha chiqadi." defaultValue={d.heroTitle} className="md:col-span-2" />
+            <ImageUpload
+              name="photoUrl"
+              label="1-surat: bosh ekran (Qabulga yozilish tugmasi yonida)"
+              hint="Kompyuterdan tanlang yoki sudrab tashlang. Tik (portret) surat yaxshi chiqadi."
+              defaultValue={d.photoUrl}
+              aspect="aspect-[4/5]"
+            />
+            <ImageUpload
+              name="aboutPhotoUrl"
+              label={"2-surat: \"Shifokor haqida\" bo'limi"}
+              hint="Bo'sh qoldirilsa, 1-surat ishlatiladi."
+              defaultValue={d.aboutPhotoUrl}
+              aspect="aspect-[4/5]"
+            />
           </div>
         </Panel>
 

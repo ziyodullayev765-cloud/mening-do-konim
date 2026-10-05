@@ -1,24 +1,22 @@
-"use client";
-
+import Link from "next/link";
 import { CalendarCheck, Phone } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { telHref } from "@/lib/format";
-import { requestBooking } from "./booking/client";
 
-/** Sticky glass booking bar shown on small screens only. */
+/** Sticky booking bar shown on small screens only. */
 export function MobileBookBar({ phone }: { phone: string }) {
   return (
-    <div className="fixed inset-x-3 bottom-3 z-30 sm:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <div className="glass flex gap-2 rounded-full p-1.5">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:hidden">
+      <div className="flex gap-2">
         {phone && (
-          <a href={telHref(phone)} className="btn btn-secondary shrink-0 !px-4" aria-label={t.contact.phone}>
+          <a href={telHref(phone)} className="btn btn-secondary shrink-0" aria-label={t.contact.phone}>
             <Phone className="size-5" aria-hidden />
           </a>
         )}
-        <button type="button" onClick={() => requestBooking()} className="btn btn-primary flex-1">
+        <Link href="/book" className="btn btn-primary flex-1">
           <CalendarCheck className="size-5" aria-hidden />
           {t.common.bookAppointment}
-        </button>
+        </Link>
       </div>
     </div>
   );

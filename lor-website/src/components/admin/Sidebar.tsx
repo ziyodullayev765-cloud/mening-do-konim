@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  BadgeDollarSign, CalendarClock, CalendarDays, CircleHelp, ExternalLink, LayoutDashboard,
+  BadgeDollarSign, CalendarClock, CalendarDays, CircleHelp, ExternalLink, Inbox, LayoutDashboard,
   LogOut, Menu, Quote, Settings, Stethoscope, UserRound, Users, X,
 } from "lucide-react";
 import { t } from "@/lib/i18n";
@@ -20,10 +20,11 @@ const NAV = [
   { href: "/admin/schedule", label: t.admin.nav.schedule, icon: CalendarClock },
   { href: "/admin/testimonials", label: t.admin.nav.testimonials, icon: Quote },
   { href: "/admin/faq", label: t.admin.nav.faq, icon: CircleHelp },
+  { href: "/admin/messages", label: t.admin.nav.messages, icon: Inbox, badge: "unreadMessages" },
   { href: "/admin/settings", label: t.admin.nav.settings, icon: Settings },
 ] as const;
 
-type Counts = { newAppointments: number };
+type Counts = { newAppointments: number; unreadMessages: number };
 
 export function Sidebar({ adminName, counts }: { adminName: string; counts: Counts }) {
   const pathname = usePathname();

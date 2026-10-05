@@ -8,7 +8,7 @@ import { failure, success, type ActionState } from "@/lib/action";
 import { normalizePhone } from "@/lib/format";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { getAvailableSlots, getSettings } from "@/lib/slots";
-import { bookingSchema, fieldErrors } from "@/lib/validation";
+import { bookingSchema, contactSchema, fieldErrors } from "@/lib/validation";
 
 export type BookingResult = ActionState & {
   booking?: { service: string; date: string; time: string; name: string };
@@ -38,8 +38,8 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
     await db.$transaction(async (tx) => {
       const patient = await tx.patient.upsert({
         where: { phone },
-        create: { phone, fullName: data.fullName },
-        update: { fullName: data.fullName },
+        create: { phone, fullName: data.fullName, email: data.email || null },
+        update: { fullName: data.fullName, ...(data.email ? { email: data.email } : {}) },
       });
       await tx.appointment.create({
         data: {
@@ -64,6 +64,32 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
       return { ...failure(t.booking.slotTaken), slotTaken: true };
     }
     console.error("createBooking failed", e);
+    return failure(t.common.serverError);
+  }
+}
+
+export async function sendContactMessage(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  // Honeypot: silently accept bot submissions without storing them.
+  if (formData.get("website")) return success(t.contact.sent);
+
+  const ip = await clientIp();
+  if (!rateLimit(`contact:${ip}`, 5, 15 * 60 * 1000).ok) return failure(t.common.tooManyRequests);
+
+  const parsed = contactSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
+
+  try {
+    await db.contactMessage.create({
+      data: {
+        name: parsed.data.name,
+        phone: normalizePhone(parsed.data.phone),
+        email: parsed.data.email || null,
+        message: parsed.data.message,
+      },
+    });
+    return success(t.contact.sent);
+  } catch (e) {
+    console.error("sendContactMessage failed", e);
     return failure(t.common.serverError);
   }
 }

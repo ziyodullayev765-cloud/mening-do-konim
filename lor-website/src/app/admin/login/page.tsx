@@ -11,9 +11,9 @@ export default async function LoginPage() {
   return (
     <main className="grid min-h-dvh lg:grid-cols-2">
       <div className="relative hidden overflow-hidden bg-ink lg:block">
-        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(80%_60%_at_20%_10%,rgb(27_107_112/0.45),transparent_70%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(80%_60%_at_20%_10%,rgb(47_111_216/0.45),transparent_70%)]" />
         <div className="relative flex h-full flex-col justify-end p-14">
-          <p className="eyebrow !text-[#8fc1c0]">{t.admin.brand}</p>
+          <p className="eyebrow !text-[#9cc4f5]">{t.admin.brand}</p>
           <p className="mt-4 max-w-md font-serif text-4xl leading-tight text-paper">Qabullar, xizmatlar va jadvalni bir joyda boshqaring.</p>
         </div>
       </div>

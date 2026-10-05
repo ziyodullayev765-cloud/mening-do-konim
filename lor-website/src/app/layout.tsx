@@ -1,15 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Lexend, Manrope } from "next/font/google";
+import { Manrope, Newsreader } from "next/font/google";
 import { getDoctor, getSiteSettings } from "@/lib/data";
 import { t } from "@/lib/i18n";
 import "./globals.css";
 
 const manrope = Manrope({ subsets: ["latin", "latin-ext", "cyrillic"], variable: "--font-manrope", display: "swap" });
-const lexend = Lexend({ subsets: ["latin", "latin-ext"], variable: "--font-display", display: "swap" });
+const newsreader = Newsreader({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-newsreader",
+  display: "swap",
+  style: ["normal", "italic"],
+});
 
 export const dynamic = "force-dynamic";
 
-export const viewport: Viewport = { themeColor: "#e6f1fd", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#f5f9fe", width: "device-width", initialScale: 1 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const [doctor, settings] = await Promise.all([getDoctor(), getSiteSettings()]);
@@ -37,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={t.meta.locale} className={`${manrope.variable} ${lexend.variable}`}>
+    <html lang={t.meta.locale} className={`${manrope.variable} ${newsreader.variable}`}>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

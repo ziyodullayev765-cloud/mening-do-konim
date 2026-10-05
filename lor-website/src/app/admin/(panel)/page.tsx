@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const settings = await getSettings();
   const today = clinicNow(settings.timezone).date;
 
-  const [todayCount, upcoming, newCount, completed, cancelled, patients, services, todayList, recent] = await Promise.all([
+  const [todayCount, upcoming, newCount, completed, cancelled, patients, services, unread, todayList, recent] = await Promise.all([
     db.appointment.count({ where: { date: today, status: { not: "CANCELLED" } } }),
     db.appointment.count({ where: { date: { gte: today }, status: { in: ["NEW", "CONFIRMED", "RESCHEDULED"] } } }),
     db.appointment.count({ where: { status: "NEW" } }),
@@ -20,6 +20,7 @@ export default async function DashboardPage() {
     db.appointment.count({ where: { status: "CANCELLED" } }),
     db.patient.count(),
     db.service.count({ where: { active: true } }),
+    db.contactMessage.count({ where: { isRead: false } }),
     db.appointment.findMany({
       where: { date: today, status: { not: "CANCELLED" } },
       orderBy: { time: "asc" },
@@ -41,6 +42,7 @@ export default async function DashboardPage() {
     { label: t.admin.dashboard.cancelled, value: cancelled, href: "/admin/appointments?status=CANCELLED" },
     { label: t.admin.dashboard.patients, value: patients, href: "/admin/patients" },
     { label: t.admin.dashboard.services, value: services, href: "/admin/services" },
+    { label: t.admin.dashboard.unreadMessages, value: unread, href: "/admin/messages", highlight: unread > 0 },
   ];
 
   return (
