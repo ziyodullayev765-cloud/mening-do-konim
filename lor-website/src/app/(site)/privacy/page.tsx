@@ -13,7 +13,7 @@ export default async function PrivacyPage() {
   return (
     <section className="pt-8 pb-28 sm:pt-12 lg:pb-32">
       <div className="container-x max-w-3xl">
-        <BackButton fallback="/" className="mb-4 -ml-0.5" />
+        <div className="mb-4"><BackButton fallback="/" className="-ml-0.5" /></div>
         <h1 className="h-display text-[1.573rem] sm:text-[clamp(1.87rem,1.36rem+1.7vw,2.55rem)]">{p.title}</h1>
         <p className="mt-2 text-sm text-muted">{p.updated}</p>
         <p className="mt-5 text-[15px] leading-relaxed text-text sm:text-[17px]">{p.intro}</p>

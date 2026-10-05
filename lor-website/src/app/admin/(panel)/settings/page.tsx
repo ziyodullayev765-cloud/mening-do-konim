@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth";
-import { getT } from "@/lib/i18n/server";
+import { getL, getT } from "@/lib/i18n/server";
+import { getBotUsername, telegramConfigured } from "@/lib/telegram";
+import { Send } from "lucide-react";
 import { getSettings } from "@/lib/slots";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { Checkbox, TextArea, TextField } from "@/components/admin/fields";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { PageHeader, Panel } from "@/components/admin/ui";
-import { changePassword, saveSettings } from "@/app/admin/actions/settings";
+import { changePassword, connectTelegram, disconnectTelegram, saveSettings, testTelegram } from "@/app/admin/actions/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -17,6 +19,9 @@ export default async function SettingsPage() {
   const t = await getT();
   const admin = await requireAdmin();
   const s = await getSettings();
+  const L = await getL();
+  const tgReady = telegramConfigured();
+  const bot = tgReady ? await getBotUsername() : null;
   const st = t.admin.settings;
   return (
     <>
@@ -44,7 +49,53 @@ export default async function SettingsPage() {
           <div className="flex justify-end"><SubmitButton>{t.common.save}</SubmitButton></div>
         </ActionForm>
 
-        <Panel title={st.account} className="self-start xl:col-span-2">
+        <div className="space-y-6 self-start xl:col-span-2">
+        <Panel title={L("Telegram bildirishnomalar", "Уведомления в Telegram")}>
+          {!tgReady ? (
+            <p className="text-sm text-muted">{L("Bot tokeni (TELEGRAM_BOT_TOKEN) sozlanmagan.", "Токен бота (TELEGRAM_BOT_TOKEN) не настроен.")}</p>
+          ) : (
+            <div className="space-y-4 text-sm">
+              <p className="text-muted">
+                {L("Yangi qabul yoki xabar kelganda bemorning ismi, telefoni va qabul vaqti Telegram'ga yuboriladi.", "При новой записи или сообщении имя, телефон пациента и время приёма отправляются в Telegram.")}
+              </p>
+              {s.telegramChatId ? (
+                <p className="rounded-lg border border-success/30 bg-success-soft px-3 py-2 font-semibold text-success">
+                  {L("Ulangan", "Подключено")}: {s.telegramChatName ?? s.telegramChatId}
+                </p>
+              ) : (
+                <ol className="list-decimal space-y-1.5 pl-5 text-text">
+                  <li>
+                    {L("Telegram'da botni oching", "Откройте бота в Telegram")}
+                    {bot && (
+                      <>
+                        {": "}
+                        <a href={`https://t.me/${bot}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent hover:underline">@{bot}</a>
+                      </>
+                    )}
+                  </li>
+                  <li>{L("/start tugmasini bosing (yoki istalgan xabar yozing).", "Нажмите /start (или напишите любое сообщение).")}</li>
+                  <li>{L("Shu yerda \"Ulash\" tugmasini bosing.", "Нажмите здесь «Подключить».")}</li>
+                </ol>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <ActionForm action={connectTelegram}>
+                  <SubmitButton className="btn btn-primary btn-sm"><Send className="size-4" aria-hidden /> {s.telegramChatId ? L("Qayta ulash", "Переподключить") : L("Ulash", "Подключить")}</SubmitButton>
+                </ActionForm>
+                {s.telegramChatId && (
+                  <>
+                    <ActionForm action={testTelegram}>
+                      <SubmitButton className="btn btn-secondary btn-sm">{L("Sinov xabari", "Тестовое сообщение")}</SubmitButton>
+                    </ActionForm>
+                    <ActionForm action={disconnectTelegram}>
+                      <SubmitButton className="btn btn-ghost btn-sm text-danger">{L("Uzish", "Отключить")}</SubmitButton>
+                    </ActionForm>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </Panel>
+        <Panel title={st.account}>
           <p className="mb-5 text-sm text-muted">{admin.email}</p>
           <ActionForm action={changePassword} resetOnSuccess className="space-y-4">
             <TextField name="currentPassword" type="password" autoComplete="current-password" label={st.currentPassword} required />
@@ -52,6 +103,7 @@ export default async function SettingsPage() {
             <SubmitButton className="btn btn-secondary">{st.changePassword}</SubmitButton>
           </ActionForm>
         </Panel>
+        </div>
       </div>
     </>
   );

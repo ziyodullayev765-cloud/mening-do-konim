@@ -3,11 +3,13 @@
 import { autoRu } from "@/lib/i18n/content-ru";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { db } from "@/lib/db";
 import { t as uz } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
 import { failure, success, type ActionState } from "@/lib/action";
-import { normalizePhone } from "@/lib/format";
+import { formatDate, normalizePhone } from "@/lib/format";
+import { esc, notifyTelegram } from "@/lib/telegram";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { getAvailableSlots, getSettings } from "@/lib/slots";
 import { bookingSchemaFor, contactSchemaFor, fieldErrors } from "@/lib/validation";
@@ -43,13 +45,13 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
     if (!slots.includes(data.time)) return { ...failure(t.booking.slotTaken), slotTaken: true };
 
     const phone = normalizePhone(data.phone);
-    await db.$transaction(async (tx) => {
+    const appointment = await db.$transaction(async (tx) => {
       const patient = await tx.patient.upsert({
         where: { phone },
         create: { phone, fullName: data.fullName, email: data.email || null },
         update: { fullName: data.fullName, ...(data.email ? { email: data.email } : {}) },
       });
-      await tx.appointment.create({
+      return tx.appointment.create({
         data: {
           patientId: patient.id,
           serviceId: service?.id ?? null,
@@ -62,6 +64,27 @@ export async function createBooking(input: unknown): Promise<BookingResult> {
     });
 
     revalidatePath("/admin", "layout");
+
+    // Telegram alert for the doctor — sent after the response so the patient never waits on it.
+    const site = process.env.SITE_URL;
+    after(() =>
+      notifyTelegram(
+        [
+          "🆕 <b>Yangi qabul</b>",
+          "",
+          `👤 <b>${esc(data.fullName)}</b>`,
+          `📞 ${esc(phone)}`,
+          data.email ? `✉️ ${esc(data.email)}` : null,
+          `🩺 ${esc(serviceName)}`,
+          `📅 ${esc(formatDate(data.date, true, uz))}, ⏰ <b>${esc(data.time)}</b>`,
+          data.note ? `💬 ${esc(data.note)}` : null,
+          site ? `\n<a href="${site}/admin/appointments/${appointment.id}">Admin panelda ochish</a>` : null,
+        ]
+          .filter((x) => x !== null)
+          .join("\n"),
+      ),
+    );
+
     return {
       ...success(),
       booking: { service: shownServiceName, date: data.date, time: data.time, name: data.fullName },
@@ -88,14 +111,30 @@ export async function sendContactMessage(_prev: ActionState, formData: FormData)
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
 
   try {
+    const phone = normalizePhone(parsed.data.phone);
     await db.contactMessage.create({
       data: {
         name: parsed.data.name,
-        phone: normalizePhone(parsed.data.phone),
+        phone,
         email: parsed.data.email || null,
         message: parsed.data.message,
       },
     });
+    const { name, email, message } = parsed.data;
+    after(() =>
+      notifyTelegram(
+        [
+          "✉️ <b>Saytdan yangi xabar</b>",
+          "",
+          `👤 <b>${esc(name)}</b>`,
+          `📞 ${esc(phone)}`,
+          email ? `✉️ ${esc(email)}` : null,
+          `💬 ${esc(message)}`,
+        ]
+          .filter((x) => x !== null)
+          .join("\n"),
+      ),
+    );
     return success(t.contact.sent);
   } catch (e) {
     console.error("sendContactMessage failed", e);

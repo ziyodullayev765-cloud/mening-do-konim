@@ -4,7 +4,8 @@ import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { getT } from "@/lib/i18n/server";
+import { getL, getT } from "@/lib/i18n/server";
+import { connectLatestChat, notifyTelegram } from "@/lib/telegram";
 import { requireAdmin } from "@/lib/auth";
 import { failure, success, type ActionState } from "@/lib/action";
 import { TIME_RE } from "@/lib/slots-shared";
@@ -95,4 +96,35 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   const passwordHash = await bcrypt.hash(parsed.data.newPassword, 12);
   await db.admin.update({ where: { id: admin.id }, data: { passwordHash } });
   return success(t.admin.settings.passwordChanged);
+}
+
+/* ---------- Telegram notifications ---------- */
+
+export async function connectTelegram(): Promise<ActionState> {
+  await requireAdmin();
+  const L = await getL();
+  const r = await connectLatestChat();
+  if (r.ok) {
+    await notifyTelegram(`✅ ${L("Bildirishnomalar ulandi. Yangi qabullar shu yerga keladi.", "Уведомления подключены. Новые записи будут приходить сюда.")}`);
+    revalidatePath("/admin/settings");
+    return success(L(`Telegram ulandi: ${r.name}`, `Telegram подключён: ${r.name}`));
+  }
+  if (r.reason === "no-messages") return failure(L("Botga hali xabar yozilmagan. Telegram'da botni ochib /start yozing va qayta urinib ko'ring.", "Боту ещё никто не писал. Откройте бота в Telegram, отправьте /start и попробуйте снова."));
+  if (r.reason === "no-token") return failure(L("TELEGRAM_BOT_TOKEN sozlanmagan.", "TELEGRAM_BOT_TOKEN не настроен."));
+  return failure(L("Telegram bilan bog'lanib bo'lmadi. Keyinroq urinib ko'ring.", "Не удалось связаться с Telegram. Попробуйте позже."));
+}
+
+export async function testTelegram(): Promise<ActionState> {
+  await requireAdmin();
+  const L = await getL();
+  const ok = await notifyTelegram(`🔔 ${L("Sinov xabari: bildirishnomalar ishlayapti.", "Тестовое сообщение: уведомления работают.")}`);
+  return ok ? success(L("Sinov xabari yuborildi.", "Тестовое сообщение отправлено.")) : failure(L("Xabar yuborilmadi. Avval Telegram'ni ulang.", "Сообщение не отправлено. Сначала подключите Telegram."));
+}
+
+export async function disconnectTelegram(): Promise<ActionState> {
+  await requireAdmin();
+  const L = await getL();
+  await db.setting.update({ where: { id: 1 }, data: { telegramChatId: null, telegramChatName: null } });
+  revalidatePath("/admin/settings");
+  return success(L("Telegram uzildi.", "Telegram отключён."));
 }

@@ -18,7 +18,7 @@ export function PageHeader({
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        {back && <BackButton fallback={back} className="mb-2 -ml-0.5" />}
+        {back && <div className="mb-2"><BackButton fallback={back} className="-ml-0.5" /></div>}
         <h1 className="font-serif text-3xl text-ink lg:text-4xl">{title}</h1>
         {description && <p className="mt-1.5 text-[15px] text-muted">{description}</p>}
       </div>

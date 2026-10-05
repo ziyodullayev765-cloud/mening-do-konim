@@ -27,7 +27,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
       <div className="container-x">
         <div className="flex items-start justify-between gap-4">
         <div className="max-w-2xl">
-          <BackButton fallback="/" className="mb-3 -ml-0.5" />
+          <div className="mb-3"><BackButton fallback="/" className="-ml-0.5" /></div>
           <p className="eyebrow">{doctor.fullName}</p>
           <h1 className="h-display mt-3 text-[1.573rem] sm:mt-4 sm:text-[clamp(2.04rem,1.53rem+2.04vw,3.188rem)]">{t.booking.title}</h1>
           <p className="mt-2 text-[15px] text-muted sm:mt-4 sm:text-lg">{t.booking.lead}</p>

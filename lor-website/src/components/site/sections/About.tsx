@@ -38,7 +38,7 @@ export async function AboutPage({ doctor }: { doctor: Doctor }) {
       <section aria-labelledby="about-title" className="hero-glow bg-white bg-[radial-gradient(55%_60%_at_95%_0%,#e4f5f8_0%,transparent_70%)]">
         <div className="container-x grid items-center gap-12 py-8 sm:py-14 lg:grid-cols-12 lg:py-20">
           <div className="min-w-0 lg:col-span-7">
-            <BackButton fallback="/" className="mb-3 -ml-0.5" />
+            <div className="mb-3"><BackButton fallback="/" className="-ml-0.5" /></div>
             {/* Phones: small portrait beside the name instead of a big photo below the text. */}
             <div className="flex items-center gap-4 lg:block">
               <div className="min-w-0 flex-1">
