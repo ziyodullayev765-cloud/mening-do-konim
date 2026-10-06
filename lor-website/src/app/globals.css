@@ -294,3 +294,22 @@
 @media (prefers-reduced-motion: reduce) {
   .welcome-overlay, .welcome-card, .welcome-in, .welcome-word, .welcome-wave, .welcome-orb, .welcome-shine { animation: none !important; }
 }
+
+/* ---------- Booking confirmed celebration ---------- */
+.joy-card { animation: joy-card .7s cubic-bezier(.2,.9,.25,1.15) both; }
+.joy-badge { animation: joy-pop .6s .1s cubic-bezier(.2,1.4,.4,1) both; }
+.joy-ring { animation: joy-ring 1.6s .5s ease-out 2 both; }
+.joy-circle { stroke-dasharray: 151; stroke-dashoffset: 151; animation: joy-draw .6s .2s ease-out forwards; }
+.joy-tick { stroke-dasharray: 36; stroke-dashoffset: 36; animation: joy-draw .4s .7s cubic-bezier(.65,0,.45,1) forwards; }
+.joy-spark { position: absolute; font-size: 14px; color: #f5b83d; opacity: 0; animation: joy-spark 1.2s .9s ease-out both; }
+.joy-in { animation: joy-up .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
+@keyframes joy-card { from { opacity: 0; transform: translateY(24px) scale(.96); } }
+@keyframes joy-pop { from { transform: scale(0); } }
+@keyframes joy-ring { from { transform: scale(1); opacity: .9; } to { transform: scale(2.1); opacity: 0; } }
+@keyframes joy-draw { to { stroke-dashoffset: 0; } }
+@keyframes joy-spark { 0% { opacity: 0; transform: scale(.2) rotate(0); } 40% { opacity: 1; transform: scale(1.3) rotate(90deg); } 100% { opacity: 0; transform: scale(.6) rotate(180deg) translateY(-8px); } }
+@keyframes joy-up { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) {
+  .joy-card, .joy-badge, .joy-ring, .joy-spark, .joy-in { animation: none !important; }
+  .joy-circle, .joy-tick { animation: none; stroke-dashoffset: 0; }
+}

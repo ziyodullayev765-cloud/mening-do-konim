@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState, useTransition } from "react";
-import { ArrowLeft, ArrowRight, CalendarCheck, Check, LoaderCircle, Phone, RotateCcw } from "lucide-react";
+import { useCallback, useEffect, useState, useTransition, useRef } from "react";
+import { ArrowLeft, ArrowRight, Check, LoaderCircle, Phone, RotateCcw } from "lucide-react";
 import { useI18n } from "../I18nProvider";
 import { formatDate, formatPrice, telHref } from "@/lib/format";
 import { createBooking, type BookingResult } from "@/app/(site)/actions";
@@ -10,6 +10,7 @@ import { ServiceStep } from "./ServiceStep";
 import { DateStep } from "./DateStep";
 import { TimeStep } from "./TimeStep";
 import { DetailsStep, type Details } from "./DetailsStep";
+import { Confetti, playJoy } from "../Celebration";
 import type { Availability, BookableService } from "./types";
 
 type Step = 0 | 1 | 2 | 3;
@@ -36,6 +37,7 @@ export function BookingWizard({
   const [notice, setNotice] = useState<string | null>(null);
   const [result, setResult] = useState<BookingResult | null>(null);
   const [submitting, startSubmit] = useTransition();
+  const audioRef = useRef<AudioContext | null>(null);
 
   const service = services.find((s) => s.id === serviceId) ?? null;
 
@@ -90,6 +92,11 @@ export function BookingWizard({
 
   function submit() {
     if (!date || !time) return;
+    // Unlock audio inside the click so the success tune can play afterwards.
+    try {
+      audioRef.current ??= new AudioContext();
+      void audioRef.current.resume();
+    } catch {}
     startSubmit(async () => {
       const res = await createBooking({ serviceId: serviceId ?? "", date, time, ...details });
       if (res.ok) {
@@ -108,7 +115,7 @@ export function BookingWizard({
   }
 
   if (result?.ok && result.booking) {
-    return <Success booking={result.booking} phone={clinicPhone} />;
+    return <Success booking={result.booking} phone={clinicPhone} audio={audioRef.current} />;
   }
 
   return (
@@ -258,16 +265,33 @@ function Loading() {
   );
 }
 
-function Success({ booking, phone }: { booking: NonNullable<BookingResult["booking"]>; phone: string }) {
+function Success({ booking, phone, audio }: { booking: NonNullable<BookingResult["booking"]>; phone: string; audio: AudioContext | null }) {
   const { t } = useI18n();
+  const [confetti, setConfetti] = useState(true);
+  const stopConfetti = useCallback(() => setConfetti(false), []);
+  useEffect(() => {
+    // Bring the confirmation into view (the form was further down the page).
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (audio) playJoy(audio, 0.25);
+  }, [audio]);
   return (
-    <div className="card mx-auto max-w-2xl p-8 text-center sm:p-12" role="status">
-      <span className="mx-auto grid size-16 place-items-center rounded-full bg-success-soft text-success">
-        <CalendarCheck className="size-8" aria-hidden />
+    <div className="card joy-card relative mx-auto max-w-2xl overflow-hidden p-8 text-center sm:p-12" role="status">
+      {confetti && <Confetti onDone={stopConfetti} />}
+      {/* Animated badge: ring pulses, circle and tick draw themselves */}
+      <span className="joy-badge relative mx-auto grid size-20 place-items-center">
+        <span aria-hidden className="joy-ring absolute inset-0 rounded-full bg-success/20" />
+        <span aria-hidden className="joy-ring absolute inset-0 rounded-full bg-success/15 [animation-delay:.35s]" />
+        <svg viewBox="0 0 52 52" className="relative size-20 text-success" aria-hidden>
+          <circle className="joy-circle" cx="26" cy="26" r="24" fill="currentColor" fillOpacity=".12" stroke="currentColor" strokeWidth="2.5" />
+          <path className="joy-tick" d="M15 27l7.5 7.5L37.5 19" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <span aria-hidden className="joy-spark left-0 top-1">✦</span>
+        <span aria-hidden className="joy-spark right-0 top-3 [animation-delay:.15s]">✦</span>
+        <span aria-hidden className="joy-spark -bottom-1 left-3 [animation-delay:.3s]">✦</span>
       </span>
-      <h2 className="mt-6 font-serif text-3xl text-ink sm:text-4xl">{t.booking.successTitle}</h2>
-      <p className="mx-auto mt-3 max-w-md text-muted">{t.booking.successLead}</p>
-      <dl className="mx-auto mt-8 grid max-w-md gap-px overflow-hidden rounded-xl border border-line bg-line text-left sm:grid-cols-2">
+      <h2 className="joy-in mt-6 font-serif text-3xl text-ink [--d:.55s] sm:text-4xl">{t.booking.successTitle} 🎉</h2>
+      <p className="joy-in mx-auto mt-3 max-w-md text-muted [--d:.7s]">{t.booking.successLead}</p>
+      <dl className="joy-in mx-auto mt-8 grid [--d:.85s] max-w-md gap-px overflow-hidden rounded-xl border border-line bg-line text-left sm:grid-cols-2">
         {[
           [t.booking.service, booking.service],
           [t.booking.patient, booking.name],
@@ -280,8 +304,8 @@ function Success({ booking, phone }: { booking: NonNullable<BookingResult["booki
           </div>
         ))}
       </dl>
-      <p className="mt-6 text-sm text-muted">{t.booking.successChange}</p>
-      <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+      <p className="joy-in mt-6 text-sm text-muted [--d:1.3s]">{t.booking.successChange}</p>
+      <div className="joy-in mt-8 flex flex-col justify-center gap-3 [--d:1.4s] sm:flex-row">
         {phone && (
           <a href={telHref(phone)} className="btn btn-secondary">
             <Phone className="size-4" aria-hidden /> {phone}
