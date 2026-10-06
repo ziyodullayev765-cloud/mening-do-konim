@@ -49,12 +49,16 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 const RESET_SCROLL_ON_RELOAD = `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.hash)history.replaceState(history.state,"",location.pathname+location.search);addEventListener("load",function(){setTimeout(function(){history.scrollRestoration="auto"},300)});addEventListener("pagehide",function(){history.scrollRestoration="manual"});addEventListener("pageshow",function(e){if(e.persisted)history.scrollRestoration="auto"})}catch(e){}`;
 
+/** Sends uncaught browser errors to /api/client-error so they show up in the server logs. */
+const REPORT_ERRORS = `(function(){var n=0;function send(m,s,st){if(n++>5)return;try{var b=JSON.stringify({message:String(m||""),source:String(s||""),stack:String(st||""),url:location.href});navigator.sendBeacon?navigator.sendBeacon("/api/client-error",b):fetch("/api/client-error",{method:"POST",body:b,keepalive:true})}catch(e){}}window.addEventListener("error",function(e){send(e.message,(e.filename||"")+":"+(e.lineno||0),e.error&&e.error.stack)});window.addEventListener("unhandledrejection",function(e){var r=e.reason||{};send(r.message||String(r),"promise",r.stack)});window.__reportError=send})();`;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [locale, theme] = await Promise.all([getLocale(), getTheme()]);
   return (
     <html lang={locale} data-theme={theme} className={`${manrope.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: RESET_SCROLL_ON_RELOAD }} />
+        <script dangerouslySetInnerHTML={{ __html: REPORT_ERRORS }} />
       </head>
       <body className="min-h-dvh">{children}</body>
     </html>

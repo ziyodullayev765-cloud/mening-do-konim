@@ -6,6 +6,8 @@ import { t } from "@/lib/i18n";
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     console.error(error);
+    // Errors caught by this boundary don't reach window.onerror — report them too.
+    (window as unknown as { __reportError?: (m: string, s: string, st?: string) => void }).__reportError?.(error.message, `boundary${error.digest ? ` digest=${error.digest}` : ""}`, error.stack);
   }, [error]);
   return (
     <main className="grid min-h-dvh place-items-center px-6">
