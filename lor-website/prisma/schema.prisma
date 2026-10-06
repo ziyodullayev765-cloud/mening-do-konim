@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   /// Direct (non-pooled) connection used by migrations. On Vercel + Neon this
   /// is provided automatically; elsewhere set it to the same value as DATABASE_URL.
@@ -192,10 +192,13 @@ model Appointment {
 
 /// Weekly working hours. dayOfWeek: 0 = Sunday ... 6 = Saturday.
 model WorkingDay {
-  dayOfWeek Int     @id
-  isOpen    Boolean @default(true)
-  openTime  String  @default("09:00")
-  closeTime String  @default("18:00")
+  dayOfWeek  Int     @id
+  isOpen     Boolean @default(true)
+  openTime   String  @default("09:00")
+  closeTime  String  @default("18:00")
+  /// Optional break (e.g. lunch) with no bookings; empty strings = no break
+  breakStart String  @default("")
+  breakEnd   String  @default("")
 }
 
 model BlockedDate {
@@ -237,19 +240,23 @@ model ContactMessage {
 
 /// Single-row site settings.
 model Setting {
-  id                Int     @id @default(1)
-  bookingEnabled    Boolean @default(true)
-  slotMinutes       Int     @default(30)
-  bookingWindowDays Int     @default(30)
+  id                 Int     @id @default(1)
+  bookingEnabled     Boolean @default(true)
+  slotMinutes        Int     @default(30)
+  bookingWindowDays  Int     @default(30)
   /// Minimum minutes between "now" and the earliest bookable slot
-  minNoticeMinutes  Int     @default(60)
-  timezone          String  @default("Asia/Tashkent")
-  siteTitle         String  @default("")
-  metaDescription   String  @default("")
+  minNoticeMinutes   Int     @default(60)
+  timezone           String  @default("Asia/Tashkent")
+  siteTitle          String  @default("")
+  metaDescription    String  @default("")
   /// Optional background image for the public site (shown softly behind the content)
-  backgroundUrl     String?
+  backgroundUrl      String?
+  /// Optional background image for the admin login page
+  loginBackgroundUrl String?
+  /// Admin-edited site texts: { "uz": { "site.heroTitle": "..." }, "ru": { ... } }
+  texts              Json    @default("{}")
   /// Code people send to the Telegram bot to start receiving booking notifications
-  telegramCode      String?
+  telegramCode       String?
 }
 
 /// Telegram chats that receive new-booking notifications (bot token is in TELEGRAM_BOT_TOKEN).

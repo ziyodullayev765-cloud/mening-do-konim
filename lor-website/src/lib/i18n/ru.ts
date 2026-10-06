@@ -237,6 +237,7 @@ export const ru: Dictionary = {
       testimonials: "Отзывы",
       faq: "Вопросы (FAQ)",
       messages: "Сообщения",
+      texts: "Тексты сайта",
       settings: "Настройки",
       logout: "Выйти",
       viewSite: "Открыть сайт",

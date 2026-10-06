@@ -5,15 +5,15 @@ import { Footer } from "@/components/site/Footer";
 import { MobileBookBar } from "@/components/site/MobileBookBar";
 import { I18nProvider } from "@/components/site/I18nProvider";
 import { NoCopy } from "@/components/site/NoCopy";
-import { getLocale } from "@/lib/i18n/server";
+import { getLocale, getTextOverrides } from "@/lib/i18n/server";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
+  const [locale, texts] = await Promise.all([getLocale(), getTextOverrides()]);
   const { doctor, schedule, settings, testimonials } = await getPublicContent(locale);
   const today = schedule.find((d) => d.dayOfWeek === dayOfWeek(clinicNow(settings.timezone).date));
   const todayHours = today?.isOpen ? `${today.openTime} – ${today.closeTime}` : null;
   return (
-    <I18nProvider locale={locale}>
+    <I18nProvider locale={locale} texts={texts}>
       <NoCopy />
       {settings.backgroundUrl && (
         // Admin-chosen background: fixed behind the page, softened by an overlay so text stays readable.

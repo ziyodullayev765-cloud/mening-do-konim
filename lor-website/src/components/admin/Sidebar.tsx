@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   BadgeDollarSign, CalendarClock, CalendarDays, CircleHelp, ExternalLink, Inbox, LayoutDashboard,
-  LogOut, Menu, Quote, Settings, Stethoscope, UserRound, Users, X,
+  LogOut, Menu, Quote, Settings, Stethoscope, Type, UserRound, Users, X,
 } from "lucide-react";
 import { useI18n } from "@/components/site/I18nProvider";
 import { logout } from "@/app/admin/actions/auth";
@@ -27,6 +27,7 @@ export function Sidebar({ adminName, counts }: { adminName: string; counts: Coun
     { href: "/admin/testimonials", label: t.admin.nav.testimonials, icon: Quote },
     { href: "/admin/faq", label: t.admin.nav.faq, icon: CircleHelp },
     { href: "/admin/messages", label: t.admin.nav.messages, icon: Inbox, badge: "unreadMessages" },
+    { href: "/admin/texts", label: t.admin.nav.texts, icon: Type },
     { href: "/admin/settings", label: t.admin.nav.settings, icon: Settings },
   ] as const;
   const pathname = usePathname();

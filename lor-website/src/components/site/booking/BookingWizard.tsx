@@ -33,6 +33,7 @@ export function BookingWizard({
 
   const [availability, setAvailability] = useState<Availability | null>(null);
   const [slots, setSlots] = useState<string[] | null>(null);
+  const [slotMinutes, setSlotMinutes] = useState(30);
   const [loadError, setLoadError] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [result, setResult] = useState<BookingResult | null>(null);
@@ -60,7 +61,9 @@ export function BookingWizard({
     try {
       const res = await fetch(`/api/availability?date=${d}`, { cache: "no-store" });
       if (!res.ok) throw new Error();
-      setSlots((await res.json()).slots ?? []);
+      const json = await res.json();
+      if (json.slotMinutes) setSlotMinutes(json.slotMinutes);
+      setSlots(json.slots ?? []);
     } catch {
       setLoadError(true);
     }
@@ -163,6 +166,8 @@ export function BookingWizard({
               <TimeStep
                 date={date}
                 slots={slots}
+                slotMinutes={slotMinutes}
+                onChangeDate={() => setStep(1)}
                 selected={time}
                 onSelect={(tm) => {
                   setTime(tm);

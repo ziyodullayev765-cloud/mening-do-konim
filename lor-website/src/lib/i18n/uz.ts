@@ -265,6 +265,7 @@ export const uz = {
       testimonials: "Fikrlar",
       faq: "Savollar (FAQ)",
       messages: "Xabarlar",
+      texts: "Sayt matnlari",
       settings: "Sozlamalar",
       logout: "Chiqish",
       viewSite: "Saytni ko'rish",

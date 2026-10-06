@@ -46,7 +46,16 @@ export default async function SettingsPage() {
             </div>
           </Panel>
           <Panel title={st.appearance}>
-            <ImageUpload name="backgroundUrl" label={st.background} hint={st.backgroundHint} defaultValue={s.backgroundUrl} aspect="aspect-[16/9]" />
+            <div className="grid gap-6 sm:grid-cols-2">
+              <ImageUpload name="backgroundUrl" label={st.background} hint={st.backgroundHint} defaultValue={s.backgroundUrl} aspect="aspect-[16/9]" />
+              <ImageUpload
+                name="loginBackgroundUrl"
+                label={L("Admin kirish sahifasi foni", "Фон страницы входа в админку")}
+                hint={L("Login sahifasining chap qismida ko'rinadi (telefonda — butun fon).", "Показывается слева на странице входа (на телефоне — весь фон).")}
+                defaultValue={s.loginBackgroundUrl}
+                aspect="aspect-[16/9]"
+              />
+            </div>
           </Panel>
           <Panel title={st.seo}>
             <div className="grid gap-5">

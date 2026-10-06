@@ -8,7 +8,7 @@ import { clinicNow, getSettings, getWeekSchedule } from "@/lib/slots";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { TextField } from "@/components/admin/fields";
-import { ScheduleRow } from "@/components/admin/ScheduleRow";
+import { WeekEditor } from "@/components/admin/ScheduleRow";
 import { EmptyState, PageHeader, Panel } from "@/components/admin/ui";
 import { addBlockedDate, removeBlockedDate, saveSchedule } from "@/app/admin/actions/settings";
 
@@ -32,11 +32,7 @@ export default async function SchedulePage() {
       <div className="grid gap-6 xl:grid-cols-5">
         <Panel title={t.admin.schedule.weekly} className="xl:col-span-3">
           <ActionForm action={saveSchedule}>
-            <div className="divide-y divide-line">
-              {week.map((d) => (
-                <ScheduleRow key={d.dayOfWeek} day={d} label={t.weekdays[d.dayOfWeek]} />
-              ))}
-            </div>
+            <WeekEditor days={week} labels={t.weekdays} slotMinutes={settings.slotMinutes} />
             <div className="mt-6 flex justify-end border-t border-line pt-5">
               <SubmitButton>{t.common.save}</SubmitButton>
             </div>

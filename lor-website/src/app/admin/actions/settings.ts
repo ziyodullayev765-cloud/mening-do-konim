@@ -17,6 +17,7 @@ import { adminSchemasFor, fieldErrors, id } from "@/lib/validation";
 
 export async function saveSchedule(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const t = await getT();
+  const L = await getL();
   await requireAdmin();
   const days = [];
   const errors: Record<string, string[]> = {};
@@ -32,7 +33,19 @@ export async function saveSchedule(_prev: ActionState, formData: FormData): Prom
       errors[`to_${dow}`] = [t.admin.schedule.invalidRange];
       continue;
     }
-    days.push({ dayOfWeek: dow, isOpen, openTime, closeTime });
+    const breakStart = String(formData.get(`bfrom_${dow}`) ?? "");
+    const breakEnd = String(formData.get(`bto_${dow}`) ?? "");
+    if (breakStart || breakEnd) {
+      const valid = TIME_RE.test(breakStart) && TIME_RE.test(breakEnd) && breakEnd > breakStart;
+      const inside = valid && breakStart >= openTime && breakEnd <= closeTime;
+      if (isOpen && !inside) {
+        errors[`to_${dow}`] = [L("Tanaffus ish vaqti ichida bo'lishi va tugashi boshlanishidan keyin bo'lishi kerak.", "Перерыв должен быть внутри рабочего времени и заканчиваться после начала.")];
+        continue;
+      }
+      days.push({ dayOfWeek: dow, isOpen, openTime, closeTime, breakStart: valid ? breakStart : "", breakEnd: valid ? breakEnd : "" });
+      continue;
+    }
+    days.push({ dayOfWeek: dow, isOpen, openTime, closeTime, breakStart: "", breakEnd: "" });
   }
   if (Object.keys(errors).length) return failure(t.common.invalidForm, errors);
   await db.$transaction(
@@ -76,10 +89,17 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
   await requireAdmin();
   const parsed = adminSchemasFor(t).settingsSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return failure(t.common.invalidForm, fieldErrors(parsed.error));
-  const data = { ...parsed.data, backgroundUrl: parsed.data.backgroundUrl || null };
-  const before = await db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true } });
+  const data = {
+    ...parsed.data,
+    backgroundUrl: parsed.data.backgroundUrl || null,
+    loginBackgroundUrl: parsed.data.loginBackgroundUrl || null,
+  };
+  const before = await db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true, loginBackgroundUrl: true } });
   await db.setting.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
-  if (before?.backgroundUrl && before.backgroundUrl !== data.backgroundUrl) await deleteUnusedMedia([before.backgroundUrl]);
+  const replaced = [before?.backgroundUrl, before?.loginBackgroundUrl].filter(
+    (u): u is string => Boolean(u) && u !== data.backgroundUrl && u !== data.loginBackgroundUrl,
+  );
+  if (replaced.length) await deleteUnusedMedia(replaced);
   revalidatePath("/", "layout");
   return success(t.admin.settings.saved);
 }

@@ -60,7 +60,7 @@ export async function getSettings() {
 
 type Context = {
   settings: Awaited<ReturnType<typeof getSettings>>;
-  days: Map<number, { isOpen: boolean; openTime: string; closeTime: string }>;
+  days: Map<number, { isOpen: boolean; openTime: string; closeTime: string; breakStart: string; breakEnd: string }>;
   blocked: Set<string>;
   taken: Map<string, Set<string>>;
   now: { date: string; minutes: number };
@@ -101,11 +101,15 @@ function slotsFor(date: string, ctx: Context, { enforceNotice = true } = {}) {
   const step = Math.max(5, ctx.settings.slotMinutes);
   const open = toMinutes(day.openTime);
   const close = toMinutes(day.closeTime);
+  const hasBreak = TIME_RE.test(day.breakStart) && TIME_RE.test(day.breakEnd) && day.breakEnd > day.breakStart;
+  const breakFrom = hasBreak ? toMinutes(day.breakStart) : 0;
+  const breakTo = hasBreak ? toMinutes(day.breakEnd) : 0;
   const taken = ctx.taken.get(date) ?? new Set<string>();
   const earliest = date === ctx.now.date && enforceNotice ? ctx.now.minutes + ctx.settings.minNoticeMinutes : -1;
   const out: string[] = [];
   for (let m = open; m + step <= close; m += step) {
     if (m < earliest) continue;
+    if (hasBreak && m < breakTo && m + step > breakFrom) continue; // overlaps the break
     const time = fromMinutes(m);
     if (!taken.has(time)) out.push(time);
   }

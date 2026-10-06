@@ -313,3 +313,16 @@
   .joy-card, .joy-badge, .joy-ring, .joy-spark, .joy-in { animation: none !important; }
   .joy-circle, .joy-tick { animation: none; stroke-dashoffset: 0; }
 }
+
+/* Booking: time slots appear one after another */
+@keyframes slot-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.slot-in {
+  animation: slot-in 0.35s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: calc(var(--i, 0) * 25ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .slot-in { animation: none; }
+}
