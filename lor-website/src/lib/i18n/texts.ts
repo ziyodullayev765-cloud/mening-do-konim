@@ -145,6 +145,7 @@ export const TEXT_GROUPS: TextGroup[] = [
     fields: [
       f("admin.login.title", "Kirish sahifasi sarlavhasi", "Заголовок страницы входа"),
       f("admin.login.lead", "Sarlavha ostidagi matn", "Текст под заголовком"),
+      f("admin.login.eyebrow", "Rasm ustidagi kichik yozuv («BOSHQARUV PANELI»)", "Маленькая надпись на картинке («ПАНЕЛЬ УПРАВЛЕНИЯ»)"),
       f("admin.login.tagline", "Rasm ustidagi katta yozuv", "Крупная надпись на картинке", true),
       f("admin.login.submit", "«Kirish» tugmasi", "Кнопка «Войти»"),
       f("admin.welcome.hello", "Kirgandan keyingi salom («Assalomu alaykum»)", "Приветствие после входа («Ассаламу алейкум»)"),

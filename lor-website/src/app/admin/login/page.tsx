@@ -6,6 +6,7 @@ import { getLocale, getT, getTextOverrides } from "@/lib/i18n/server";
 import { I18nProvider } from "@/components/site/I18nProvider";
 import { AdminPrefs } from "@/components/admin/AdminPrefs";
 import { LoginForm } from "./LoginForm";
+import { EntDoodles } from "./EntDoodles";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -36,12 +37,13 @@ export default async function LoginPage() {
           <div aria-hidden className="absolute inset-0 bg-[radial-gradient(80%_60%_at_20%_10%,rgb(10_147_150/0.45),transparent_70%)]" />
         )}
         <div className="relative flex h-full flex-col justify-end p-14">
-          <p className="eyebrow !text-[#8fdcd6]">{t.admin.brand}</p>
-          <p className="mt-4 max-w-md font-serif text-4xl leading-tight text-paper">{t.admin.login.tagline}</p>
+          <p className="eyebrow !text-[#8fdcd6]">{t.admin.login.eyebrow}</p>
+          <p className="mt-4 max-w-md font-serif text-4xl leading-tight text-white">{t.admin.login.tagline}</p>
         </div>
       </div>
-      <div className="flex items-center justify-center px-5 py-16">
-        <div className={`w-full max-w-sm ${bg ? "max-lg:rounded-2xl max-lg:border max-lg:border-white/50 max-lg:bg-surface/85 max-lg:p-6 max-lg:shadow-xl max-lg:backdrop-blur-xl" : ""}`}>
+      <div className="relative isolate flex items-center justify-center overflow-hidden px-5 py-16">
+        <EntDoodles />
+        <div className={`relative w-full max-w-sm ${bg ? "max-lg:rounded-2xl max-lg:border max-lg:border-white/50 max-lg:bg-surface/85 max-lg:p-6 max-lg:shadow-xl max-lg:backdrop-blur-xl" : ""}`}>
           <h1 className="font-serif text-3xl text-ink">{t.admin.login.title}</h1>
           <p className="mt-2 text-muted">{t.admin.login.lead}</p>
           <LoginForm />

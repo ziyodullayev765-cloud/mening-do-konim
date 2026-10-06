@@ -363,3 +363,13 @@
 /* Admin-uploaded panel background: softened so the glass stays readable */
 .admin-bg-veil { background: rgb(248 250 252 / .55); }
 [data-theme="dark"] .admin-bg-veil { background: rgb(8 14 27 / .68); }
+
+/* Admin login: floating ear / nose / throat line drawings */
+.ent-doodles { color: var(--color-accent); }
+.ent-doodle { opacity: .2; transform: rotate(var(--r, 0deg)); animation: ent-float 12s ease-in-out infinite alternate; }
+@keyframes ent-float {
+  from { transform: translateY(0) rotate(var(--r, 0deg)); }
+  to { transform: translateY(-14px) rotate(calc(var(--r, 0deg) + 6deg)); }
+}
+[data-theme="dark"] .ent-doodle { opacity: .2; }
+@media (prefers-reduced-motion: reduce) { .ent-doodle { animation: none; } }

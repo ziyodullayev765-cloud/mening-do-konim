@@ -11,7 +11,7 @@ type Lang = "uz" | "ru";
 export type EditorField = { path: string; label: string; long: boolean; defaults: Record<Lang, string>; values: Record<Lang, string> };
 export type EditorGroup = { id: string; title: string; fields: EditorField[] };
 
-export function TextsEditor({ groups }: { groups: EditorGroup[] }) {
+export function TextsEditor({ groups, initialGroup }: { groups: EditorGroup[]; initialGroup?: string }) {
   const { L } = useI18n();
   const [values, setValues] = useState(() => {
     const out: Record<string, string> = {};
@@ -19,7 +19,7 @@ export function TextsEditor({ groups }: { groups: EditorGroup[] }) {
     return out;
   });
   const [query, setQuery] = useState("");
-  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set([groups[0]?.id]));
+  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set([groups.some((g) => g.id === initialGroup) ? initialGroup! : groups[0]?.id]));
 
   const q = query.trim().toLowerCase();
   const visible = useMemo(
@@ -65,7 +65,7 @@ export function TextsEditor({ groups }: { groups: EditorGroup[] }) {
         const isOpen = q ? Boolean(shown) : openIds.has(group.id);
         const count = changedIn(group);
         return (
-          <section key={group.id} className={`card overflow-hidden ${q && !shown ? "hidden" : ""}`}>
+          <section key={group.id} id={`group-${group.id}`} className={`card scroll-mt-6 overflow-hidden ${q && !shown ? "hidden" : ""}`}>
             <button
               type="button"
               onClick={() => toggle(group.id)}

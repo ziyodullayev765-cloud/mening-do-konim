@@ -12,7 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t.admin.nav.texts };
 }
 
-export default async function TextsPage() {
+export default async function TextsPage({ searchParams }: { searchParams: Promise<{ group?: string }> }) {
+  const { group } = await searchParams;
   await requireAdmin();
   const [t, L] = await Promise.all([getT(), getL()]);
   const s = await db.setting.findUnique({ where: { id: 1 }, select: { texts: true } });
@@ -40,7 +41,8 @@ export default async function TextsPage() {
           "Меняйте заголовки, кнопки и подписи сайта на узбекском и русском. Пустое поле возвращает исходный текст.",
         )}
       />
-      <TextsEditor groups={groups} />
+      <TextsEditor groups={groups} initialGroup={group} />
+      {group && <script dangerouslySetInnerHTML={{ __html: `document.getElementById(${JSON.stringify("group-" + group)})?.scrollIntoView()` }} />}
     </>
   );
 }

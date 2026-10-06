@@ -252,6 +252,7 @@ export const ru: Dictionary = {
       invalid: "Неверный логин или пароль.",
       showPassword: "Показать пароль",
       hidePassword: "Скрыть пароль",
+      eyebrow: "Панель управления",
       tagline: "Записи, услуги и график — в одном месте.",
     },
     welcome: {

@@ -280,6 +280,7 @@ export const uz = {
       invalid: "Login yoki parol noto'g'ri.",
       showPassword: "Parolni ko'rsatish",
       hidePassword: "Parolni yashirish",
+      eyebrow: "Boshqaruv paneli",
       tagline: "Qabullar, xizmatlar va jadvalni bir joyda boshqaring.",
     },
     welcome: {

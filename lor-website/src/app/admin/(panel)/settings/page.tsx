@@ -55,6 +55,9 @@ export default async function SettingsPage() {
                 defaultValue={s.loginBackgroundUrl}
                 aspect="aspect-[16/9]"
               />
+              <a href="/admin/texts?group=admin" className="text-sm font-semibold text-accent hover:underline sm:col-span-2">
+                {L("Kirish sahifasidagi yozuvlarni o'zgartirish →", "Изменить надписи на странице входа →")}
+              </a>
               <ImageUpload
                 name="adminBackgroundUrl"
                 label={L("Admin panel foni", "Фон админ-панели")}
