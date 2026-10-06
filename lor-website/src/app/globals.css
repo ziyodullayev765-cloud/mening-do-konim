@@ -212,3 +212,19 @@
 }
 [data-theme="dark"] .site-bg-veil { background: rgb(11 18 32 / .86); }
 [data-theme="dark"] .has-site-bg .bg-white { background-color: rgb(19 29 49 / .72); }
+
+/* ---------- Theme switch animation ---------- */
+/* The new theme is revealed as a growing circle (see ThemeToggle); disable the default cross-fade. */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 2; }
+/* Fallback for browsers without view transitions */
+.theme-fade, .theme-fade *, .theme-fade *::before, .theme-fade *::after {
+  transition: background-color .5s ease, color .5s ease, border-color .5s ease, fill .5s ease !important;
+}
+.theme-icon-in { display: grid; animation: theme-icon-in .6s cubic-bezier(.34,1.56,.64,1); }
+@keyframes theme-icon-in {
+  from { transform: rotate(-120deg) scale(.3); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .theme-icon-in { animation: none; } }
