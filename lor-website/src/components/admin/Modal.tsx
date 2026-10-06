@@ -65,7 +65,7 @@ export function Modal({
               <X className="size-5" aria-hidden />
             </button>
           </header>
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
+          <div className="min-h-0 flex-auto overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
           {footer && <footer className="shrink-0 border-t border-line bg-paper-2/40 px-5 py-4 sm:px-6">{footer}</footer>}
         </>
       )}

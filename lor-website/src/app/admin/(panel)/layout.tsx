@@ -40,9 +40,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <div className="admin-bg-veil absolute inset-0" />
           </>
         )}
-        <span className="left-[18%] top-[-8%] size-[34rem] bg-[#1e9db2]" />
-        <span className="right-[-6%] top-[30%] size-[30rem] bg-[#7c6cf0] [animation-delay:-6s]" />
-        <span className="bottom-[-12%] left-[40%] size-[28rem] bg-[#2bd4c4] [animation-delay:-12s]" />
       </div>
       <Sidebar adminName={admin.name} counts={{ newAppointments, unreadMessages }} />
       <div className="lg:pl-64">
