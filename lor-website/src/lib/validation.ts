@@ -165,6 +165,7 @@ export function adminSchemasFor(d: Dictionary) {
     metaDescription: text(300),
     backgroundUrl: image,
     loginBackgroundUrl: image,
+    adminBackgroundUrl: image,
   });
 
   const passwordSchema = z.object({

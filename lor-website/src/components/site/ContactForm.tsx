@@ -5,7 +5,7 @@ import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
 import { useI18n } from "./I18nProvider";
 import type { ActionState } from "@/lib/action";
 import { sendContactMessage } from "@/app/(site)/actions";
-import { PLANE_DURATION_S, PaperPlane, playPting } from "./PaperPlane";
+import { PaperPlane, playSwoosh } from "./PaperPlane";
 
 export function ContactForm() {
   const { t } = useI18n();
@@ -19,11 +19,11 @@ export function ContactForm() {
   useEffect(() => {
     if (!state.ok) return;
     formRef.current?.reset();
-    // Celebrate: the paper plane loops and flies away, then a happy "pting".
+    // Celebrate: the paper plane loops and flies away.
     const r = buttonRef.current?.getBoundingClientRect();
     if (r) setFlight({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (audioRef.current) playPting(audioRef.current, reduced ? 1.2 : PLANE_DURATION_S - 0.35);
+    // Swoosh as the plane takes off, like a messenger's "sent" sound.
+    if (audioRef.current) playSwoosh(audioRef.current, 0.05);
   }, [state]);
 
   const err = (name: string) => state.errors?.[name]?.[0];

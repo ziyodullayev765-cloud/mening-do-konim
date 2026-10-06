@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { getT } from "@/lib/i18n/server";
+import { z } from "zod";
+import { getL, getT } from "@/lib/i18n/server";
 import { requireAdmin } from "@/lib/auth";
 import { deleteUnusedMedia } from "@/lib/media";
 import { failure, success, type ActionState } from "@/lib/action";
@@ -142,4 +143,20 @@ export async function deleteMessage(_prev: ActionState, formData: FormData): Pro
   await db.contactMessage.delete({ where: { id: parsed.data } });
   revalidatePath("/admin", "layout");
   return success(t.admin.services.deleted);
+}
+
+/** Deletes the ticked messages (repeated `id`), or every read message when `scope=read`. */
+export async function deleteMessages(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const L = await getL();
+  let count: number;
+  if (formData.get("scope") === "read") {
+    ({ count } = await db.contactMessage.deleteMany({ where: { isRead: true } }));
+  } else {
+    const parsed = z.array(id).min(1).max(500).safeParse(formData.getAll("id"));
+    if (!parsed.success) return failure(L("Hech qanday xabar tanlanmagan.", "Не выбрано ни одного сообщения."));
+    ({ count } = await db.contactMessage.deleteMany({ where: { id: { in: parsed.data } } }));
+  }
+  revalidatePath("/admin", "layout");
+  return success(L(`O'chirildi: ${count} ta xabar.`, `Удалено сообщений: ${count}.`));
 }

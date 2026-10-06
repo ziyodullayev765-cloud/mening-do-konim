@@ -30,10 +30,10 @@ export async function deleteUnusedMedia(urls: (string | null | undefined)[]) {
   const [doctor, services, setting] = await Promise.all([
     db.doctor.findUnique({ where: { id: 1 }, select: { photoUrl: true, aboutPhotoUrl: true, contactPhotoUrl: true, logoUrl: true } }),
     db.service.findMany({ where: { imageUrl: { not: null } }, select: { imageUrl: true } }),
-    db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true, loginBackgroundUrl: true } }),
+    db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true, loginBackgroundUrl: true, adminBackgroundUrl: true } }),
   ]);
   const used = new Set(
-    [doctor?.photoUrl, doctor?.aboutPhotoUrl, doctor?.contactPhotoUrl, doctor?.logoUrl, setting?.backgroundUrl, setting?.loginBackgroundUrl, ...services.map((s) => s.imageUrl)]
+    [doctor?.photoUrl, doctor?.aboutPhotoUrl, doctor?.contactPhotoUrl, doctor?.logoUrl, setting?.backgroundUrl, setting?.loginBackgroundUrl, setting?.adminBackgroundUrl, ...services.map((s) => s.imageUrl)]
       .map(mediaIdFromUrl)
       .filter(Boolean),
   );

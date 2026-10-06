@@ -3,6 +3,7 @@ import { after } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { ensureWebhook } from "@/lib/telegram";
 import { db } from "@/lib/db";
+import { getSettings } from "@/lib/slots";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { I18nProvider } from "@/components/site/I18nProvider";
 import { Sidebar } from "@/components/admin/Sidebar";
@@ -21,15 +22,24 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const admin = await requireAdmin();
   // Keep the Telegram bot pointed at this site (no-op once set; outside the request path).
   after(() => ensureWebhook());
-  const [newAppointments, unreadMessages] = await Promise.all([
+  const [newAppointments, unreadMessages, settings] = await Promise.all([
     db.appointment.count({ where: { status: "NEW" } }),
     db.contactMessage.count({ where: { isRead: false } }),
+    getSettings(),
   ]);
+  const bg = settings.adminBackgroundUrl;
   return (
     <I18nProvider locale={locale}>
     <div className="admin-glass relative isolate min-h-dvh bg-paper">
       {/* Soft drifting colour behind the frosted "liquid glass" panels */}
       <div aria-hidden className="admin-aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        {bg && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bg} alt="" className="absolute inset-0 size-full object-cover" />
+            <div className="admin-bg-veil absolute inset-0" />
+          </>
+        )}
         <span className="left-[18%] top-[-8%] size-[34rem] bg-[#1e9db2]" />
         <span className="right-[-6%] top-[30%] size-[30rem] bg-[#7c6cf0] [animation-delay:-6s]" />
         <span className="bottom-[-12%] left-[40%] size-[28rem] bg-[#2bd4c4] [animation-delay:-12s]" />

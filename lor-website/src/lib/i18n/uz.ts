@@ -280,6 +280,13 @@ export const uz = {
       invalid: "Login yoki parol noto'g'ri.",
       showPassword: "Parolni ko'rsatish",
       hidePassword: "Parolni yashirish",
+      tagline: "Qabullar, xizmatlar va jadvalni bir joyda boshqaring.",
+    },
+    welcome: {
+      hello: "Assalomu alaykum",
+      /** Name in the greeting; empty = taken from the doctor profile */
+      name: "",
+      cta: "Ishni boshlash",
     },
     dashboard: {
       today: "Bugungi qabullar",

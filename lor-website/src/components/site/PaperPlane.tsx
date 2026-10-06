@@ -5,31 +5,46 @@ import { createPortal } from "react-dom";
 
 const DURATION = 5600;
 
-/** Bright two-note chime ("pting") made with Web Audio, scheduled `delay` seconds from now. */
-export function playPting(ctx: AudioContext, delay: number) {
-  const start = ctx.currentTime + delay;
-  const master = ctx.createGain();
-  master.gain.value = 0.22;
-  master.connect(ctx.destination);
-  // Two bell-like notes (E6 → B6) with a soft overtone each.
-  [
-    { f: 1318.5, at: 0 },
-    { f: 1975.5, at: 0.11 },
-  ].forEach(({ f, at }) => {
-    for (const [mult, vol] of [[1, 1], [2.01, 0.18]] as const) {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = f * mult;
-      const t0 = start + at;
-      g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.1);
-      osc.connect(g).connect(master);
-      osc.start(t0);
-      osc.stop(t0 + 1.2);
-    }
-  });
+/**
+ * "Message sent" swoosh in the style of a phone messenger: a quick rising
+ * whoosh of filtered air plus a soft upward tone. Synthesised with Web Audio
+ * (no sound file), scheduled `delay` seconds from now.
+ */
+export function playSwoosh(ctx: AudioContext, delay = 0) {
+  const t0 = ctx.currentTime + delay;
+  const dur = 0.42;
+
+  // Air: white noise through a band-pass filter sweeping upwards.
+  const noise = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+  const data = noise.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = noise;
+  const band = ctx.createBiquadFilter();
+  band.type = "bandpass";
+  band.Q.value = 1.4;
+  band.frequency.setValueAtTime(500, t0);
+  band.frequency.exponentialRampToValueAtTime(4200, t0 + dur * 0.8);
+  const airGain = ctx.createGain();
+  airGain.gain.setValueAtTime(0.0001, t0);
+  airGain.gain.exponentialRampToValueAtTime(0.55, t0 + 0.06);
+  airGain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(band).connect(airGain).connect(ctx.destination);
+  src.start(t0);
+  src.stop(t0 + dur);
+
+  // Body: a short sine glide that gives the whoosh its "fwip".
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(320, t0);
+  osc.frequency.exponentialRampToValueAtTime(1350, t0 + 0.22);
+  const toneGain = ctx.createGain();
+  toneGain.gain.setValueAtTime(0.0001, t0);
+  toneGain.gain.exponentialRampToValueAtTime(0.12, t0 + 0.03);
+  toneGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.26);
+  osc.connect(toneGain).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + 0.3);
 }
 
 /** Keyframes: lift off, one full loop, then fly up and away while shrinking. */
@@ -108,5 +123,3 @@ export function PaperPlane({ origin, onDone }: { origin: { x: number; y: number 
     document.body,
   );
 }
-
-export const PLANE_DURATION_S = DURATION / 1000;

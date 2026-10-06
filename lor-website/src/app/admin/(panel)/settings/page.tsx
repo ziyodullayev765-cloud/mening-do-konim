@@ -55,6 +55,13 @@ export default async function SettingsPage() {
                 defaultValue={s.loginBackgroundUrl}
                 aspect="aspect-[16/9]"
               />
+              <ImageUpload
+                name="adminBackgroundUrl"
+                label={L("Admin panel foni", "Фон админ-панели")}
+                hint={L("Admin panel ichida shaffof oynalar ortida ko'rinadi.", "Виден внутри админки за стеклянными панелями.")}
+                defaultValue={s.adminBackgroundUrl}
+                aspect="aspect-[16/9]"
+              />
             </div>
           </Panel>
           <Panel title={st.seo}>

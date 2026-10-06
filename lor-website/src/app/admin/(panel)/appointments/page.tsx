@@ -11,6 +11,7 @@ import { clinicNow, getSettings } from "@/lib/slots";
 import { DATE_RE } from "@/lib/slots-shared";
 import { statusSchema } from "@/lib/validation";
 import { EmptyState, PageHeader, StatusBadge } from "@/components/admin/ui";
+import { deleteAppointments } from "@/app/admin/actions/appointments";
 import { BULK_FORM, BulkDeleteBar, SelectAll } from "@/components/admin/BulkDelete";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -137,7 +138,7 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
           </div>
         </div>
       )}
-      {items.length > 0 && <BulkDeleteBar />}
+      {items.length > 0 && <BulkDeleteBar action={deleteAppointments} />}
 
       {pages > 1 && (
         <nav className="mt-6 flex items-center justify-center gap-2" aria-label={t.admin.nav.appointments}>

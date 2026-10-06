@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getAdmin } from "@/lib/auth";
 import { getSettings } from "@/lib/slots";
-import { getL, getLocale, getT } from "@/lib/i18n/server";
+import { getLocale, getT, getTextOverrides } from "@/lib/i18n/server";
 import { I18nProvider } from "@/components/site/I18nProvider";
 import { AdminPrefs } from "@/components/admin/AdminPrefs";
 import { LoginForm } from "./LoginForm";
@@ -13,11 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LoginPage() {
-  const [t, L, locale] = await Promise.all([getT(), getL(), getLocale()]);
+  const [t, locale, texts] = await Promise.all([getT(), getLocale(), getTextOverrides()]);
   if (await getAdmin()) redirect("/admin");
   const bg = (await getSettings()).loginBackgroundUrl;
   return (
-    <I18nProvider locale={locale}>
+    <I18nProvider locale={locale} texts={texts}>
     <main className="relative grid min-h-dvh lg:grid-cols-2">
       {bg && (
         // On phones the uploaded picture becomes the page background behind a frosted form card.
@@ -37,7 +37,7 @@ export default async function LoginPage() {
         )}
         <div className="relative flex h-full flex-col justify-end p-14">
           <p className="eyebrow !text-[#8fdcd6]">{t.admin.brand}</p>
-          <p className="mt-4 max-w-md font-serif text-4xl leading-tight text-paper">{L("Qabullar, xizmatlar va jadvalni bir joyda boshqaring.", "Записи, услуги и график — в одном месте.")}</p>
+          <p className="mt-4 max-w-md font-serif text-4xl leading-tight text-paper">{t.admin.login.tagline}</p>
         </div>
       </div>
       <div className="flex items-center justify-center px-5 py-16">

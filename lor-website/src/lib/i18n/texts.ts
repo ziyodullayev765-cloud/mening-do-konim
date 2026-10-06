@@ -140,6 +140,18 @@ export const TEXT_GROUPS: TextGroup[] = [
       ]),
     ],
   },
+  {
+    id: "admin", uz: "Admin panelga kirish", ru: "Вход в админ-панель",
+    fields: [
+      f("admin.login.title", "Kirish sahifasi sarlavhasi", "Заголовок страницы входа"),
+      f("admin.login.lead", "Sarlavha ostidagi matn", "Текст под заголовком"),
+      f("admin.login.tagline", "Rasm ustidagi katta yozuv", "Крупная надпись на картинке", true),
+      f("admin.login.submit", "«Kirish» tugmasi", "Кнопка «Войти»"),
+      f("admin.welcome.hello", "Kirgandan keyingi salom («Assalomu alaykum»)", "Приветствие после входа («Ассаламу алейкум»)"),
+      f("admin.welcome.name", "Salomdagi ism (bo'sh — profildagi ism)", "Имя в приветствии (пусто — из профиля)"),
+      f("admin.welcome.cta", "Salomlashuvdagi tugma", "Кнопка в приветствии"),
+    ],
+  },
 ];
 
 export const EDITABLE_PATHS = new Set(TEXT_GROUPS.flatMap((g) => g.fields.map((x) => x.path)));

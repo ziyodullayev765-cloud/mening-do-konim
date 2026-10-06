@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useI18n } from "@/components/site/I18nProvider";
-import { deleteAppointments } from "@/app/admin/actions/appointments";
+import type { ActionState } from "@/lib/action";
 import { ActionForm } from "./ActionForm";
 import { ConfirmButton } from "./ConfirmButton";
 
@@ -37,7 +37,13 @@ export function SelectAll({ label }: { label: string }) {
 }
 
 /** Bar that appears when rows are ticked; deletes them after confirmation. */
-export function BulkDeleteBar() {
+export function BulkDeleteBar({
+  action,
+  what = "appointments",
+}: {
+  action: (prev: ActionState, formData: FormData) => Promise<ActionState>;
+  what?: "appointments" | "messages";
+}) {
   const { L } = useI18n();
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -56,12 +62,16 @@ export function BulkDeleteBar() {
       <div className="flex items-center gap-4 rounded-full border border-line bg-surface px-5 py-2.5 shadow-lift">
         <span className="text-sm font-semibold text-ink tabular-nums">{L(`${count} ta tanlandi`, `Выбрано: ${count}`)}</span>
         {/* The row checkboxes join this form through their form="bulk-delete" attribute. */}
-        <ActionForm id={BULK_FORM} action={deleteAppointments} onSuccess={() => setCount(0)}>
+        <ActionForm id={BULK_FORM} action={action} onSuccess={() => setCount(0)}>
           <ConfirmButton
-            message={L(
-              `Tanlangan ${count} ta qabul butunlay o'chiriladi. Buni qaytarib bo'lmaydi.`,
-              `Выбранные записи (${count}) будут удалены навсегда. Это нельзя отменить.`,
-            )}
+            message={
+              what === "messages"
+                ? L(`Tanlangan ${count} ta xabar butunlay o'chiriladi.`, `Выбранные сообщения (${count}) будут удалены навсегда.`)
+                : L(
+                    `Tanlangan ${count} ta qabul butunlay o'chiriladi. Buni qaytarib bo'lmaydi.`,
+                    `Выбранные записи (${count}) будут удалены навсегда. Это нельзя отменить.`,
+                  )
+            }
             confirmLabel={L("O'chirish", "Удалить")}
             className="btn btn-danger btn-sm"
           >

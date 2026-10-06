@@ -93,11 +93,13 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
     ...parsed.data,
     backgroundUrl: parsed.data.backgroundUrl || null,
     loginBackgroundUrl: parsed.data.loginBackgroundUrl || null,
+    adminBackgroundUrl: parsed.data.adminBackgroundUrl || null,
   };
-  const before = await db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true, loginBackgroundUrl: true } });
+  const before = await db.setting.findUnique({ where: { id: 1 }, select: { backgroundUrl: true, loginBackgroundUrl: true, adminBackgroundUrl: true } });
   await db.setting.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
-  const replaced = [before?.backgroundUrl, before?.loginBackgroundUrl].filter(
-    (u): u is string => Boolean(u) && u !== data.backgroundUrl && u !== data.loginBackgroundUrl,
+  const kept = [data.backgroundUrl, data.loginBackgroundUrl, data.adminBackgroundUrl];
+  const replaced = [before?.backgroundUrl, before?.loginBackgroundUrl, before?.adminBackgroundUrl].filter(
+    (u): u is string => Boolean(u) && !kept.includes(u!),
   );
   if (replaced.length) await deleteUnusedMedia(replaced);
   revalidatePath("/", "layout");

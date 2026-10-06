@@ -360,3 +360,6 @@
 [data-theme="dark"] .admin-glass .input { background-color: rgb(14 23 41 / .7); }
 [data-theme="dark"] .admin-glass .btn-secondary { background-color: rgb(255 255 255 / .04); }
 @media (prefers-reduced-motion: reduce) { .admin-aurora > span { animation: none; } }
+/* Admin-uploaded panel background: softened so the glass stays readable */
+.admin-bg-veil { background: rgb(248 250 252 / .55); }
+[data-theme="dark"] .admin-bg-veil { background: rgb(8 14 27 / .68); }

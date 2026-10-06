@@ -59,7 +59,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     const doctor = await getDoctor();
     const words = isPlaceholder(doctor.fullName) ? [] : doctor.fullName.trim().split(/\s+/);
     // "Familiya Ism Otasining ismi" -> greet by name + patronymic.
-    const name = words.length >= 3 ? `${words[1]} ${words[2]}` : words.join(" ");
+    const name = t.admin.welcome.name.trim() || (words.length >= 3 ? `${words[1]} ${words[2]}` : words.join(" "));
     const hour = Math.floor(clinicNow(settings.timezone).minutes / 60);
     const greeting = ru
       ? hour < 12 ? "Доброе утро" : hour < 18 ? "Добрый день" : "Добрый вечер"
@@ -71,12 +71,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     if (unread) lines.push({ icon: "inbox", text: ru ? `Непрочитанных сообщений: ${unread}` : `${unread} ta o'qilmagan xabar` });
     splash = (
       <WelcomeSplash
-        hello={ru ? "Ассаламу алейкум" : "Assalomu alaykum"}
+        hello={t.admin.welcome.hello}
         name={name}
         greeting={greeting}
         today={formatDate(today, true, t)}
         lines={lines}
-        cta={ru ? "Начать работу" : "Ishni boshlash"}
+        cta={t.admin.welcome.cta}
       />
     );
   }

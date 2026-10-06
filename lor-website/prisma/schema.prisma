@@ -253,6 +253,8 @@ model Setting {
   backgroundUrl      String?
   /// Optional background image for the admin login page
   loginBackgroundUrl String?
+  /// Optional background image inside the admin panel (behind the glass panels)
+  adminBackgroundUrl String?
   /// Admin-edited site texts: { "uz": { "site.heroTitle": "..." }, "ru": { ... } }
   texts              Json    @default("{}")
   /// Code people send to the Telegram bot to start receiving booking notifications

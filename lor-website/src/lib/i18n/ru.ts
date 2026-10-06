@@ -252,6 +252,13 @@ export const ru: Dictionary = {
       invalid: "Неверный логин или пароль.",
       showPassword: "Показать пароль",
       hidePassword: "Скрыть пароль",
+      tagline: "Записи, услуги и график — в одном месте.",
+    },
+    welcome: {
+      hello: "Ассаламу алейкум",
+      /** Name in the greeting; empty = taken from the doctor profile */
+      name: "",
+      cta: "Начать работу",
     },
     dashboard: {
       today: "Записи на сегодня",
