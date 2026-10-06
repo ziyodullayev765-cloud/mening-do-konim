@@ -2,8 +2,9 @@
 
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { getT } from "@/lib/i18n/server";
+import { getL, getT } from "@/lib/i18n/server";
 import { requireAdmin } from "@/lib/auth";
 import { failure, success, type ActionState } from "@/lib/action";
 import { isSlotFreeForAdmin } from "@/lib/slots";
@@ -71,4 +72,26 @@ export async function saveAppointmentNote(_prev: ActionState, formData: FormData
   await db.appointment.update({ where: { id: parsed.data.id }, data: { adminNote: parsed.data.adminNote } });
   refresh(parsed.data.id);
   return success(t.admin.appointments.noteSaved);
+}
+
+/**
+ * Permanently deletes one or more appointments (ids from the `id` field, repeated
+ * for a bulk delete). A patient left with no appointments is removed too.
+ */
+export async function deleteAppointments(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const L = await getL();
+  const parsed = z.array(id).min(1).max(500).safeParse(formData.getAll("id"));
+  if (!parsed.success) return failure(L("Hech qanday qabul tanlanmagan.", "Не выбрано ни одной записи."));
+  const ids = [...new Set(parsed.data)];
+  const deleted = await db.$transaction(async (tx) => {
+    const rows = await tx.appointment.findMany({ where: { id: { in: ids } }, select: { patientId: true } });
+    const { count } = await tx.appointment.deleteMany({ where: { id: { in: ids } } });
+    const patientIds = [...new Set(rows.map((r) => r.patientId))];
+    if (patientIds.length) await tx.patient.deleteMany({ where: { id: { in: patientIds }, appointments: { none: {} } } });
+    return count;
+  });
+  revalidatePath("/admin", "layout");
+  if (formData.get("back") === "1") redirect("/admin/appointments");
+  return success(L(`O'chirildi: ${deleted} ta qabul.`, `Удалено записей: ${deleted}.`));
 }

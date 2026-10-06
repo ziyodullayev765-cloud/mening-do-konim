@@ -82,7 +82,7 @@ export function Sidebar({ adminName, counts }: { adminName: string; counts: Coun
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-ink px-4 lg:hidden">
+      <header className="admin-glass-bar sticky top-0 z-40 flex h-14 items-center justify-between border-b border-white/10 px-4 lg:hidden">
         <span className="text-sm font-semibold text-white">{t.admin.brand}</span>
         <AdminPrefs className="ml-auto mr-1" />
         <button type="button" onClick={() => setOpen((v) => !v)} className="p-2 text-white" aria-label={open ? t.nav.closeMenu : t.nav.openMenu} aria-expanded={open}>
@@ -91,7 +91,7 @@ export function Sidebar({ adminName, counts }: { adminName: string; counts: Coun
       </header>
       {open && <div className="fixed inset-0 z-40 bg-ink/40 lg:hidden" onClick={() => setOpen(false)} aria-hidden />}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-ink transition-transform duration-300 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`admin-glass-bar fixed inset-y-0 left-0 z-50 w-64 border-r border-white/10 transition-transform duration-300 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
         {nav}
       </aside>

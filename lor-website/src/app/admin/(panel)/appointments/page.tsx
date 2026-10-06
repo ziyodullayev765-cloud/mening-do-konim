@@ -11,6 +11,7 @@ import { clinicNow, getSettings } from "@/lib/slots";
 import { DATE_RE } from "@/lib/slots-shared";
 import { statusSchema } from "@/lib/validation";
 import { EmptyState, PageHeader, StatusBadge } from "@/components/admin/ui";
+import { BULK_FORM, BulkDeleteBar, SelectAll } from "@/components/admin/BulkDelete";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -102,6 +103,7 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="border-b border-line bg-paper-2/50 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
                 <tr>
+                  <th className="w-10 py-3 pr-0 pl-5"><SelectAll label={t.meta.locale === "ru" ? "Выбрать все" : "Hammasini tanlash"} /></th>
                   <th className="px-5 py-3">{t.admin.appointments.date}</th>
                   <th className="px-5 py-3">{t.admin.appointments.patient}</th>
                   <th className="px-5 py-3">{t.admin.appointments.service}</th>
@@ -111,7 +113,10 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
               </thead>
               <tbody className="divide-y divide-line">
                 {items.map((a) => (
-                  <tr key={a.id} className={`hover:bg-paper-2/40 ${a.date === today ? "bg-accent-soft/25" : ""}`}>
+                  <tr key={a.id} className={`hover:bg-paper-2/40 has-[:checked]:bg-danger-soft/40 ${a.date === today ? "bg-accent-soft/25" : ""}`}>
+                    <td className="py-3.5 pr-0 pl-5">
+                      <input type="checkbox" name="id" value={a.id} form={BULK_FORM} aria-label={a.patient.fullName} className="size-4 accent-[var(--color-accent)]" />
+                    </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       <span className="font-semibold tabular-nums text-ink">{a.time}</span>
                       <span className="ml-2 text-muted">{formatDate(a.date, false, t)}</span>
@@ -132,6 +137,7 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
           </div>
         </div>
       )}
+      {items.length > 0 && <BulkDeleteBar />}
 
       {pages > 1 && (
         <nav className="mt-6 flex items-center justify-center gap-2" aria-label={t.admin.nav.appointments}>

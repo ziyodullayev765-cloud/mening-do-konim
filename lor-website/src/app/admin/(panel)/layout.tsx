@@ -27,7 +27,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
   return (
     <I18nProvider locale={locale}>
-    <div className="min-h-dvh bg-paper">
+    <div className="admin-glass relative isolate min-h-dvh bg-paper">
+      {/* Soft drifting colour behind the frosted "liquid glass" panels */}
+      <div aria-hidden className="admin-aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <span className="left-[18%] top-[-8%] size-[34rem] bg-[#1e9db2]" />
+        <span className="right-[-6%] top-[30%] size-[30rem] bg-[#7c6cf0] [animation-delay:-6s]" />
+        <span className="bottom-[-12%] left-[40%] size-[28rem] bg-[#2bd4c4] [animation-delay:-12s]" />
+      </div>
       <Sidebar adminName={admin.name} counts={{ newAppointments, unreadMessages }} />
       <div className="lg:pl-64">
         <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-12">{children}</main>

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarCheck, CheckCheck, Mail, Phone, X } from "lucide-react";
+import { ArrowLeft, CalendarCheck, CheckCheck, Mail, Phone, Trash2, X } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getT } from "@/lib/i18n/server";
+import { getL, getT } from "@/lib/i18n/server";
 import { autoRu } from "@/lib/i18n/content-ru";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { getSettings } from "@/lib/slots";
@@ -12,7 +12,7 @@ import { PageHeader, Panel, StatusBadge } from "@/components/admin/ui";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
 import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { TextArea, TextField } from "@/components/admin/fields";
-import { rescheduleAppointment, saveAppointmentNote, setAppointmentStatus } from "@/app/admin/actions/appointments";
+import { deleteAppointments, rescheduleAppointment, saveAppointmentNote, setAppointmentStatus } from "@/app/admin/actions/appointments";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AppointmentPage({ params }: { params: Promise<{ id: string }> }) {
-  const t = await getT();
+  const [t, L] = await Promise.all([getT(), getL()]);
   const svc = (name: string) => (t.meta.locale === "ru" ? autoRu(name) : name);
   await requireAdmin();
   const { id } = await params;
@@ -106,6 +106,23 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
               <input type="hidden" name="id" value={a.id} />
               <TextArea name="adminNote" label={t.admin.appointments.adminNote} defaultValue={a.adminNote} rows={3} className="[&>label]:sr-only" />
               <SubmitButton className="btn btn-secondary btn-sm">{t.admin.appointments.saveNote}</SubmitButton>
+            </ActionForm>
+          </Panel>
+
+          <Panel title={L("Qabulni o'chirish", "Удалить запись")}>
+            <p className="-mt-1 mb-4 text-sm text-muted">
+              {L("Qabul butunlay o'chiriladi. Bemorning boshqa qabuli bo'lmasa, u ham ro'yxatdan olib tashlanadi.", "Запись удаляется навсегда. Если у пациента нет других записей, он тоже удаляется из списка.")}
+            </p>
+            <ActionForm action={deleteAppointments}>
+              <input type="hidden" name="id" value={a.id} />
+              <input type="hidden" name="back" value="1" />
+              <ConfirmButton
+                message={L("Bu qabul butunlay o'chiriladi. Buni qaytarib bo'lmaydi. Davom etasizmi?", "Эта запись будет удалена навсегда. Это нельзя отменить. Продолжить?")}
+                confirmLabel={L("O'chirish", "Удалить")}
+                className="btn btn-secondary btn-sm !text-danger"
+              >
+                <Trash2 className="size-4" aria-hidden /> {L("O'chirish", "Удалить")}
+              </ConfirmButton>
             </ActionForm>
           </Panel>
         </div>

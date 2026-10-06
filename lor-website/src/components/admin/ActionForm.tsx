@@ -22,10 +22,12 @@ export function ActionForm({
   action,
   children,
   className,
+  id,
   resetOnSuccess = false,
   onSuccess,
 }: {
   action: Action;
+  id?: string;
   children: React.ReactNode;
   className?: string;
   resetOnSuccess?: boolean;
@@ -49,6 +51,7 @@ export function ActionForm({
     <ErrorsContext.Provider value={state.ok ? undefined : state.errors}>
       <form
         ref={ref}
+        id={id}
         className={className}
         noValidate
         // Submitting manually (instead of <form action>) keeps the user's input
