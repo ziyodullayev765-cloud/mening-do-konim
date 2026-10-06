@@ -1,21 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { flushSync } from "react-dom";
 import { Moon, Sun } from "lucide-react";
 
 export type Theme = "light" | "dark";
 export const THEME_COOKIE = "theme";
-
-type ViewTransitionDoc = Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
 
 /**
  * Sun / moon switch shared by the public site and the admin panel. The choice
  * is applied via <html data-theme> and kept in a cookie so the server renders
  * the same theme on the next visit (no flash).
  *
- * Switching is animated: the new theme spreads from the button as a growing
- * circle (View Transitions API); browsers without it get a soft colour fade.
+ * Switching is animated: the new theme's colour spreads from the button as a
+ * growing circle, then the page appears in the new theme.
  */
 export function ThemeToggle({ labels, className = "" }: { labels: { light: string; dark: string }; className?: string }) {
   const [theme, setTheme] = useState<Theme>("light");
@@ -35,35 +32,37 @@ export function ThemeToggle({ labels, className = "" }: { labels: { light: strin
     const next: Theme = theme === "dark" ? "light" : "dark";
     const html = document.documentElement;
     const apply = () => {
-      setTheme(next);
-      setSpin((n) => n + 1);
       html.dataset.theme = next;
       document.cookie = `${THEME_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
     };
+    setSpin((n) => n + 1);
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const doc = document as ViewTransitionDoc;
-    if (reduced) return apply();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return apply();
 
-    if (!doc.startViewTransition) {
-      // Fallback: fade colours for a moment.
-      html.classList.add("theme-fade");
-      apply();
-      window.setTimeout(() => html.classList.remove("theme-fade"), 650);
-      return;
-    }
-
+    // One smooth motion, starting on the very click: a circle in the new
+    // theme's colour grows from the button; once it covers the screen the
+    // theme switches underneath and the circle melts away. Only one element
+    // animates (clip-path/opacity), so there is no pause before it starts.
     const r = e.currentTarget.getBoundingClientRect();
     const x = r.left + r.width / 2;
     const y = r.top + r.height / 2;
     const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-    const vt = doc.startViewTransition(() => flushSync(apply));
-    vt.ready.then(() => {
-      html.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-        { duration: 750, easing: "cubic-bezier(.4,0,.2,1)", pseudoElement: "::view-transition-new(root)" },
-      );
-    });
+    const veil = document.createElement("div");
+    veil.className = "theme-veil";
+    veil.style.background = next === "dark" ? "#0b1220" : "#f8fafc";
+    document.body.appendChild(veil);
+    const grow = veil.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+      { duration: 520, easing: "cubic-bezier(.55,0,.35,1)", fill: "forwards" },
+    );
+    grow.onfinish = () => {
+      apply();
+      // Give the browser one frame to paint the new theme, then fade the veil out.
+      requestAnimationFrame(() => {
+        const fade = veil.animate({ opacity: [1, 0] }, { duration: 260, easing: "ease-out", fill: "forwards" });
+        fade.onfinish = () => veil.remove();
+      });
+    };
   }
 
   const label = theme === "dark" ? labels.light : labels.dark;
