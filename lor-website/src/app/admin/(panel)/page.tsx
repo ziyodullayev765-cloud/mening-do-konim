@@ -7,9 +7,13 @@ import { autoRu } from "@/lib/i18n/content-ru";
 import { formatDate } from "@/lib/format";
 import { clinicNow, getSettings } from "@/lib/slots";
 import { EmptyState, PageHeader, Panel, StatusBadge } from "@/components/admin/ui";
+import { WelcomeSplash } from "@/components/admin/WelcomeSplash";
+import { getDoctor } from "@/lib/data";
+import { isPlaceholder } from "@/lib/format";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ welcome?: string }> }) {
   const t = await getT();
+  const welcome = (await searchParams).welcome === "1";
   const svc = (name: string) => (t.meta.locale === "ru" ? autoRu(name) : name);
   await requireAdmin();
   const settings = await getSettings();
@@ -48,8 +52,38 @@ export default async function DashboardPage() {
     { label: t.admin.dashboard.unreadMessages, value: unread, href: "/admin/messages", highlight: unread > 0 },
   ];
 
+  // One-time greeting right after signing in.
+  let splash: React.ReactNode = null;
+  if (welcome) {
+    const ru = t.meta.locale === "ru";
+    const doctor = await getDoctor();
+    const words = isPlaceholder(doctor.fullName) ? [] : doctor.fullName.trim().split(/\s+/);
+    // "Familiya Ism Otasining ismi" -> greet by name + patronymic.
+    const name = words.length >= 3 ? `${words[1]} ${words[2]}` : words.join(" ");
+    const hour = Math.floor(clinicNow(settings.timezone).minutes / 60);
+    const greeting = ru
+      ? hour < 12 ? "Доброе утро" : hour < 18 ? "Добрый день" : "Добрый вечер"
+      : hour < 12 ? "Xayrli tong" : hour < 18 ? "Xayrli kun" : "Xayrli kech";
+    const lines: { icon: "calendar" | "inbox"; text: string }[] = [
+      { icon: "calendar", text: todayCount ? (ru ? `Сегодня записей: ${todayCount}` : `Bugun ${todayCount} ta qabul bor`) : ru ? "На сегодня записей нет" : "Bugun qabul yo'q" },
+    ];
+    if (newCount) lines.push({ icon: "inbox", text: ru ? `Новых заявок: ${newCount}` : `${newCount} ta yangi so'rov kutmoqda` });
+    if (unread) lines.push({ icon: "inbox", text: ru ? `Непрочитанных сообщений: ${unread}` : `${unread} ta o'qilmagan xabar` });
+    splash = (
+      <WelcomeSplash
+        hello={ru ? "Ассаламу алейкум" : "Assalomu alaykum"}
+        name={name}
+        greeting={greeting}
+        today={formatDate(today, true, t)}
+        lines={lines}
+        cta={ru ? "Начать работу" : "Ishni boshlash"}
+      />
+    );
+  }
+
   return (
     <>
+      {splash}
       <PageHeader title={t.admin.nav.dashboard} description={formatDate(today, true, t)} back={false} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

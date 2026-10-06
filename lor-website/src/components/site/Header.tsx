@@ -24,16 +24,8 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
   ];
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
   const ok = (v: string) => Boolean(v) && !isPlaceholder(v);
   const nav = NAV.filter((n) => hasReviews || n.href !== "/#reviews");
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -48,7 +40,8 @@ export function Header({ name, phone, email, address, todayHours, hasReviews, lo
   return (
     <>
       {/* Utility bar + header stay pinned together as one liquid-glass panel */}
-      <div className={`glass-header sticky top-0 z-40 transition-shadow duration-300 ${scrolled || open ? "shadow-[0_10px_30px_-18px_rgb(26_43_76/0.35)]" : ""}`}>
+      <div className="glass-header sticky top-0 z-40">
+      <div aria-hidden className="glass-sheen" />
       {/* Top utility bar */}
       <div className="hidden border-b border-white/60 text-[13px] text-muted md:block">
         <div className="container-x flex h-10 items-center justify-between gap-6">

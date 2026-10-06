@@ -30,7 +30,7 @@ export async function login(_prev: ActionState, formData: FormData): Promise<Act
 
   resetRateLimit(key);
   await createSession(admin.id, remember);
-  redirect("/admin");
+  redirect("/admin?welcome=1");
 }
 
 export async function logout() {
